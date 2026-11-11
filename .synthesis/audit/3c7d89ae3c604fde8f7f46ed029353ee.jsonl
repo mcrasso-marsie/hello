@@ -1,0 +1,1 @@
+{"at": "2026-11-11T21:32:58+00:00", "work_item_id": "3c7d89ae3c604fde8f7f46ed029353ee", "stage": "DISCOVER", "artifact_id": "DG-0001", "passed": false, "policy": null, "approver": null, "rejection_reason": "human-signoff", "constitution_version": "6745e3e3690f", "quiz_questions": null, "quiz_answers": null, "quiz_justification": null, "failed_checks": {"human-signoff": ""}}
