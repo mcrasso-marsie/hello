@@ -36,9 +36,229 @@
   "pbi_id": null,
   "child_ids": [],
   "artifact_paths": {
-    "DISCOVER": "docs/discovery/DG-0001.md"
+    "DISCOVER": "docs/discovery/DG-0001.md",
+    "DEFINE": "docs/strategy/STRAT-0001.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "DEFINE": {
+      "core_strategy": "Add one small, single-purpose command to the existing hello package. It takes the path of one text file and reports how many words it contains. It is built only on what the language runtime already provides, guarded by a quality bar that is defined once and enforced on every change, and documented well enough that a new user can install and run it without help. Breadth, configurability and outside dependencies are deliberately traded away for a capability that is correct, predictable and cheap to maintain.",
+      "names_mechanism": false,
+      "rejected_alternatives": [
+        {
+          "direction": "Build the command on a third-party command-line framework.",
+          "tradeoff": "Every external dependency needs a documented rationale under AGENTS.md. A one-argument command gains almost nothing from a framework, and it would add install weight, lockfile churn and supply-chain surface."
+        },
+        {
+          "direction": "Delegate counting to the operating system's existing word-count utility and wrap it.",
+          "tradeoff": "Behavior would depend on the platform. The utility is missing or differs on some systems, so results would vary across machines and would not be testable in isolation."
+        },
+        {
+          "direction": "Ship a general text-statistics tool (lines, characters, multiple files, stdin, output formats) from the start.",
+          "tradeoff": "It multiplies the surface to test, document and maintain for options nobody asked for. It delays the one requested capability and conflicts with the minimalist scope."
+        },
+        {
+          "direction": "Expose word counting only as an importable library function, with no command.",
+          "tradeoff": "It does not meet the stated need. The user wants to run a command with a file path and see a number, not write code."
+        }
+      ],
+      "dependencies": [
+        {
+          "description": "A current stable Python runtime, available to the project's existing environment and lockfile tooling.",
+          "owner": "Project owner",
+          "status": "Available"
+        },
+        {
+          "description": "The existing src-layout hello package and pyproject.toml, which the new command is added to.",
+          "owner": "Project owner",
+          "status": "Available"
+        },
+        {
+          "description": "Quality Gate commands (format, lint, type-check, test) recorded in the AGENTS.md Toolchain table.",
+          "owner": "Project owner",
+          "status": "Not yet defined; the table is empty"
+        }
+      ],
+      "assumptions": [
+        {
+          "description": "A 'word' means a run of non-whitespace characters separated by whitespace, matching the common word-count convention.",
+          "validator": "Project owner",
+          "how_checked": "The owner reviews the expected counts for a small sample set before SPEC is finalized. The set covers punctuation, multiple spaces, tabs, newlines and an empty file.",
+          "if_false": "Revise the word definition in SPEC before implementation. The strategy direction is unchanged."
+        },
+        {
+          "description": "Input files are UTF-8 (or ASCII) text and small enough to process comfortably on a developer machine.",
+          "validator": "Project owner",
+          "how_checked": "The owner confirms the intended inputs. Test fixtures include a UTF-8 file with non-ASCII characters.",
+          "if_false": "Add explicit handling for other encodings or streaming of large files as a scoped follow-up."
+        },
+        {
+          "description": "Requiring the newest stable Python release does not exclude the intended users.",
+          "validator": "Project owner",
+          "how_checked": "The owner confirms the target environments when the version pin is set in SPEC.",
+          "if_false": "Pin to the oldest Python version those environments support and record the rationale."
+        }
+      ],
+      "risks": [
+        {
+          "description": "A missing, unreadable, binary or wrongly encoded file causes an unhandled crash with a stack trace.",
+          "likelihood": "Medium",
+          "impact": "Poor first-user experience and an unclear failure.",
+          "mitigation": "Treat each error case as a first-class scenario. It produces a clear one-line message and a non-zero exit, and each case is covered by tests."
+        },
+        {
+          "description": "'Best practices' expands into heavy tooling and ceremony that outweighs a tiny tool.",
+          "likelihood": "Medium",
+          "impact": "Slower changes and a maintenance burden with no user value.",
+          "mitigation": "Limit the Quality Gate to formatting, linting, type-checking and tests. Each command is recorded in AGENTS.md, and any further tool requires a written rationale."
+        },
+        {
+          "description": "The word definition differs from what the user intuitively expects on edge cases.",
+          "likelihood": "Low",
+          "impact": "Counts are seen as wrong and trust in the tool is lost.",
+          "mitigation": "Validate the definition against sample files with the owner, and state it in the README."
+        }
+      ],
+      "thesis": "Give the hello project its first user-facing capability now: a minimal, dependency-free command that reports a text file's word count, built and documented to a clear, enforced quality bar.",
+      "from_problem_graph": "DG-0001",
+      "goals": [
+        {
+          "description": "A user can get the word count of a text file by running one command with the file path.",
+          "why": "This is the primary requested capability, and the project currently has no user-facing entry point.",
+          "success_metric": "The reported count matches the expected count on 100% of the agreed sample files.",
+          "owner": "Project owner"
+        },
+        {
+          "description": "Bad input fails clearly instead of crashing.",
+          "why": "Error handling was the least certain part of the request, and stack traces block non-expert users.",
+          "success_metric": "Every defined error case (missing file, unreadable file, undecodable content) yields a one-line message and a non-zero exit, with 0 uncaught exceptions in tests.",
+          "owner": "Project owner"
+        },
+        {
+          "description": "Every change is checked against a defined, minimal quality bar on a current Python version.",
+          "why": "The owner asked for best practices and the latest Python, but the toolchain table is empty, so nothing is enforced today.",
+          "success_metric": "The AGENTS.md Toolchain table lists 4 Quality Gate commands (format, lint, type-check, test), all passing on the target Python version.",
+          "owner": "Project owner"
+        },
+        {
+          "description": "A new user can install and run the command from the README alone.",
+          "why": "The README currently gives no install or run path, so adoption needs outside help.",
+          "success_metric": "A fresh-clone walkthrough following only the README reaches a correct word count with 0 extra steps.",
+          "owner": "Project owner"
+        }
+      ],
+      "success_criteria": [
+        {
+          "criterion": "Word-count correctness",
+          "measurement": "Automated tests against the agreed sample fixtures",
+          "target": "100% of fixtures match",
+          "baseline": "No capability exists",
+          "cadence": "Every change, via the Quality Gate"
+        },
+        {
+          "criterion": "Graceful error handling",
+          "measurement": "Automated tests for each defined error case",
+          "target": "All cases produce a clear message and a non-zero exit",
+          "baseline": "No capability exists",
+          "cadence": "Every change"
+        },
+        {
+          "criterion": "Quality Gate defined and green",
+          "measurement": "AGENTS.md Toolchain commands run locally and pass",
+          "target": "4 commands defined, all passing",
+          "baseline": "0 commands defined",
+          "cadence": "Every change"
+        },
+        {
+          "criterion": "Runtime dependency footprint",
+          "measurement": "Runtime dependencies declared in pyproject.toml",
+          "target": "0 third-party runtime dependencies",
+          "baseline": "0",
+          "cadence": "At each review"
+        },
+        {
+          "criterion": "Documented onboarding",
+          "measurement": "Manual fresh-clone run following only the README",
+          "target": "Succeeds with no outside help",
+          "baseline": "README has no install or run instructions",
+          "cadence": "Before each release"
+        }
+      ],
+      "non_goals": [
+        {
+          "description": "Counting lines, characters or bytes, or producing other text statistics.",
+          "tradeoff": "This keeps the tool single-purpose and cheap to test. Users who need more statistics must use other tools for now."
+        },
+        {
+          "description": "Counting multiple files at once or reading from standard input.",
+          "tradeoff": "This avoids designing aggregation and output formats nobody asked for. Pipelines and batch use are not supported in v1."
+        },
+        {
+          "description": "Language-aware word segmentation (for example, scripts without spaces between words).",
+          "tradeoff": "The simple whitespace rule stays predictable. Counts for such languages will not match linguistic expectations."
+        },
+        {
+          "description": "Publishing the package to a public package index.",
+          "tradeoff": "It avoids release and versioning overhead. Users install from the repository as the README describes."
+        }
+      ],
+      "in_scope": [
+        "A word-count command added to the existing hello package that accepts one text file path and prints its word count",
+        "Clear error reporting and non-zero exit for missing, unreadable or undecodable files",
+        "A defined word rule, stated in documentation and backed by tests",
+        "Quality Gate commands recorded in the AGENTS.md Toolchain table and enforced on every change",
+        "Project configured for the current stable Python release",
+        "README install and run instructions for the command"
+      ],
+      "out_of_scope": [
+        "The existing src layout, py.typed marker and lockfile setup, which already exist and are not re-planned",
+        "Other text statistics (lines, characters, bytes)",
+        "Multiple files, directories or standard input",
+        "Encodings other than UTF-8 and streaming for very large files",
+        "Third-party runtime dependencies",
+        "Publishing to a package index"
+      ],
+      "walkthrough": [
+        {
+          "name": "Count words in a file",
+          "today": [
+            "The user has notes.txt and wants to know how many words it contains.",
+            "The hello package has no command to run.",
+            "The user counts by hand or looks for another tool."
+          ],
+          "with_strategy": [
+            "The user runs the hello word-count command with the path notes.txt.",
+            "The command prints the number of words, for example 342.",
+            "The user has the answer in one step."
+          ]
+        },
+        {
+          "name": "Wrong file path",
+          "today": [
+            "No command exists, so there is no behavior to rely on."
+          ],
+          "with_strategy": [
+            "The user mistypes the path as notse.txt.",
+            "The command prints a one-line message saying the file was not found, with no stack trace.",
+            "The command exits with a non-zero status, and the user corrects the path."
+          ]
+        },
+        {
+          "name": "New user onboarding",
+          "today": [
+            "A new user clones the repository.",
+            "The README says nothing about how to install or run anything.",
+            "The user has to ask the owner or read the source."
+          ],
+          "with_strategy": [
+            "A new user clones the repository and opens the README.",
+            "They follow the stated install and run steps.",
+            "They count words in a sample file without outside help."
+          ]
+        }
+      ],
+      "path": "docs/strategy/STRAT-0001.md"
+    }
+  },
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
