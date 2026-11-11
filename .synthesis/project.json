@@ -1,0 +1,16 @@
+{
+  "type": "service",
+  "language": "python",
+  "repos": [
+    "git@github.com:mcrasso-marsie/hello.git"
+  ],
+  "connectors": [
+    "github"
+  ],
+  "regulated": false,
+  "strict": false,
+  "settings": {
+    "token_quota": null
+  },
+  "provenance": "created"
+}
