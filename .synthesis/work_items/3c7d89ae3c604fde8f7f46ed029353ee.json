@@ -1,0 +1,55 @@
+{
+  "id": "3c7d89ae3c604fde8f7f46ed029353ee",
+  "preset": "greenfield-project",
+  "sequence": [
+    {
+      "stage": "DISCOVER",
+      "gate": "PROBLEM_GATE"
+    },
+    {
+      "stage": "DEFINE",
+      "gate": "STRATEGY_GATE"
+    },
+    {
+      "stage": "SPEC",
+      "gate": "SPEC_GATE"
+    },
+    {
+      "stage": "PBI_PLANNING",
+      "gate": "PLAN_GATE"
+    },
+    {
+      "stage": "ASSEMBLE",
+      "gate": "QUALITY_GATE"
+    },
+    {
+      "stage": "REVIEW",
+      "gate": "REVIEW_GATE"
+    },
+    {
+      "stage": "INTEGRATE",
+      "gate": "ACCEPTANCE_GATE"
+    }
+  ],
+  "current_index": 0,
+  "rejection_count": 0,
+  "pbi_id": null,
+  "child_ids": [],
+  "artifact_paths": {},
+  "pending_artifacts": {},
+  "rework_notes": null,
+  "trunk_merge_pending": false,
+  "clarification_questions": {},
+  "clarifications": {},
+  "clarification_rounds": {},
+  "settings": {
+    "token_quota": null
+  },
+  "resume_index": null,
+  "waiting_on_amendment": false,
+  "intent": null,
+  "spec_judge": "",
+  "amendment_owner": "",
+  "intent_reviewed": false,
+  "handed_over_to": null
+}
