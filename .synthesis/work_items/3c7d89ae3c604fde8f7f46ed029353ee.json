@@ -34,7 +34,16 @@
   "current_index": 3,
   "rejection_count": 0,
   "pbi_id": null,
-  "child_ids": [],
+  "child_ids": [
+    "3c7d89ae3c604fde8f7f46ed029353ee-setup-dev-toolchain",
+    "3c7d89ae3c604fde8f7f46ed029353ee-add-word-counter",
+    "3c7d89ae3c604fde8f7f46ed029353ee-record-quality-gate",
+    "3c7d89ae3c604fde8f7f46ed029353ee-add-cli-success-path",
+    "3c7d89ae3c604fde8f7f46ed029353ee-add-cli-error-handling",
+    "3c7d89ae3c604fde8f7f46ed029353ee-declare-console-script",
+    "3c7d89ae3c604fde8f7f46ed029353ee-document-readme",
+    "3c7d89ae3c604fde8f7f46ed029353ee-guard-package-surface"
+  ],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0001.md",
     "DEFINE": "docs/strategy/STRAT-0001.md",
