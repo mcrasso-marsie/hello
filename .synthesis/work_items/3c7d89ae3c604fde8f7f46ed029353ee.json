@@ -259,6 +259,37 @@
       "path": "docs/strategy/STRAT-0001.md"
     }
   },
+  "quiz_questions": {
+    "DEFINE": [
+      {
+        "text": "The strategy rejects wrapping the operating system's existing word-count utility, even though that utility already counts words. Explain what would go wrong with that approach, and which of the strategy's goals or success criteria it would undermine.",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "Why does the strategy build the command without a third-party command-line framework?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "AGENTS.md requires a documented rationale for every external dependency, and a single-argument command gains too little from a framework to justify the added install weight, lockfile churn and supply-chain surface.",
+        "options": [
+          "AGENTS.md requires a documented rationale for every external dependency, and a single-argument command gains too little from a framework to justify the added install weight, lockfile churn and supply-chain surface.",
+          "Command-line frameworks generally lag behind the newest stable Python release, which would conflict with the goal of targeting the current Python version.",
+          "A framework would print its own usage errors and stack traces, so the command could not meet the one-line-message, non-zero-exit error goal.",
+          "The project's existing src layout and py.typed marker cannot be combined with a framework-provided entry point without re-planning the package structure."
+        ]
+      },
+      {
+        "text": "The Quality Gate commands are listed as a dependency whose status is 'not yet defined'. If they stayed undefined, which of the strategy's success criteria could no longer be verified in the way the strategy describes, and why? Consider how the criteria are measured and how often they are checked.",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      }
+    ]
+  },
+  "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
