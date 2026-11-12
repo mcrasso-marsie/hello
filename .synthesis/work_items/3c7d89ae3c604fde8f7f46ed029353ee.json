@@ -603,42 +603,61 @@
       "path": "docs/specs/SPEC-0001.md"
     }
   },
-  "quiz_questions": {
-    "SPEC": [
-      {
-        "text": "The spec reads input with strict UTF-8 decoding and treats invalid bytes as an error with exit 1. What would go wrong if the command instead decoded with errors=\"replace\" and carried on?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
-        "options": [
-          "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
-          "Replacement decoding would defer the failure until count_words runs, where a UnicodeDecodeError would escape as a traceback and violate the one-line error contract.",
-          "count_words would need to import codecs to recognise replacement characters, which would break the rule that hello.counter performs no I/O.",
-          "str.split() treats replacement characters as whitespace, so words on either side of an invalid byte would be merged and the file would be undercounted."
-        ]
-      },
-      {
-        "text": "The spec keeps the word rule in hello.counter.count_words(text) with no file, process or console I/O, and puts reading, decoding, printing and exit codes in hello.cli. Suppose a later change makes count_words accept a path and open the file itself. Explain what this would break or make harder, both for testing the word rule and for the reuse the spec anticipates, and why the architecture test bans those imports rather than relying on convention.",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "Under the CLI error contract, a missing file, an unreadable path and invalid UTF-8 all exit with status 1, while a wrong argument count exits with status 2 via argparse. What does this split let a calling script do, and what did the spec knowingly give up?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
-        "options": [
-          "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
-          "A script can identify every failure cause from the exit code alone, so it never needs stderr; the spec gave up only the ability to customise argparse's usage text.",
-          "Exit 2 marks transient errors a script may safely retry, while exit 1 marks permanent ones; the spec gave up automatic retries for file errors.",
-          "The split lets usage errors keep a full traceback for debugging while file errors stay to one line; the spec gave up tracebacks only for file problems."
-        ]
-      }
-    ]
+  "quiz_questions": {},
+  "passed_quizzes": {
+    "SPEC": {
+      "passed": true,
+      "justification": "The reviewer understood why the word counter is pure. It lets the word rule be tested in memory, without files. It keeps error ownership in the command layer, which protects the one-line error contract. It allows reuse with text that does not come from a file. The reviewer also understood why the boundary is enforced by a deterministic architecture test instead of a convention: conventions erode one convenient import at a time, and the test catches a violation on every gate run. Nothing significant was missed. The answer goes beyond restating the spec by explaining how a path-taking counter would undermine the error contract owned by hello.cli.",
+      "answers": [
+        {
+          "question": {
+            "text": "The spec reads input with strict UTF-8 decoding and treats invalid bytes as an error with exit 1. What would go wrong if the command instead decoded with errors=\"replace\" and carried on?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
+            "options": [
+              "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
+              "Replacement decoding would defer the failure until count_words runs, where a UnicodeDecodeError would escape as a traceback and violate the one-line error contract.",
+              "count_words would need to import codecs to recognise replacement characters, which would break the rule that hello.counter performs no I/O.",
+              "str.split() treats replacement characters as whitespace, so words on either side of an invalid byte would be merged and the file would be undercounted."
+            ]
+          },
+          "response": "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
+          "correct": true,
+          "note": ""
+        },
+        {
+          "question": {
+            "text": "The spec keeps the word rule in hello.counter.count_words(text) with no file, process or console I/O, and puts reading, decoding, printing and exit codes in hello.cli. Suppose a later change makes count_words accept a path and open the file itself. Explain what this would break or make harder, both for testing the word rule and for the reuse the spec anticipates, and why the architecture test bans those imports rather than relying on convention.",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "Testing: the word rule would be testable only through real files. Today count_words(\"one two three\") and the empty/whitespace cases run in memory; with a path, every rule test needs temporary files and drags in encoding and file errors, so a failure no longer tells you whether the rule or the I/O is wrong. It also blurs ownership: word-counter explicitly does not own file access, encoding or errors, while word-count-command owns turning missing, unreadable and undecodable files into one-line messages. Opening files in count_words would leak FileNotFoundError or UnicodeDecodeError from the wrong layer, or duplicate that handling. Reuse: ADR-0002 expects future utilities to reuse the counter, and they may have text from somewhere other than a file; a path-only function forces them to write a file first. Why a test instead of convention: a convention erodes silently, one convenient import at a time. The architecture test (ADR-0002, DETERMINISTIC, tests/arch/test_layering.py bans os, sys, pathlib, io, open and subprocess) runs in the Quality Gate on every change and fails the moment the boundary is crossed. It is also listed as a regression guardrail.",
+          "correct": true,
+          "note": "The answer covers all three parts of the question. Testing: rule tests would need temporary files, and encoding and file errors would mix into them, so a failure would no longer show whether the rule or the I/O is at fault. Reuse: future utilities may get text from somewhere other than a file, and a path-only function would force them to write one first. Enforcement: a convention erodes silently, while the deterministic layering test fails in the Quality Gate the moment the boundary is crossed. The answer also notes a consequence that is not next to the decision: FileNotFoundError or UnicodeDecodeError would surface from the wrong layer, or the one-line error handling owned by word-count-command would have to be duplicated."
+        },
+        {
+          "question": {
+            "text": "Under the CLI error contract, a missing file, an unreadable path and invalid UTF-8 all exit with status 1, while a wrong argument count exits with status 2 via argparse. What does this split let a calling script do, and what did the spec knowingly give up?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
+            "options": [
+              "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
+              "A script can identify every failure cause from the exit code alone, so it never needs stderr; the spec gave up only the ability to customise argparse's usage text.",
+              "Exit 2 marks transient errors a script may safely retry, while exit 1 marks permanent ones; the spec gave up automatic retries for file errors.",
+              "The split lets usage errors keep a full traceback for debugging while file errors stay to one line; the spec gave up tracebacks only for file problems."
+            ]
+          },
+          "response": "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
+          "correct": true,
+          "note": ""
+        }
+      ]
+    }
   },
-  "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
