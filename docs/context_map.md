@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: none
+generated_from: cad19640e028e63483a109e72385c550a455dafa
 ---
 
 # Context Map: hello
@@ -32,6 +32,10 @@ generated_from: none
 
 | If the work concerns | Go to | Kind |
 |----------------------|-------|------|
+| Standard-library-only runtime (ADR-0001) | docs/adrs/ADR-0001.md | ADR |
+| Pure word counter separated from command I/O (ADR-0002) | docs/adrs/ADR-0002.md | ADR |
+| Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
+| One-line error and exit-status contract for CLI commands (ADR-0004) | docs/adrs/ADR-0004.md | ADR |
 
 ## Validation Checklist
 
