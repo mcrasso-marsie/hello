@@ -31,7 +31,7 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 5,
+  "current_index": 6,
   "rejection_count": 0,
   "pbi_id": "add-cli-success-path",
   "child_ids": [],
