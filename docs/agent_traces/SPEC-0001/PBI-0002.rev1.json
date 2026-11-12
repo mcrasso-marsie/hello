@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "bbf770f9-1304-4b0f-a544-7b5501d90cd7",
+  "timestamp": "2026-11-12T13:51:57Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "src/hello/counter.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 9,
+              "content_hash": "sha256:d9ae3f9f03ba69f3f469fb4d71d454070e13c2e240ab99ed3079ca7403d780ea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/arch/test_layering.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 38,
+              "content_hash": "sha256:42a419981692986ca052cef2ca13a9361a23b98bf1a73c56756a7f444092cf2c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/count-words-counts-whitespace-separated-runs.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:01ea3d7bb494681a08ba869bfb7bf91255bf312fc147e284b29edf904213ddbd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_count_words_counts_whitespace_separated_runs.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 33,
+              "content_hash": "sha256:bdaf501cd9635ffce88f0e6aec401e60f872e58cb4327b8dcbd4e4c28f70b890"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_counter.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 18,
+              "content_hash": "sha256:b8e5fd04a9a343913767f2f80b04150658bafc51d3d3048125ccd24695ce96df"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0002",
+    "rev": 1,
+    "base_revision": "f922ed4e21a6c3be65e18ed19dd73fe04fb058a2"
+  }
+}
