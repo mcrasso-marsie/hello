@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 65f5c11e9e03602d91565d035379ebe4feb969e9
+generated_from: 85c81f8cc5e6692eb70bf1d73c6e79c9834cd7de
 ---
 
 # Context Map: hello
@@ -20,7 +20,10 @@ generated_from: 65f5c11e9e03602d91565d035379ebe4feb969e9
 
 | Unit | Kind | Location | Depends on |
 |------|------|----------|------------|
-|  |  |  |  |
+| hello (hello) | system | docs/architecture.md#8-system-decomposition |  |
+| hello command-line package (hello-cli) | container | docs/architecture.md#8-system-decomposition |  |
+| Word-count command (word-count-command) | component | docs/architecture.md#8-system-decomposition | Word counter |
+| Word counter (word-counter) | component | docs/architecture.md#8-system-decomposition |  |
 
 ## Glossary
 
@@ -32,10 +35,12 @@ generated_from: 65f5c11e9e03602d91565d035379ebe4feb969e9
 
 | If the work concerns | Go to | Kind |
 |----------------------|-------|------|
+| Word-count command (SPEC-0001) | docs/specs/SPEC-0001.md | spec |
 | Standard-library-only runtime (ADR-0001) | docs/adrs/ADR-0001.md | ADR |
 | Pure word counter separated from command I/O (ADR-0002) | docs/adrs/ADR-0002.md | ADR |
 | Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
 | One-line error and exit-status contract for CLI commands (ADR-0004) | docs/adrs/ADR-0004.md | ADR |
+| Architecture (ARCH-0001) | docs/architecture.md | architecture |
 
 ## Validation Checklist
 
