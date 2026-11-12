@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "id": "e1d47622-e3e6-4de2-9609-4e0248651669",
+  "timestamp": "2026-11-12T14:04:12Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "tests/features/guardrail-existing-hello-package-import-is-unchanged.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:25f065227267cbca25e5009b24e7bbfb0654d46caf4ec62f033da7aeb9f53755"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_guardrail_existing_hello_package_import_is_unchanged.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 32,
+              "content_hash": "sha256:b44f09fab190e61f3b0d2b8485329e55dd59330bc4ff1a2a8287c8f6e3717b78"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_package.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 21,
+              "content_hash": "sha256:b6043cd33728284f4afbfcda27f04e88084223b41413792c1311048213819f74"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0008",
+    "rev": 1,
+    "base_revision": "83ede87d26ee5894061bf7b31607c56bae01a8cd"
+  }
+}
