@@ -37,10 +37,607 @@
   "child_ids": [],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0001.md",
-    "DEFINE": "docs/strategy/STRAT-0001.md"
+    "DEFINE": "docs/strategy/STRAT-0001.md",
+    "SPEC": "docs/specs/SPEC-0001.md"
   },
-  "pending_artifacts": {},
-  "quiz_questions": {},
+  "pending_artifacts": {
+    "SPEC": {
+      "definition_of_done": [
+        "src/hello/counter.py defines count_words(text: str) -> int, which returns the number of runs of non-whitespace characters separated by whitespace (equivalent to len(text.split())).",
+        "count_words returns 0 for an empty string and for a string containing only whitespace.",
+        "src/hello/cli.py defines main(argv: list[str] | None = None) -> int, which parses exactly one positional PATH argument with argparse.",
+        "pyproject.toml declares the console script `wordcount = \"hello.cli:main\"` under [project.scripts].",
+        "Running `wordcount PATH` on a readable UTF-8 file prints only the integer word count followed by a newline to stdout and exits with status 0.",
+        "Tabs, newlines and repeated spaces act only as separators: a file containing \"  alpha\\t\\tbeta\\n\\ngamma  \" reports 3.",
+        "Punctuation attached to non-whitespace characters is part of a word: a file containing \"Hello, world! It's-fine.\" reports 3.",
+        "UTF-8 files with non-ASCII characters are counted: a file containing \"caf\u00e9 na\u00efve \u65e5\u672c\" reports 3.",
+        "An empty file reports 0 and exits with status 0.",
+        "A path that does not exist prints exactly one line `wordcount: error: file not found: PATH` to stderr, prints nothing to stdout, and exits with status 1.",
+        "A path that exists but cannot be read (a directory, or a file without read permission) prints exactly one line starting with `wordcount: error: cannot read file:` to stderr and exits with status 1.",
+        "A file whose bytes are not valid UTF-8 prints exactly one line `wordcount: error: file is not valid UTF-8 text: PATH` to stderr and exits with status 1.",
+        "No error case writes a Python traceback to stderr.",
+        "Invoking `wordcount` with no argument or with more than one argument prints argparse usage to stderr and exits with status 2.",
+        "pyproject.toml [project].dependencies is empty; ruff, mypy and pytest are declared only in the `dev` dependency group.",
+        "pyproject.toml requires-python has a lower bound equal to the major.minor version recorded in .python-version.",
+        "The AGENTS.md Toolchain table lists four Quality Gate rows: format (`uv run ruff format --check .`), lint (`uv run ruff check .`), type-check (`uv run mypy --strict src tests`) and test (`uv run pytest`).",
+        "All four Quality Gate commands exit 0 on the finished change.",
+        "README.md documents the install step (`uv sync`), the run step (`uv run wordcount PATH`), the word rule, and the error exit statuses."
+      ],
+      "regression_guardrails": [
+        "`import hello` still succeeds and src/hello/__init__.py keeps every name it exported before this change.",
+        "src/hello/py.typed remains present in the package, so the package stays marked as typed.",
+        "The src layout is unchanged: package code stays under src/hello/.",
+        "uv.lock stays consistent with pyproject.toml: `uv lock --check` exits 0 after the change.",
+        "The existing AGENTS.md Judgment Boundaries bullets are kept word for word; only the Toolchain table is filled in.",
+        "The word counter keeps the existing architecture boundary: hello.counter performs no file, process or console I/O."
+      ],
+      "scenarios": [
+        {
+          "name": "count_words counts whitespace-separated runs",
+          "given": [
+            "the hello.counter module is importable"
+          ],
+          "when": [
+            "count_words is called with the string \"one two three\""
+          ],
+          "then": [
+            "it returns the integer 3"
+          ]
+        },
+        {
+          "name": "count_words returns zero for empty and whitespace-only text",
+          "given": [
+            "the hello.counter module is importable"
+          ],
+          "when": [
+            "count_words is called with \"\" and then with \" \\t\\n \""
+          ],
+          "then": [
+            "both calls return 0"
+          ]
+        },
+        {
+          "name": "wordcount prints the count of a simple file",
+          "given": [
+            "a temporary file notes.txt containing \"one two three\\n\" encoded as UTF-8"
+          ],
+          "when": [
+            "main([\"<path to notes.txt>\"]) is called with stdout and stderr captured"
+          ],
+          "then": [
+            "the return value is 0",
+            "stdout is exactly \"3\\n\"",
+            "stderr is empty"
+          ]
+        },
+        {
+          "name": "whitespace variants act only as separators",
+          "given": [
+            "a temporary file containing \"  alpha\\t\\tbeta\\n\\ngamma  \" encoded as UTF-8"
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 0",
+            "stdout is exactly \"3\\n\""
+          ]
+        },
+        {
+          "name": "punctuation stays part of a word",
+          "given": [
+            "a temporary file containing \"Hello, world! It's-fine.\" encoded as UTF-8"
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 0",
+            "stdout is exactly \"3\\n\""
+          ]
+        },
+        {
+          "name": "non-ASCII UTF-8 text is counted",
+          "given": [
+            "a temporary file containing \"caf\u00e9 na\u00efve \u65e5\u672c\" encoded as UTF-8"
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 0",
+            "stdout is exactly \"3\\n\""
+          ]
+        },
+        {
+          "name": "empty file reports zero",
+          "given": [
+            "a temporary file with zero bytes"
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 0",
+            "stdout is exactly \"0\\n\""
+          ]
+        },
+        {
+          "name": "missing file fails with a one-line message",
+          "given": [
+            "a path notse.txt inside a temporary directory where no such file exists"
+          ],
+          "when": [
+            "main is called with that path"
+          ],
+          "then": [
+            "the return value is 1",
+            "stdout is empty",
+            "stderr is exactly one line \"wordcount: error: file not found: <path>\"",
+            "stderr does not contain \"Traceback\""
+          ]
+        },
+        {
+          "name": "directory path fails as unreadable",
+          "given": [
+            "a temporary directory path"
+          ],
+          "when": [
+            "main is called with the directory path"
+          ],
+          "then": [
+            "the return value is 1",
+            "stderr is exactly one line starting with \"wordcount: error: cannot read file:\"",
+            "stderr does not contain \"Traceback\""
+          ]
+        },
+        {
+          "name": "file without read permission fails as unreadable",
+          "given": [
+            "a POSIX system where the test is not running as root",
+            "a temporary file whose mode is set to 000"
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 1",
+            "stderr is exactly one line starting with \"wordcount: error: cannot read file:\""
+          ]
+        },
+        {
+          "name": "undecodable content fails with a one-line message",
+          "given": [
+            "a temporary file containing the bytes b\"\\xff\\xfe\\xfa\""
+          ],
+          "when": [
+            "main is called with that file's path"
+          ],
+          "then": [
+            "the return value is 1",
+            "stdout is empty",
+            "stderr is exactly one line \"wordcount: error: file is not valid UTF-8 text: <path>\""
+          ]
+        },
+        {
+          "name": "missing argument is a usage error",
+          "given": [
+            "no arguments"
+          ],
+          "when": [
+            "main([]) is called with stderr captured"
+          ],
+          "then": [
+            "SystemExit is raised with code 2",
+            "stderr contains \"usage:\""
+          ]
+        },
+        {
+          "name": "too many arguments is a usage error",
+          "given": [
+            "two existing temporary text files a.txt and b.txt"
+          ],
+          "when": [
+            "main is called with both paths"
+          ],
+          "then": [
+            "SystemExit is raised with code 2",
+            "stderr contains \"usage:\""
+          ]
+        },
+        {
+          "name": "console script is installed and runs",
+          "given": [
+            "the project environment synced with `uv sync`",
+            "a temporary file containing \"one two three\" encoded as UTF-8"
+          ],
+          "when": [
+            "the subprocess `uv run wordcount <path>` is run"
+          ],
+          "then": [
+            "its exit status is 0",
+            "its stdout is exactly \"3\\n\""
+          ]
+        },
+        {
+          "name": "requires-python matches .python-version",
+          "given": [
+            "pyproject.toml and .python-version at the repository root"
+          ],
+          "when": [
+            "the test tests/test_project_config.py::test_requires_python_matches_python_version_file runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "README documents install, run, word rule and errors",
+          "given": [
+            "README.md at the repository root"
+          ],
+          "when": [
+            "the test tests/test_readme.py::test_readme_documents_install_run_and_word_rule runs"
+          ],
+          "then": [
+            "it passes, confirming README.md contains \"uv sync\", \"uv run wordcount\", the sentence defining a word as a run of non-whitespace characters, and the exit statuses 1 and 2"
+          ]
+        },
+        {
+          "name": "no third-party runtime dependencies",
+          "given": [
+            "pyproject.toml at the repository root"
+          ],
+          "when": [
+            "the test tests/arch/test_dependencies.py::test_no_runtime_dependencies runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "word counter performs no I/O",
+          "given": [
+            "src/hello/counter.py"
+          ],
+          "when": [
+            "the test tests/arch/test_layering.py::test_word_counter_has_no_io_imports runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "Quality Gate commands are recorded in AGENTS.md",
+          "given": [
+            "AGENTS.md at the repository root"
+          ],
+          "when": [
+            "the test tests/test_agents_md.py::test_toolchain_lists_quality_gate_commands runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "error output is a single line without traceback",
+          "given": [
+            "the missing-file, directory and undecodable-file cases"
+          ],
+          "when": [
+            "the test tests/test_cli.py::test_errors_are_single_line_without_traceback runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "guardrail: existing hello package import is unchanged",
+          "given": [
+            "the names exported by src/hello/__init__.py before this change are recorded in the test"
+          ],
+          "when": [
+            "the test tests/test_package.py::test_existing_package_surface_unchanged runs"
+          ],
+          "then": [
+            "it passes, confirming `import hello` succeeds and every recorded name is still present"
+          ]
+        },
+        {
+          "name": "guardrail: py.typed marker is still shipped",
+          "given": [
+            "the project environment synced with `uv sync`"
+          ],
+          "when": [
+            "importlib.resources.files(\"hello\") is checked for \"py.typed\""
+          ],
+          "then": [
+            "py.typed exists in the installed package"
+          ]
+        },
+        {
+          "name": "guardrail: lockfile stays consistent",
+          "given": [
+            "the change applied to pyproject.toml and uv.lock"
+          ],
+          "when": [
+            "`uv lock --check` is run"
+          ],
+          "then": [
+            "it exits with status 0"
+          ]
+        },
+        {
+          "name": "guardrail: AGENTS.md judgment boundaries are preserved",
+          "given": [
+            "AGENTS.md after the change"
+          ],
+          "when": [
+            "the test tests/test_agents_md.py::test_judgment_boundaries_preserved runs"
+          ],
+          "then": [
+            "it passes, confirming both existing Judgment Boundaries bullets are present word for word"
+          ]
+        }
+      ],
+      "feature_name": "Word-count command",
+      "context": "The hello project has no user-facing capability yet: a user who wants to know how many words a text file contains has nothing to run and must count by hand or find another tool. The README gives no install or run path, and the AGENTS.md Toolchain table is empty, so no quality bar is enforced on changes.\n\nThis spec adds a single `wordcount PATH` console command to the existing src-layout hello package, built on the standard library only. A pure word counter defines a word as a run of non-whitespace characters; a thin command layer reads the file as UTF-8, prints the count, and turns missing, unreadable or undecodable files into a one-line error with a non-zero exit. It also records four Quality Gate commands (format, lint, type-check, test) in AGENTS.md, pins the project to the Python version in .python-version, and documents installation and use in the README.",
+      "c4_elements": [
+        "hello",
+        "hello-cli",
+        "word-count-command",
+        "word-counter"
+      ],
+      "api_contracts": [
+        "Console command: `wordcount PATH` \u2014 exactly one positional argument; prints `<int>\\n` to stdout and exits 0 on success",
+        "Error contract: missing file -> stderr `wordcount: error: file not found: PATH`, exit 1; unreadable path -> stderr `wordcount: error: cannot read file: PATH`, exit 1; invalid UTF-8 -> stderr `wordcount: error: file is not valid UTF-8 text: PATH`, exit 1; wrong argument count -> argparse usage on stderr, exit 2",
+        "Python API: hello.counter.count_words(text: str) -> int",
+        "Python API: hello.cli.main(argv: list[str] | None = None) -> int",
+        "pyproject.toml [project.scripts]: wordcount = \"hello.cli:main\""
+      ],
+      "data_models": [
+        "Input: file contents read as str via open(path, encoding=\"utf-8\") with strict error handling",
+        "Output: a single non-negative integer word count"
+      ],
+      "dependencies": [
+        "Python runtime at the version recorded in .python-version (existing)",
+        "Existing src-layout hello package, pyproject.toml and uv.lock (existing)",
+        "Python standard library: argparse, sys (runtime)",
+        "Dev-only tools in the `dev` dependency group: ruff (format and lint), mypy (type-check), pytest (tests)"
+      ],
+      "needed_by": [
+        "Future hello text utilities reusing the CLI error contract (none planned)"
+      ],
+      "constraints": [
+        "No third-party runtime dependencies: [project].dependencies stays empty",
+        "hello.counter performs no file, process or console I/O",
+        "Input is decoded as strict UTF-8; other encodings are out of scope",
+        "One file path per invocation; no stdin, multiple files or directories",
+        "Every error case produces exactly one stderr line and no traceback",
+        "Every dev tool added has its rationale recorded in this spec or an ADR, per AGENTS.md"
+      ],
+      "decisions": [
+        {
+          "text": "We will keep the hello package's runtime on the Python standard library only, using argparse for argument parsing, and leave [project].dependencies empty.",
+          "binds_beyond_feature": true,
+          "title": "Standard-library-only runtime",
+          "context": "AGENTS.md requires a documented rationale for every external dependency, and the strategy targets zero runtime dependencies for a one-argument command.",
+          "alternatives": [
+            "Use a third-party CLI framework such as click or typer: rejected, adds install weight and supply-chain surface for no benefit on one argument",
+            "Wrap the OS `wc` utility: rejected, platform-dependent and not testable in isolation"
+          ],
+          "positive_consequences": [
+            "Install is trivial and has no supply-chain surface",
+            "Behavior is identical across platforms"
+          ],
+          "negative_consequences": [
+            "Richer CLI features (colors, completion) must be hand-written if ever needed"
+          ],
+          "enforcement": [
+            {
+              "rule": "pyproject.toml [project].dependencies is empty",
+              "kind": "deterministic",
+              "mechanism": "tests/arch/test_dependencies.py::test_no_runtime_dependencies",
+              "scope": "system-wide"
+            }
+          ]
+        },
+        {
+          "text": "We will keep the word rule in a pure function hello.counter.count_words that performs no I/O, and keep all file, encoding, output and exit-status handling in hello.cli.",
+          "binds_beyond_feature": true,
+          "title": "Pure word counter separated from command I/O",
+          "context": "The architecture assigns the word rule to word-counter and all I/O to word-count-command; the rule must be testable in isolation.",
+          "alternatives": [
+            "Single module doing reading and counting together: rejected, couples the rule to the filesystem and makes it harder to test and reuse"
+          ],
+          "positive_consequences": [
+            "The word rule is unit-testable without files",
+            "Future utilities can reuse the counter"
+          ],
+          "negative_consequences": [
+            "Two modules to maintain for a small feature"
+          ],
+          "enforcement": [
+            {
+              "rule": "src/hello/counter.py imports none of os, sys, pathlib, io, builtins.open or subprocess",
+              "kind": "deterministic",
+              "mechanism": "tests/arch/test_layering.py::test_word_counter_has_no_io_imports",
+              "scope": "word-counter"
+            }
+          ]
+        },
+        {
+          "text": "We will define the Quality Gate as four commands recorded in the AGENTS.md Toolchain table \u2014 `uv run ruff format --check .`, `uv run ruff check .`, `uv run mypy --strict src tests`, `uv run pytest` \u2014 with ruff, mypy and pytest declared only in the `dev` dependency group.",
+          "binds_beyond_feature": true,
+          "title": "Minimal Quality Gate toolchain: ruff, mypy, pytest",
+          "context": "The Toolchain table is empty so nothing is enforced; the strategy limits the gate to format, lint, type-check and test, and AGENTS.md requires a rationale for each external tool.",
+          "alternatives": [
+            "black plus flake8 plus isort: rejected, three tools where ruff covers formatting and linting in one",
+            "unittest only, no type-checker: rejected, the package ships py.typed and the owner asked for best practices",
+            "pyright instead of mypy: rejected, requires a Node-based install in some setups; mypy is pure Python and managed by uv"
+          ],
+          "positive_consequences": [
+            "One fast tool covers format and lint",
+            "Every change is checked the same way locally"
+          ],
+          "negative_consequences": [
+            "Three dev dependencies enter uv.lock and must be kept updated",
+            "mypy --strict demands full annotations, slowing quick edits"
+          ],
+          "enforcement": [
+            {
+              "rule": "AGENTS.md Toolchain table lists the four Quality Gate commands",
+              "kind": "deterministic",
+              "mechanism": "tests/test_agents_md.py::test_toolchain_lists_quality_gate_commands",
+              "scope": "system-wide"
+            },
+            {
+              "rule": "All four Quality Gate commands are run and pass before any change lands",
+              "kind": "convention",
+              "mechanism": "Quality Gate run per AGENTS.md Toolchain table",
+              "scope": "system-wide"
+            }
+          ]
+        },
+        {
+          "text": "We will report every runtime error of a hello command as exactly one stderr line of the form `<command>: error: <message>: <path>` with exit status 1, never a traceback, and leave argument-usage errors to argparse with exit status 2.",
+          "binds_beyond_feature": true,
+          "title": "One-line error and exit-status contract for CLI commands",
+          "context": "Error handling was the least certain part of the request and stack traces block non-expert users.",
+          "alternatives": [
+            "Let exceptions propagate: rejected, produces tracebacks",
+            "Distinct exit codes per error type: rejected, adds a contract nobody asked for"
+          ],
+          "positive_consequences": [
+            "Errors are predictable and scriptable",
+            "Future commands share one error style"
+          ],
+          "negative_consequences": [
+            "Error causes are not distinguishable by exit code alone"
+          ],
+          "enforcement": [
+            {
+              "rule": "Each error case writes exactly one stderr line, no traceback, and returns 1",
+              "kind": "deterministic",
+              "mechanism": "tests/test_cli.py::test_errors_are_single_line_without_traceback",
+              "scope": "hello-cli"
+            }
+          ]
+        },
+        {
+          "text": "We will name the console script `wordcount`, mapped to hello.cli:main.",
+          "binds_beyond_feature": false,
+          "title": "Console script name",
+          "context": "The strategy names the capability but not the command.",
+          "alternatives": [
+            "`hello` as the command name: rejected, does not describe what it does"
+          ],
+          "positive_consequences": [],
+          "negative_consequences": [],
+          "enforcement": []
+        }
+      ],
+      "adr_references": [
+        "ADR-0001",
+        "ADR-0002",
+        "ADR-0003",
+        "ADR-0004"
+      ],
+      "critical_components": [],
+      "architecture_change": {
+        "summary": "First architecture draft: the hello system as one local Python CLI container with a word-count command, split into a command-line shell and a pure, dependency-free counting core.",
+        "added": [
+          {
+            "id": "hello",
+            "name": "hello",
+            "level": "system",
+            "parent": "",
+            "owns": "Giving users local, dependency-free text utilities, starting with reporting the word count of one text file.",
+            "does_not_own": "Other text statistics, batch or stdin processing, non-UTF-8 encodings, or distribution through a public package index.",
+            "deployment": "Installed from the repository into a local Python environment on the user's machine.",
+            "technology": "Python (current stable release), standard library only"
+          },
+          {
+            "id": "hello-cli",
+            "name": "hello command-line package",
+            "level": "container",
+            "parent": "hello",
+            "owns": "The installable src-layout hello package and its console command that takes one file path, prints that file's word count, and exits with a status code.",
+            "does_not_own": "Any network access, persistent state, configuration files, or third-party runtime dependencies.",
+            "deployment": "Run as a local process on the user's machine after installing the package from the repository into the project environment.",
+            "technology": "Python standard library; console entry point declared in pyproject.toml; environment managed with the existing lockfile tooling"
+          },
+          {
+            "id": "word-count-command",
+            "name": "Word-count command",
+            "level": "component",
+            "parent": "hello-cli",
+            "owns": "Parsing the single file-path argument, reading the file as UTF-8 text, passing the text to the counter, printing the count, and turning a missing file, unreadable file or undecodable content into a one-line message on standard error with a non-zero exit status.",
+            "does_not_own": "The definition of what a word is, or counting logic of any kind.",
+            "deployment": "",
+            "technology": "Python standard library"
+          },
+          {
+            "id": "word-counter",
+            "name": "Word counter",
+            "level": "component",
+            "parent": "hello-cli",
+            "owns": "The word rule: a word is a run of non-whitespace characters separated by whitespace. It counts the words in a given text and returns the number.",
+            "does_not_own": "File access, encoding, argument handling, output or exit codes; it never touches the filesystem or the process.",
+            "deployment": "",
+            "technology": "Python standard library"
+          }
+        ],
+        "changed": [],
+        "removed": [],
+        "relations_added": [
+          {
+            "source": "word-count-command",
+            "target": "word-counter",
+            "description": "Passes the decoded file text in an in-process function call and receives the integer word count."
+          }
+        ],
+        "relations_removed": [],
+        "sections": {}
+      },
+      "path": "docs/specs/SPEC-0001.md"
+    }
+  },
+  "quiz_questions": {
+    "SPEC": [
+      {
+        "text": "The spec reads input with strict UTF-8 decoding and treats invalid bytes as an error with exit 1. What would go wrong if the command instead decoded with errors=\"replace\" and carried on?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
+        "options": [
+          "Invalid bytes would become U+FFFD replacement characters, which are non-whitespace, so a garbled or wrongly encoded file would silently print a plausible-looking count with exit 0 instead of reporting that it is not valid UTF-8 text.",
+          "Replacement decoding would defer the failure until count_words runs, where a UnicodeDecodeError would escape as a traceback and violate the one-line error contract.",
+          "count_words would need to import codecs to recognise replacement characters, which would break the rule that hello.counter performs no I/O.",
+          "str.split() treats replacement characters as whitespace, so words on either side of an invalid byte would be merged and the file would be undercounted."
+        ]
+      },
+      {
+        "text": "The spec keeps the word rule in hello.counter.count_words(text) with no file, process or console I/O, and puts reading, decoding, printing and exit codes in hello.cli. Suppose a later change makes count_words accept a path and open the file itself. Explain what this would break or make harder, both for testing the word rule and for the reuse the spec anticipates, and why the architecture test bans those imports rather than relying on convention.",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "Under the CLI error contract, a missing file, an unreadable path and invalid UTF-8 all exit with status 1, while a wrong argument count exits with status 2 via argparse. What does this split let a calling script do, and what did the spec knowingly give up?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
+        "options": [
+          "A script can tell 'the command was invoked wrongly' (2) apart from 'the command ran but the file could not be used' (1), but it cannot tell which file problem occurred without reading the stderr message.",
+          "A script can identify every failure cause from the exit code alone, so it never needs stderr; the spec gave up only the ability to customise argparse's usage text.",
+          "Exit 2 marks transient errors a script may safely retry, while exit 1 marks permanent ones; the spec gave up automatic retries for file errors.",
+          "The split lets usage errors keep a full traceback for debugging while file errors stay to one line; the spec gave up tracebacks only for file problems."
+        ]
+      }
+    ]
+  },
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
