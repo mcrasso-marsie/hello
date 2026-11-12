@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "id": "48cdfa4c-35d9-4c34-808c-1c9f66884ea2",
+  "timestamp": "2026-11-12T13:53:53Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "src/hello/cli.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 20,
+              "content_hash": "sha256:9d63ea93f1f9afddef91416239264d0976e22ece167eaf2623dcf663b92c6172"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/wordcount-prints-the-count-of-a-simple-file.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 8,
+              "content_hash": "sha256:d33c9f46a8b688071b3c286bf9b28283dd44833c63639b74406a324527d4e1bb"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_wordcount_prints_the_count_of_a_simple_file.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 65,
+              "content_hash": "sha256:30f282750c176319c52d56de3a7468a1dbadb0b762ae32233455c686f508ba00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_cli.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 83,
+              "content_hash": "sha256:e0d9fec0e7951bd90b296654e7296867897b79404d282426d315769cb26f5323"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0004",
+    "rev": 1,
+    "base_revision": "14d941d7e03f9ddf5d2631777ac7e8aedb25cc54"
+  }
+}

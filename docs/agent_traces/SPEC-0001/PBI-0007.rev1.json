@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "id": "48c87d2f-e388-42b5-9667-338c17b08bd5",
+  "timestamp": "2026-11-12T14:06:15Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 42,
+              "content_hash": "sha256:4fff2b143777d37d23daa0c37bc944d2d7b7e133392b6bd131693585c872637c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/readme-documents-install-run-word-rule-and-errors.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:6d1fdaea17208146dba4cb8eed7557ddbeea99c426ff5f26b6cc42aa2fc548ba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_readme_documents_install_run_word_rule_and_errors.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 38,
+              "content_hash": "sha256:f3f192ca4b20543255053bec1e0dc4811fd57b821a9e962c33853a6717ec23df"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_readme.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 21,
+              "content_hash": "sha256:1c8b7126bf23574fa891f5f063e44b094be8361d8067050adc1e2172565e3919"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0007",
+    "rev": 1,
+    "base_revision": "d2df1f8b2092da8ebc31b6bf13a86e34355526ed"
+  }
+}

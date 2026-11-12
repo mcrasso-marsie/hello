@@ -1,0 +1,168 @@
+{
+  "version": "1.0.0",
+  "id": "8cbc9e2e-cd38-4a37-9c0c-f0035f60b6fd",
+  "timestamp": "2026-11-12T13:44:25Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "pyproject.toml",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 18,
+              "end_line": 18,
+              "content_hash": "sha256:983054275c57a3ed03fe6ee7bf5e1148335db095a12e8dce06cd3cd226d98d6f"
+            },
+            {
+              "start_line": 21,
+              "end_line": 21,
+              "content_hash": "sha256:7598b2443635ed8f1b6aa76beecd76cbfa88f019f7531590e6f1bb3b4100da0d"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/arch/test_dependencies.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 13,
+              "content_hash": "sha256:a55a68ca546ab85bfc52869ed375dd4736910a1a5ef63fabd47cc4c819d8575c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/no-third-party-runtime-dependencies.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:9e3843a493b868290bd789196dd25e68c5258ccca4ab835f43734633dbbd60d6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_no_third_party_runtime_dependencies.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 34,
+              "content_hash": "sha256:e8b20e45356d10216f1ed858db0afe4a6a1fd77e391192aa81ad753531f9a186"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_project_config.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 19,
+              "content_hash": "sha256:811c4bc746f9aed0cabbe70b7af46cf0d596c20b4f5fce42bcd81c83fce0c7ac"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "uv.lock",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 4,
+              "end_line": 71,
+              "content_hash": "sha256:74abb9d46f6a5ec673c46a939872f38db471096e161c0903d876f171c2e9eaae"
+            },
+            {
+              "start_line": 101,
+              "end_line": 101,
+              "content_hash": "sha256:686a317289dbd176e92c1ba7ea49d3bb5aa476c5c4953b3482dca6994081534f"
+            },
+            {
+              "start_line": 104,
+              "end_line": 104,
+              "content_hash": "sha256:66e984af82f7977e3d260f6891a46eb2f90f8a5b68cc7dc2fc4624fd9d0c0929"
+            },
+            {
+              "start_line": 111,
+              "end_line": 111,
+              "content_hash": "sha256:63a1d52c49f7224740d4a4d8484c43e73e0f8b676cec8a8f7832da3eb76a5ead"
+            },
+            {
+              "start_line": 114,
+              "end_line": 114,
+              "content_hash": "sha256:e17d92b8fec203468aeb7a5b39c56bce1713fcf42afd81080985192793ff1c7a"
+            },
+            {
+              "start_line": 126,
+              "end_line": 241,
+              "content_hash": "sha256:76deecbf090adb996a02afc85e244515d2b63ed10f598d0f4a8fc81503d78439"
+            },
+            {
+              "start_line": 382,
+              "end_line": 450,
+              "content_hash": "sha256:ee1fd807da7e5d01460735ce9da4a093c8133033d9fc7a168452970325bd2a3e"
+            },
+            {
+              "start_line": 482,
+              "end_line": 490,
+              "content_hash": "sha256:95ec46cbd7dca4f299d4173f84663f0ec4d3e8c59bace1e9928b2a107d9f23c3"
+            },
+            {
+              "start_line": 543,
+              "end_line": 567,
+              "content_hash": "sha256:45b06b9d4a7bf8198622d102aad0b9aadfe9978638b6f8a5a1e25dc18dad782b"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0001",
+    "rev": 1,
+    "base_revision": "1b5538ace640a735ebe489a8788229287f345bfb"
+  }
+}

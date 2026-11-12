@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "id": "acac0d5e-492f-4783-9c10-ea718b6c89b7",
+  "timestamp": "2026-11-12T13:59:28Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "pyproject.toml",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 12,
+              "end_line": 14,
+              "content_hash": "sha256:51b87af92f04792449985867cc11f6165512251c2182bc950d52ba5144882660"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_console_script.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 24,
+              "content_hash": "sha256:2a3d144853d682f580663cc808452708eef327e8f2302d5c4ad80d8f4c7b498a"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0001/PBI-0006",
+    "rev": 1,
+    "base_revision": "89ab39ef441cf5d604a3f112d764a081a61afbfa"
+  }
+}
