@@ -1,0 +1,1 @@
+{"at": "2026-11-12T13:44:24+00:00", "work_item_id": "3c7d89ae3c604fde8f7f46ed029353ee-setup-dev-toolchain", "stage": "ASSEMBLE", "pbi_id": "setup-dev-toolchain", "model": "openrouter:anthropic/claude-haiku-5.5", "requests": 11, "input_tokens": 258689, "output_tokens": 10693, "cache_read_tokens": 225064, "cache_write_tokens": 33601}
