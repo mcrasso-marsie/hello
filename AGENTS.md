@@ -14,7 +14,10 @@ version: 1
 
 | Action | Command | Authority |
 |--------|---------|-----------|
-|  |  |  |
+| format | `uv run ruff format --check .` | Quality Gate (ADR-0003) |
+| lint | `uv run ruff check .` | Quality Gate (ADR-0003) |
+| type-check | `uv run mypy --strict src tests` | Quality Gate (ADR-0003) |
+| test | `uv run pytest` | Quality Gate (ADR-0003) |
 
 ---
 
