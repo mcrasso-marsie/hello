@@ -31,7 +31,7 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 6,
+  "current_index": 7,
   "rejection_count": 0,
   "pbi_id": "guard-package-surface",
   "child_ids": [],
