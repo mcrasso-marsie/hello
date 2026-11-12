@@ -1,0 +1,1 @@
+{"at": "2026-11-12T14:04:10+00:00", "work_item_id": "3c7d89ae3c604fde8f7f46ed029353ee-guard-package-surface", "stage": "ASSEMBLE", "pbi_id": "guard-package-surface", "model": "openrouter:anthropic/claude-haiku-5.5", "requests": 8, "input_tokens": 172037, "output_tokens": 5729, "cache_read_tokens": 151576, "cache_write_tokens": 20443}
