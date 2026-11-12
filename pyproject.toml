@@ -9,6 +9,9 @@ authors = [
 requires-python = ">=3.11"
 dependencies = []
 
+[project.scripts]
+wordcount = "hello.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
