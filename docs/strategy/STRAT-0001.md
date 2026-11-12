@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0001
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Give the hello project its first user-facing capability now: a minimal, dependency-free command that reports a text file's word count, built and documented to a clear, enforced quality bar.
@@ -189,6 +189,6 @@ It does not meet the stated need. The user wants to run a command with a file pa
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-opus-5.5  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
