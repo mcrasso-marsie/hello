@@ -1,5 +1,6 @@
 """Tests for the wordcount command-line entry point."""
 
+import os
 from pathlib import Path
 
 import pytest
@@ -81,3 +82,78 @@ def test_too_many_arguments_is_usage_error(
 
     assert excinfo.value.code == 2
     assert "usage:" in capsys.readouterr().err
+
+
+def test_missing_file_reports_one_line_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = tmp_path / "missing.txt"
+
+    assert main([str(path)]) == 1
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == f"wordcount: error: file not found: {path}\n"
+
+
+def test_directory_reports_cannot_read_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main([str(tmp_path)]) == 1
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert len(captured.err.splitlines()) == 1
+    assert captured.err.startswith("wordcount: error: cannot read file: ")
+
+
+@pytest.mark.skipif(
+    os.name != "posix" or os.geteuid() == 0,
+    reason="needs a POSIX system and a non-root user to enforce file permissions",
+)
+def test_unreadable_file_reports_cannot_read_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = tmp_path / "locked.txt"
+    path.write_text("one two three\n", encoding="utf-8")
+    path.chmod(0)
+
+    assert main([str(path)]) == 1
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert len(captured.err.splitlines()) == 1
+    assert captured.err.startswith("wordcount: error: cannot read file: ")
+
+
+def test_invalid_utf8_reports_one_line_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = tmp_path / "binary.txt"
+    path.write_bytes(b"\xff\xfe\xfa")
+
+    assert main([str(path)]) == 1
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == (f"wordcount: error: file is not valid UTF-8 text: {path}\n")
+
+
+def _assert_one_error_line(capsys: pytest.CaptureFixture[str]) -> None:
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert len(captured.err.splitlines()) == 1
+    assert captured.err.startswith("wordcount: error: ")
+    assert "Traceback" not in captured.err
+
+
+def test_errors_are_single_line_without_traceback(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    undecodable = tmp_path / "binary.txt"
+    undecodable.write_bytes(b"\xff\xfe\xfa")
+    error_paths = [tmp_path / "missing.txt", tmp_path, undecodable]
+
+    for path in error_paths:
+        assert main([str(path)]) == 1
+        _assert_one_error_line(capsys)
