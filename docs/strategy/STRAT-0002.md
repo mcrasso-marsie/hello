@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0002
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Extend hello's pure text-counting core and default command output to report both word counts and non-whitespace character counts in a single invocation, delivering complete file counts by default without adding dependencies or breaking the core/I/O boundary.
@@ -168,6 +168,6 @@ Simpler to compute from raw file size or string length, but counts indentation a
 ## Sign-Off
 
 **Authored by:** openrouter:google/gemini-4-hydrogen  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
