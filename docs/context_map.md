@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 85c81f8cc5e6692eb70bf1d73c6e79c9834cd7de
+generated_from: 01d1584fc6002d27780614cdcd0967c305771b1d
 ---
 
 # Context Map: hello
@@ -36,10 +36,12 @@ generated_from: 85c81f8cc5e6692eb70bf1d73c6e79c9834cd7de
 | If the work concerns | Go to | Kind |
 |----------------------|-------|------|
 | Word-count command (SPEC-0001) | docs/specs/SPEC-0001.md | spec |
+| Non-whitespace character count alongside word count (SPEC-0002) | docs/specs/SPEC-0002.md | spec |
 | Standard-library-only runtime (ADR-0001) | docs/adrs/ADR-0001.md | ADR |
 | Pure word counter separated from command I/O (ADR-0002) | docs/adrs/ADR-0002.md | ADR |
 | Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
 | One-line error and exit-status contract for CLI commands (ADR-0004) | docs/adrs/ADR-0004.md | ADR |
+| Labeled two-line default output for wordcount (ADR-0005) | docs/adrs/ADR-0005.md | ADR |
 | Architecture (ARCH-0001) | docs/architecture.md | architecture |
 
 ## Validation Checklist
