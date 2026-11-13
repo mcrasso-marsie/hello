@@ -1,7 +1,7 @@
 ---
 artifact_type: architecture
 id: ARCH-0001
-version: 1.0
+version: 1.1
 status: Approved
 ---
 
@@ -70,21 +70,21 @@ subgraph hello_cli["hello command-line package"]
   word_count_command["Word-count command<br/>component"]
   word_counter["Word counter<br/>component"]
 end
-word_count_command -->|"Passes the decoded file text in an in-process function call and receives the integer word count."| word_counter
+word_count_command -->|"Passes the decoded file text in in-process function calls and receives both the integer word count and the integer non-whitespace character count."| word_counter
 ```
 
 | ID | Unit | Level | Parent | Owns | Does NOT own | Deployment | Tech Family |
 |----|------|-------|--------|------|--------------|------------|-------------|
-| hello | hello | system |  | Giving users local, dependency-free text utilities, starting with reporting the word count of one text file. | Other text statistics, batch or stdin processing, non-UTF-8 encodings, or distribution through a public package index. | Installed from the repository into a local Python environment on the user's machine. | Python (current stable release), standard library only |
-| hello-cli | hello command-line package | container | hello | The installable src-layout hello package and its console command that takes one file path, prints that file's word count, and exits with a status code. | Any network access, persistent state, configuration files, or third-party runtime dependencies. | Run as a local process on the user's machine after installing the package from the repository into the project environment. | Python standard library; console entry point declared in pyproject.toml; environment managed with the existing lockfile tooling |
-| word-count-command | Word-count command | component | hello-cli | Parsing the single file-path argument, reading the file as UTF-8 text, passing the text to the counter, printing the count, and turning a missing file, unreadable file or undecodable content into a one-line message on standard error with a non-zero exit status. | The definition of what a word is, or counting logic of any kind. |  | Python standard library |
-| word-counter | Word counter | component | hello-cli | The word rule: a word is a run of non-whitespace characters separated by whitespace. It counts the words in a given text and returns the number. | File access, encoding, argument handling, output or exit codes; it never touches the filesystem or the process. |  | Python standard library |
+| hello | hello | system |  | Giving users local, dependency-free text utilities, reporting the word count and non-whitespace character count of one text file. | Total character counts including whitespace, line counts, byte sizes, batch or stdin processing, non-UTF-8 encodings, or distribution through a public package index. | Installed from the repository into a local Python environment on the user's machine. | Python (current stable release), standard library only |
+| hello-cli | hello command-line package | container | hello | The installable src-layout hello package and its console command that takes one file path, prints that file's word count and non-whitespace character count by default, and exits with a status code. | Any network access, persistent state, configuration files, or third-party runtime dependencies. | Run as a local process on the user's machine after installing the package from the repository into the project environment. | Python standard library; console entry point declared in pyproject.toml; environment managed with the existing lockfile tooling |
+| word-count-command | Word-count command | component | hello-cli | Parsing the single file-path argument, reading the file as UTF-8 text, passing the text to the counter, printing both the word count and non-whitespace character count by default, and turning a missing file, unreadable file or undecodable content into a one-line message on standard error with a non-zero exit status. | The definitions of what constitutes a word or a non-whitespace character, or counting logic of any kind. |  | Python standard library |
+| word-counter | Word counter | component | hello-cli | The pure text-counting rules: counting words (runs of non-whitespace characters separated by whitespace) and counting non-whitespace characters (excluding whitespace) in a given text, returning integer counts. | File access, encoding, argument handling, output formatting or exit codes; it never touches the filesystem or the process. |  | Python standard library |
 
 ## 9. Communication Patterns
 
 | From | To | Description |
 |------|----|-------------|
-| word-count-command | word-counter | Passes the decoded file text in an in-process function call and receives the integer word count. |
+| word-count-command | word-counter | Passes the decoded file text in in-process function calls and receives both the integer word count and the integer non-whitespace character count. |
 
 ## 10. Data Architecture
 
@@ -119,3 +119,4 @@ word_count_command -->|"Passes the decoded file text in an in-process function c
 | Version | Date | Summary | Triggered by |
 |---------|------|---------|--------------|
 | 1.0 | 2026-11-12 | First architecture draft: the hello system as one local Python CLI container with a word-count command, split into a command-line shell and a pure, dependency-free counting core. | SPEC-0001 |
+| 1.1 | 2026-11-13 | Expand the pure counting core and default CLI command output to compute and report non-whitespace character counts alongside word counts in a single invocation. | SPEC-0002 |
