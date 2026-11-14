@@ -32,7 +32,7 @@
     }
   ],
   "current_index": 1,
-  "rejection_count": 0,
+  "rejection_count": 1,
   "pbi_id": null,
   "child_ids": [],
   "artifact_paths": {
@@ -213,46 +213,7 @@
       "path": "docs/strategy/STRAT-0002.md"
     }
   },
-  "quiz_questions": {
-    "DEFINE": [
-      {
-        "text": "Two readable UTF-8 files contain the same visible text: one contains precomposed `\u00e9`, and the other contains `e` followed by a combining acute accent. Each also contains a trailing newline. Why should both produce `words: 1 characters: 1` under the approved strategy?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "The character measure excludes whitespace and counts visible characters, so the combining accent does not add a character and the newline contributes nothing.",
-        "options": [
-          "The character measure excludes whitespace and counts visible characters, so the combining accent does not add a character and the newline contributes nothing.",
-          "The character measure counts non-whitespace Unicode code points, so the two encodings must produce identical character counts.",
-          "The existing word rule also defines character counting, so any single word contributes exactly one character.",
-          "The character measure counts only precomposed letters, so combining accents and their preceding letters are replaced before counting."
-        ]
-      },
-      {
-        "text": "A downstream script expects `wordcount PATH` to print a bare integer. A reviewer proposes preserving that output unless the user supplies a new character-count flag. Why is that not an acceptable compatibility fix for this strategy?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "It would make the second measure conditional and change the invocation contract; the strategy deliberately accepts a successful-output compatibility break so the existing invocation always reports both counts.",
-        "options": [
-          "It would make the second measure conditional and change the invocation contract; the strategy deliberately accepts a successful-output compatibility break so the existing invocation always reports both counts.",
-          "It would prevent the command from preserving its word-count semantics, because labeled output requires a different word-count algorithm.",
-          "It would require accepting non-UTF-8 input, whereas the existing invocation supports only UTF-8 files.",
-          "It would be acceptable as long as the new flag preserves existing error messages and exit statuses."
-        ]
-      },
-      {
-        "text": "An implementation adds a heuristic that rejects some otherwise readable, valid UTF-8 files as binary. Its author argues that this makes text statistics safer. Why should a reviewer reject that addition under the approved strategy?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "It introduces a new reason for failure beyond the preserved error contract; adding a character measure does not authorize rejecting otherwise accepted input through binary classification.",
-        "options": [
-          "It introduces a new reason for failure beyond the preserved error contract; adding a character measure does not authorize rejecting otherwise accepted input through binary classification.",
-          "Binary detection belongs in the word-count component rather than the command component, so the same rejection is acceptable if moved there.",
-          "The strategy requires every file to produce counts, even when the file cannot be decoded as UTF-8.",
-          "The heuristic is acceptable if it reuses an existing error message and exit status, since preserving their wording is sufficient to preserve error behavior."
-        ]
-      }
-    ]
-  },
+  "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
