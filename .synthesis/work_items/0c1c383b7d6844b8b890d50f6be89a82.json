@@ -41,9 +41,19 @@
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {},
+  "clarification_questions": {
+    "DISCOVER": [
+      "Should a 'character' be counted as a Unicode code point (so \"caf\u00e9\" is 4) or as a UTF-8 byte (so \"caf\u00e9\" is 5)?",
+      "Should whitespace characters, including spaces, tabs and newlines, be included in the character count?",
+      "Should `wordcount PATH` always print both counts, or should the character count appear only when a flag such as `--chars` is passed, leaving the current word-count-only output unchanged by default?",
+      "If both counts are printed, what exact stdout format is expected: their order, the separator, whether they share one line, and whether each has a label?",
+      "Should the console script keep the name `wordcount`, or should a new or renamed command be added for the combined output?"
+    ]
+  },
   "clarifications": {},
-  "clarification_rounds": {},
+  "clarification_rounds": {
+    "DISCOVER": 1
+  },
   "settings": {
     "token_quota": null
   },
