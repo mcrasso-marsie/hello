@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "id": "780b00a1-866c-409c-9882-09868d8e0925",
+  "timestamp": "2026-11-14T00:12:28Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [],
+  "metadata": {
+    "pbi": "SPEC-0002/PBI-0006",
+    "rev": 1,
+    "base_revision": "49aa4d9849a94b8a65045c69ec8a8aec20cd8b07"
+  }
+}
