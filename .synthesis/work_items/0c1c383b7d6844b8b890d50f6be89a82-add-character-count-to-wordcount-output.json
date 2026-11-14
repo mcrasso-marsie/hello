@@ -32,7 +32,7 @@
     }
   ],
   "current_index": 5,
-  "rejection_count": 0,
+  "rejection_count": 1,
   "pbi_id": "add-character-count-to-wordcount-output",
   "child_ids": [],
   "artifact_paths": {
