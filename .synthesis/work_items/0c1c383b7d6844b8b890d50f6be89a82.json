@@ -213,7 +213,17 @@
       "path": "docs/strategy/STRAT-0002.md"
     }
   },
-  "quiz_questions": {},
+  "quiz_questions": {
+    "DEFINE": [
+      {
+        "text": "STRAT-0002 remains stale and unapproved. Could you provide the previous three quiz questions and the documented procedure for requesting strategy rework or reconciling upstream discovery? Neither is included in the handoff.",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      }
+    ]
+  },
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
