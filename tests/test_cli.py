@@ -10,16 +10,23 @@ from hello.cli import main
 
 
 @pytest.mark.parametrize(
-    "content",
+    ("content", "expected"),
     [
-        "one two three\n",
-        "  alpha\t\tbeta\n\ngamma  ",
-        "Hello, world! It's-fine.",
-        "café naïve 日本",
+        ("one two three\n", "words: 3 characters: 11\n"),
+        ("  alpha\t\tbeta\n\ngamma  ", "words: 3 characters: 14\n"),
+        ("Hello, world! It's-fine.", "words: 3 characters: 22\n"),
+        ("café naïve 日本", "words: 3 characters: 11\n"),
+        ("café", "words: 1 characters: 4\n"),
+        ("e\u0301", "words: 1 characters: 1\n"),
+        ("", "words: 0 characters: 0\n"),
+        ("  \t\n\n ", "words: 0 characters: 0\n"),
     ],
 )
-def test_prints_word_count_of_file(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str], content: str
+def test_success_output_is_labeled_combined_line(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    content: str,
+    expected: str,
 ) -> None:
     path = tmp_path / "notes.txt"
     path.write_text(content, encoding="utf-8")
@@ -27,38 +34,34 @@ def test_prints_word_count_of_file(
     assert main([str(path)]) == 0
 
     captured = capsys.readouterr()
-    assert captured.out == "3\n"
+    assert captured.out == expected
     assert captured.err == ""
 
 
-def test_empty_file_reports_zero(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    path = tmp_path / "empty.txt"
-    path.write_bytes(b"")
-
-    assert main([str(path)]) == 0
-
-    assert capsys.readouterr().out == "0\n"
-
-
-def test_counting_is_delegated_to_count_words(
+def test_counting_is_delegated_to_both_counters(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    calls: list[str] = []
+    word_calls: list[str] = []
+    character_calls: list[str] = []
 
     def fake_count_words(text: str) -> int:
-        calls.append(text)
+        word_calls.append(text)
+        return 7
+
+    def fake_count_characters(text: str) -> int:
+        character_calls.append(text)
         return 42
 
     monkeypatch.setattr(cli, "count_words", fake_count_words)
+    monkeypatch.setattr(cli, "count_characters", fake_count_characters)
     path = tmp_path / "notes.txt"
-    path.write_text("one two three\n", encoding="utf-8")
+    path.write_text("x", encoding="utf-8")
 
     assert main([str(path)]) == 0
 
-    assert calls == ["one two three\n"]
-    assert capsys.readouterr().out == "42\n"
+    assert word_calls == ["x"]
+    assert character_calls == ["x"]
+    assert capsys.readouterr().out == "words: 7 characters: 42\n"
 
 
 def test_missing_argument_is_usage_error(capsys: pytest.CaptureFixture[str]) -> None:
