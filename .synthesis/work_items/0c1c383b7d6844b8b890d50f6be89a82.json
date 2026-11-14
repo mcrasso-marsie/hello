@@ -34,7 +34,9 @@
   "current_index": 3,
   "rejection_count": 0,
   "pbi_id": null,
-  "child_ids": [],
+  "child_ids": [
+    "0c1c383b7d6844b8b890d50f6be89a82-add-character-count-to-wordcount-output"
+  ],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0002.md",
     "DEFINE": "docs/strategy/STRAT-0002.md",
