@@ -571,42 +571,62 @@
           "The heuristic creates a new failure category for otherwise accepted input; preserving the specified error contract does not authorize rejecting valid UTF-8 merely because it appears binary-like."
         ]
       }
-    ],
-    "SPEC": [
-      {
-        "text": "The decision defining a visible character rejected 'len(text) minus whitespace characters'. What is the reasoning behind rejecting it?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
-        "options": [
-          "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
-          "It counts UTF-8 bytes rather than code points, so any non-ASCII character would be over-counted.",
-          "It would need a third-party Unicode segmentation library, which violates the no-runtime-dependencies rule in ADR-0001.",
-          "It uses a different whitespace definition from the word rule, so the word count and character count could disagree about what is whitespace."
-        ]
-      },
-      {
-        "text": "The character rule excludes code points whose Unicode category starts with 'M' instead of segmenting grapheme clusters. Explain why grapheme-cluster segmentation was not used, and describe at least one input where the chosen rule gives a different answer from true grapheme-cluster counting, or a case where the rule gives a surprising result.",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "Why was 'keep the bare word count by default and add a flag for characters' rejected as the way to deliver the character count, and what cost does the chosen design knowingly accept?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
-        "options": [
-          "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
-          "Adding a flag would require argparse to be replaced by a third-party parser, and the chosen design accepts a new runtime dependency.",
-          "A flag would make count_words perform I/O, and the chosen design accepts moving file reading into the counting modules.",
-          "A flag would change the exit status for usage errors from 2 to 1, and the chosen design accepts that error output changes instead."
-        ]
-      }
     ]
   },
-  "passed_quizzes": {},
+  "passed_quizzes": {
+    "SPEC": {
+      "passed": true,
+      "justification": "The answer shows an understanding of both the constraint and the trade-off. It ties the rejection of grapheme segmentation to the missing standard-library support and the ADR-0001 ban on third-party runtime dependencies. It then explains why the category-M rule undercounts merging: emoji ZWJ sequences and flag pairs are made of code points that are neither marks nor whitespace, so each one is counted separately. The flag example goes beyond the artifact's own wording, which suggests real reasoning rather than paraphrase. Nothing important was missed. The one optional addition was the edge case of a combining mark that begins the text or follows whitespace and counts as 0.",
+      "answers": [
+        {
+          "question": {
+            "text": "The decision defining a visible character rejected 'len(text) minus whitespace characters'. What is the reasoning behind rejecting it?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
+            "options": [
+              "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
+              "It counts UTF-8 bytes rather than code points, so any non-ASCII character would be over-counted.",
+              "It would need a third-party Unicode segmentation library, which violates the no-runtime-dependencies rule in ADR-0001.",
+              "It uses a different whitespace definition from the word rule, so the word count and character count could disagree about what is whitespace."
+            ]
+          },
+          "response": "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
+          "correct": true,
+          "note": ""
+        },
+        {
+          "question": {
+            "text": "The character rule excludes code points whose Unicode category starts with 'M' instead of segmenting grapheme clusters. Explain why grapheme-cluster segmentation was not used, and describe at least one input where the chosen rule gives a different answer from true grapheme-cluster counting, or a case where the rule gives a surprising result.",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "Grapheme-cluster segmentation is not in Python's standard library and would require a third-party dependency, which violates the no-runtime-dependencies rule. Excluding Unicode category 'M' code points handles combining marks, but differs from true grapheme-cluster counting on inputs like emoji ZWJ sequences (e.g., \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67) or flag sequences (\ud83c\uddfa\ud83c\uddf8), which are 1 grapheme cluster but multiple non-'M' code points.",
+          "correct": true,
+          "note": "The answer gives the right rationale: the standard library has no grapheme segmentation, and a third-party library would break the no-runtime-dependencies constraint (ADR-0001). It also gives valid divergent inputs with the reason. The ZWJ family emoji is several code points (emoji joined by U+200D, category Cf), none in category M and none whitespace, so the rule counts 5 where a reader sees 1 cluster. It adds the regional-indicator flag sequence, which is not named in the artifact: two So code points count as 2 against 1 cluster. This shows the student understands the rule is an approximation, not just a restatement of the artifact. A further surprising case would be a combining mark that starts the text or follows whitespace, which counts 0."
+        },
+        {
+          "question": {
+            "text": "Why was 'keep the bare word count by default and add a flag for characters' rejected as the way to deliver the character count, and what cost does the chosen design knowingly accept?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
+            "options": [
+              "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
+              "Adding a flag would require argparse to be replaced by a third-party parser, and the chosen design accepts a new runtime dependency.",
+              "A flag would make count_words perform I/O, and the chosen design accepts moving file reading into the counting modules.",
+              "A flag would change the exit status for usage errors from 2 to 1, and the chosen design accepts that error output changes instead."
+            ]
+          },
+          "response": "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
+          "correct": true,
+          "note": ""
+        }
+      ]
+    }
+  },
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
