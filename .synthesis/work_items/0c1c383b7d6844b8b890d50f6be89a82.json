@@ -213,7 +213,31 @@
       "path": "docs/strategy/STRAT-0002.md"
     }
   },
-  "quiz_questions": {},
+  "quiz_questions": {
+    "DEFINE": [
+      {
+        "text": "Why must the revised character measure count both precomposed `\u00e9` and decomposed `e` plus a combining accent as one, and what would go wrong if it counted Unicode code points or UTF-8 bytes instead?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "Why is changing the successful output to `words: <N> characters: <M>` an intentional compatibility break, and why would an optional flag or a separate command not satisfy the stated requirements?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "The earlier quiz and strategy used a different character definition. Before implementation, what needs to happen to the discovery and requirements trail and its approvals, and why must the revised SPEC resolve grapheme and whitespace semantics and document the rationale for any needed dependency?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      }
+    ]
+  },
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
