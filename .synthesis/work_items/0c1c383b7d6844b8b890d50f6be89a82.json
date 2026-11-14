@@ -43,7 +43,13 @@
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {},
+  "clarification_questions": {
+    "DEFINE": [
+      "DEFINE comprehension quiz \u2014 please answer without assistance: How does the successful output change, and what compatibility risk does that create?",
+      "DEFINE comprehension quiz \u2014 please answer without assistance: How are characters counted, and how does that differ from counting UTF-8 bytes?",
+      "DEFINE comprehension quiz \u2014 please answer without assistance: Which invocation and existing error behaviors must remain unchanged?"
+    ]
+  },
   "clarifications": {
     "DISCOVER": {
       "Should a 'character' be counted as a Unicode code point (so \"caf\u00e9\" is 4) or as a UTF-8 byte (so \"caf\u00e9\" is 5)?": "Unicode code points: caf\u00e9 == 4.",
@@ -54,7 +60,8 @@
     }
   },
   "clarification_rounds": {
-    "DISCOVER": 1
+    "DISCOVER": 1,
+    "DEFINE": 1
   },
   "settings": {
     "token_quota": null
