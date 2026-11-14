@@ -213,31 +213,7 @@
       "path": "docs/strategy/STRAT-0002.md"
     }
   },
-  "quiz_questions": {
-    "DEFINE": [
-      {
-        "text": "Why does the strategy accept breaking consumers that parse a bare integer instead of making character counts optional or using a separate command?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "A file contains a decomposed \u201c\u00e9\u201d represented by an e followed by a combining accent, then a space. How many characters should be counted, and why might a byte count or a count of visible characters give a different result?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "Why should the updated command preserve invalid-UTF-8 rejection without introducing a separate binary-file rejection? What could go wrong if binary detection were added as part of this change?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      }
-    ]
-  },
+  "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
