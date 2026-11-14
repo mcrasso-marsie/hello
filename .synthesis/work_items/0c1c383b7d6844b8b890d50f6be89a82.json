@@ -35,22 +35,69 @@
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
-  "artifact_paths": {},
-  "pending_artifacts": {},
+  "artifact_paths": {
+    "DISCOVER": "docs/discovery/DG-0002.md"
+  },
+  "pending_artifacts": {
+    "DISCOVER": {
+      "graph_type": "opportunity",
+      "signals": [
+        {
+          "identity": "file-character-count",
+          "text": "Extend the existing wordcount PATH command to always report both word count and character count.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "file-character-count",
+          "text": "Count characters as Unicode code points (caf\u00e9 counts as 4), excluding whitespace including spaces, tabs and newlines.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "file-character-count",
+          "text": "Print a single labeled line in this exact format: words: <N> characters: <M>.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "file-character-count",
+          "text": "Keep the command name wordcount and its PATH argument, and add no flags.",
+          "consequence_of": null,
+          "possible_indication": null
+        }
+      ],
+      "core_issue": "Users want a non-whitespace character count alongside the word count when inspecting a UTF-8 file.",
+      "impact_value": "Makes both measures available in one command, with character counts reflecting Unicode code points rather than UTF-8 bytes.",
+      "discovery_method": "Review of the requested extension and the human's clarification answers against the existing approved word-count specification.",
+      "pattern_dependencies": "The requested character count and combined output concern one extension of the existing word-count command; no dependencies between separate patterns were identified.",
+      "pattern_narratives": [
+        {
+          "identity": "file-character-count",
+          "applies_to": "Users inspecting readable UTF-8 files with wordcount PATH.",
+          "frequency": "Every successful command invocation.",
+          "severity": "Not specified; feature enhancement.",
+          "confidence": "High, based on the explicit intent and clarification answers.",
+          "current_state": "The approved command reports only the integer word count; it does not report a character count."
+        }
+      ],
+      "questions": []
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {
-    "DISCOVER": [
-      "Should a 'character' be counted as a Unicode code point (so \"caf\u00e9\" is 4) or as a UTF-8 byte (so \"caf\u00e9\" is 5)?",
-      "Should whitespace characters, including spaces, tabs and newlines, be included in the character count?",
-      "Should `wordcount PATH` always print both counts, or should the character count appear only when a flag such as `--chars` is passed, leaving the current word-count-only output unchanged by default?",
-      "If both counts are printed, what exact stdout format is expected: their order, the separator, whether they share one line, and whether each has a label?",
-      "Should the console script keep the name `wordcount`, or should a new or renamed command be added for the combined output?"
-    ]
+  "clarification_questions": {},
+  "clarifications": {
+    "DISCOVER": {
+      "Should a 'character' be counted as a Unicode code point (so \"caf\u00e9\" is 4) or as a UTF-8 byte (so \"caf\u00e9\" is 5)?": "Unicode code points: caf\u00e9 == 4.",
+      "Should whitespace characters, including spaces, tabs and newlines, be included in the character count?": "No. Exclude whitespace characters, including spaces, tabs and newlines.",
+      "Should `wordcount PATH` always print both counts, or should the character count appear only when a flag such as `--chars` is passed, leaving the current word-count-only output unchanged by default?": "Always print both counts. Keep wordcount PATH; no new flags.",
+      "If both counts are printed, what exact stdout format is expected: their order, the separator, whether they share one line, and whether each has a label?": "Single line, exactly like this example: words: 3 characters: 14 (word count first, then character count, both labeled).",
+      "Should the console script keep the name `wordcount`, or should a new or renamed command be added for the combined output?": "Keep the command name wordcount."
+    }
   },
-  "clarifications": {},
   "clarification_rounds": {
     "DISCOVER": 1
   },
