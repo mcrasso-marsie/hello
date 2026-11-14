@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0002
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Provide users both word and non-whitespace Unicode character counts in one invocation now, while making the intentional output compatibility break explicit.
@@ -29,7 +29,7 @@ status: Draft
 | Criterion | Measurement | Target | Baseline | Cadence |
 |---|---|---|---|---|
 | Successful output reports both counts in the required format. | Successful-invocation tests covering ordinary, empty and whitespace-only UTF-8 files. | 100% pass; each successful invocation emits one line in the format `words: <N> characters: <M>`. | SPEC-0001 specifies a bare integer, so its successful-output contract does not match the new format. | Every change and Quality Gate run |
-| Character counts represent non-whitespace Unicode code points rather than UTF-8 bytes. | Character-count and command tests including `café`, whitespace and combining characters. | 100% pass; `café` counts as 4. | SPEC-0001 does not report character counts. | Every change and Quality Gate run |
+| Character counts represent non-whitespace visible characters rather than Unicode code points or UTF-8 bytes. | Character-count and command tests including `café`, whitespace and combining characters. | 100% pass; `café` counts as 4, and both precomposed `é` and decomposed `e` followed by a combining accent count as 1. | SPEC-0001 does not report character counts. | Every change and Quality Gate run |
 | Existing invocation, word counts and specified error behavior remain intact. | Applicable SPEC-0001 regression tests for arguments, word semantics, missing and unreadable files, invalid UTF-8 and traceback-free errors. | 100% pass, excluding the superseded bare-integer success-output expectation. | SPEC-0001 defines the existing behavior; current measured test results not supplied. | Every change and Quality Gate run |
 | The required project Quality Gate remains satisfied. | Results of the four commands recorded in AGENTS.md. | All four commands exit 0 before the change lands. | Existing constitution requires all four checks; current run results not supplied. | Before any change lands |
 
@@ -53,14 +53,14 @@ Would preserve existing consumers by default, but conflicts with the requirement
 **Why NOT Offer character counting through a separate command or invocation.:**  
 Avoids changing existing output, but requires users to take an additional action and does not provide both measures through the existing invocation.
 
-**Why NOT Report a byte count instead of a Unicode code-point count.:**  
+**Why NOT Report a byte count instead of a visible-character count.:**  
 May be simpler for consumers concerned with file size, but misrepresents non-ASCII text and fails the requested character definition.
 
 ## Scope Boundaries (What Ships in v1)
 
 ### In Scope
 
-- Character counts for readable UTF-8 files, excluding whitespace and counting Unicode code points.
+- Character counts for readable UTF-8 files, excluding whitespace and counting visible characters; a base letter followed by a combining accent counts as one visible character.
 - The exact combined successful-output contract for the existing single-path command.
 - Preservation of existing word-count, invocation and specified error behavior.
 - Documentation and regression coverage for the changed contract.
@@ -161,6 +161,6 @@ May be simpler for consumers concerned with file size, but misrepresents non-ASC
 ## Sign-Off
 
 **Authored by:** openrouter:openai/gpt-6.1-terra-pro  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
