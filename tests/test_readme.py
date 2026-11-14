@@ -1,4 +1,4 @@
-"""README checks: install, run, the word rule and the error exit statuses are documented."""
+"""README checks: install, run, the word and character rules and the error exit statuses are documented."""
 
 from pathlib import Path
 
@@ -10,6 +10,10 @@ REQUIRED_PHRASES = (
     "a word is a run of non-whitespace characters",
     "exit status 1",
     "exit status 2",
+    "words: <n> characters: <m>",
+    "a visible character is a non-whitespace character",
+    "combining marks",
+    "bare-integer output",
 )
 
 

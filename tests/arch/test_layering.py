@@ -1,11 +1,14 @@
-"""Architecture guardrail: hello.counter performs no I/O (ADR-0002)."""
+"""Architecture guardrail: hello.counter and hello.characters perform no I/O (ADR-0002)."""
 
 import ast
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COUNTER_SOURCE = REPO_ROOT / "src" / "hello" / "counter.py"
+CHARACTERS_SOURCE = REPO_ROOT / "src" / "hello" / "characters.py"
 FORBIDDEN_MODULES = frozenset({"os", "sys", "io", "pathlib", "subprocess", "builtins"})
+ALLOWED_CHARACTERS_IMPORTS = frozenset({"unicodedata"})
+FORBIDDEN_CALLS = frozenset({"open", "print", "input"})
 
 
 def _imported_module_names(node: ast.AST) -> list[str]:
@@ -36,3 +39,19 @@ def test_word_counter_has_no_io_imports() -> None:
 
     assert not imported & FORBIDDEN_MODULES, f"forbidden imports: {imported}"
     assert not _calls_open(tree), "counter.py must not call open()"
+
+
+def _called_names(tree: ast.AST) -> set[str]:
+    return {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+
+def test_characters_module_performs_no_io() -> None:
+    tree = ast.parse(CHARACTERS_SOURCE.read_text(encoding="utf-8"))
+    imported = _top_level_imports(tree)
+
+    assert imported <= ALLOWED_CHARACTERS_IMPORTS, f"unexpected imports: {imported}"
+    assert not _called_names(tree) & FORBIDDEN_CALLS, "characters.py must not do I/O"
