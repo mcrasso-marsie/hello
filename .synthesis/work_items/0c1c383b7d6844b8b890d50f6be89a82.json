@@ -37,9 +37,505 @@
   "child_ids": [],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0002.md",
-    "DEFINE": "docs/strategy/STRAT-0002.md"
+    "DEFINE": "docs/strategy/STRAT-0002.md",
+    "SPEC": "docs/specs/SPEC-0002.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "SPEC": {
+      "definition_of_done": [
+        "src/hello/characters.py defines count_characters(text: str) -> int, which returns the number of characters in text that are not whitespace (str.isspace() is false) and whose unicodedata category does not start with 'M'.",
+        "count_characters returns 0 for an empty string and for a string containing only whitespace.",
+        "count_characters counts the precomposed string '\u00e9' (U+00E9) as 1 and the decomposed string 'e' followed by U+0301 as 1.",
+        "hello.characters performs no file, process or console I/O and imports only the standard library.",
+        "Running `wordcount PATH` on a readable UTF-8 file prints exactly one line of the form `words: <N> characters: <M>` followed by a newline to stdout, nothing to stderr, and exits with status 0.",
+        "For a file containing 'caf\u00e9', `wordcount PATH` prints `words: 1 characters: 4`.",
+        "For an empty file and for a whitespace-only file, `wordcount PATH` prints `words: 0 characters: 0` and exits with status 0.",
+        "hello.cli.main obtains <N> from hello.counter.count_words and <M> from hello.characters.count_characters on the same decoded text.",
+        "README.md documents the `words: <N> characters: <M>` output line, the visible-character rule, and states that the bare-integer output of the earlier version no longer applies.",
+        "All four Quality Gate commands exit 0 on the finished change."
+      ],
+      "regression_guardrails": [
+        "The `wordcount PATH` invocation is unchanged: one positional PATH argument, no new flags, and the console script `wordcount = \"hello.cli:main\"` remains declared in pyproject.toml.",
+        "The word count <N> in the output follows the unchanged SPEC-0001 word rule: a file containing '  alpha\\t\\tbeta\\n\\ngamma  ' reports 3 words.",
+        "hello.counter.count_words returns the same values as before and still performs no file, process or console I/O.",
+        "A path that does not exist still prints exactly one line `wordcount: error: file not found: PATH` to stderr, prints nothing to stdout, and exits with status 1.",
+        "A path that exists but cannot be read (a directory or a file without read permission) still prints exactly one line starting with `wordcount: error: cannot read file:` to stderr, prints nothing to stdout, and exits with status 1.",
+        "A file whose bytes are not valid UTF-8 still prints exactly one line `wordcount: error: file is not valid UTF-8 text: PATH` to stderr, prints nothing to stdout, and exits with status 1.",
+        "No error case writes a Python traceback to stderr, and invoking `wordcount` with no argument or with more than one argument still prints argparse usage to stderr and exits with status 2.",
+        "`import hello` still succeeds with every name src/hello/__init__.py exported before, src/hello/py.typed remains present, and the src layout is unchanged.",
+        "pyproject.toml [project].dependencies stays empty, and ruff, mypy and pytest stay declared only in the `dev` dependency group.",
+        "The AGENTS.md Toolchain table keeps its four Quality Gate rows and its Judgment Boundaries bullets word for word."
+      ],
+      "scenarios": [
+        {
+          "name": "count_characters excludes whitespace",
+          "given": [
+            "the text 'a b\\tc\\n' containing three non-whitespace characters separated by a space, a tab and a newline"
+          ],
+          "when": [
+            "hello.characters.count_characters is called with that text"
+          ],
+          "then": [
+            "the returned value is 3"
+          ]
+        },
+        {
+          "name": "count_characters returns zero for empty and whitespace-only text",
+          "given": [
+            "the empty string and the string '  \\t\\n\\n '"
+          ],
+          "when": [
+            "hello.characters.count_characters is called with each string"
+          ],
+          "then": [
+            "both calls return 0"
+          ]
+        },
+        {
+          "name": "count_characters counts non-ASCII characters as visible characters",
+          "given": [
+            "the text 'caf\u00e9 na\u00efve \u65e5\u672c'"
+          ],
+          "when": [
+            "hello.characters.count_characters is called with that text"
+          ],
+          "then": [
+            "the returned value is 11"
+          ]
+        },
+        {
+          "name": "count_characters counts a base character with a combining mark once",
+          "given": [
+            "the precomposed string '\\u00e9' and the decomposed string 'e\\u0301'"
+          ],
+          "when": [
+            "hello.characters.count_characters is called with each string"
+          ],
+          "then": [
+            "both calls return 1"
+          ]
+        },
+        {
+          "name": "hello.characters performs no I/O",
+          "given": [
+            "the module src/hello/characters.py"
+          ],
+          "when": [
+            "its imports and calls are inspected by the architecture test tests/arch/test_layering.py::test_characters_module_performs_no_io"
+          ],
+          "then": [
+            "the test passes, showing the module imports no I/O, process or third-party modules and calls no open, print or input"
+          ]
+        },
+        {
+          "name": "wordcount prints the combined line for a non-ASCII file",
+          "given": [
+            "a readable UTF-8 file containing 'caf\u00e9'"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 1 characters: 4' followed by a newline",
+            "stderr is empty",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "wordcount prints the combined line for punctuated text",
+          "given": [
+            "a readable UTF-8 file containing 'Hello, world! It's-fine.'"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 3 characters: 22' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "wordcount counts a decomposed accent as one character",
+          "given": [
+            "a readable UTF-8 file containing 'e' followed by U+0301"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 1 characters: 1' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "wordcount reports zeros for an empty file",
+          "given": [
+            "an empty readable file"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 0 characters: 0' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "wordcount reports zeros for a whitespace-only file",
+          "given": [
+            "a readable UTF-8 file containing '  \\t\\n\\n '"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 0 characters: 0' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "main combines the word counter and the character counter",
+          "given": [
+            "hello.counter.count_words and hello.characters.count_characters replaced by test doubles returning 7 and 42",
+            "a readable UTF-8 file containing 'x'"
+          ],
+          "when": [
+            "hello.cli.main is called with the file path"
+          ],
+          "then": [
+            "each double is called once with the decoded text 'x'",
+            "stdout is exactly 'words: 7 characters: 42' followed by a newline"
+          ]
+        },
+        {
+          "name": "guardrail: word semantics are unchanged in the combined output",
+          "given": [
+            "a readable UTF-8 file containing '  alpha\\t\\tbeta\\n\\ngamma  ', which reported 3 words before this change"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stdout is exactly 'words: 3 characters: 14' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "guardrail: count_words is unchanged",
+          "given": [
+            "the text '  alpha\\t\\tbeta\\n\\ngamma  ' and the empty string"
+          ],
+          "when": [
+            "hello.counter.count_words is called with each"
+          ],
+          "then": [
+            "the calls return 3 and 0 respectively"
+          ]
+        },
+        {
+          "name": "guardrail: missing file error is unchanged",
+          "given": [
+            "a path that does not exist"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that path"
+          ],
+          "then": [
+            "stderr is exactly one line 'wordcount: error: file not found: PATH'",
+            "stdout is empty",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: unreadable path error is unchanged",
+          "given": [
+            "a path that is an existing directory"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that path"
+          ],
+          "then": [
+            "stderr is exactly one line starting with 'wordcount: error: cannot read file:'",
+            "stdout is empty",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: invalid UTF-8 error is unchanged",
+          "given": [
+            "a file containing the bytes 0xff 0xfe 0xfd"
+          ],
+          "when": [
+            "`wordcount PATH` is run with that file's path"
+          ],
+          "then": [
+            "stderr is exactly one line 'wordcount: error: file is not valid UTF-8 text: PATH'",
+            "stdout is empty",
+            "stderr contains no 'Traceback'",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: wrong argument count still exits with usage status",
+          "given": [
+            "`wordcount` invoked with no argument, and separately with two arguments"
+          ],
+          "when": [
+            "each invocation runs"
+          ],
+          "then": [
+            "argparse usage is written to stderr",
+            "stdout is empty",
+            "the exit status is 2 in both cases"
+          ]
+        },
+        {
+          "name": "guardrail: package import and typing marker are unchanged",
+          "given": [
+            "the installed hello package"
+          ],
+          "when": [
+            "`import hello` is executed and the package files are listed"
+          ],
+          "then": [
+            "the import succeeds and every name previously exported by src/hello/__init__.py is still present",
+            "src/hello/py.typed exists"
+          ]
+        },
+        {
+          "name": "guardrail: no third-party runtime dependencies",
+          "given": [
+            "pyproject.toml after the change"
+          ],
+          "when": [
+            "[project].dependencies and the dev dependency group are read"
+          ],
+          "then": [
+            "[project].dependencies is empty",
+            "ruff, mypy and pytest appear only in the dev dependency group"
+          ]
+        },
+        {
+          "name": "README documents the combined output and the character rule",
+          "given": [
+            "README.md after the change"
+          ],
+          "when": [
+            "its text is searched"
+          ],
+          "then": [
+            "it contains the output form `words: <N> characters: <M>`",
+            "it states that a visible character is a non-whitespace character and that a base character with combining marks counts once",
+            "it states that the earlier bare-integer output no longer applies"
+          ]
+        },
+        {
+          "name": "character rule decision is enforced by a unit test",
+          "given": [
+            "the decision that visible characters exclude whitespace and Unicode marks"
+          ],
+          "when": [
+            "the test tests/test_characters.py::test_combining_marks_do_not_add_to_count runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "output contract decision is enforced by a CLI test",
+          "given": [
+            "the decision that every successful invocation prints one labeled combined line"
+          ],
+          "when": [
+            "the test tests/test_cli.py::test_success_output_is_labeled_combined_line runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "Quality Gate passes on the finished change",
+          "given": [
+            "the finished change in the working tree"
+          ],
+          "when": [
+            "`uv run ruff format --check .`, `uv run ruff check .`, `uv run mypy --strict src tests` and `uv run pytest` are run"
+          ],
+          "then": [
+            "all four commands exit with status 0"
+          ]
+        }
+      ],
+      "feature_name": "Character count in word-count output",
+      "context": "The wordcount command currently reports only the word count of one UTF-8 text file, as a bare integer. Users also need the number of visible characters in the same invocation, with no flags and no second command.\n\nThis spec makes every successful invocation print both measures on one labeled line. It deliberately supersedes SPEC-0001's bare-integer success output, while keeping the invocation, the word rule and the one-line error contract unchanged.",
+      "c4_elements": [
+        "hello",
+        "hello-cli",
+        "word-count-command",
+        "word-counter",
+        "character-counter"
+      ],
+      "api_contracts": [
+        "Console command: `wordcount PATH`, one positional argument, no new flags; entry point hello.cli:main(argv: list[str] | None = None) -> int is unchanged.",
+        "Success output on stdout: exactly `words: <N> characters: <M>` followed by a newline, exit status 0. This replaces SPEC-0001's bare-integer output.",
+        "Error output and exit statuses (1 for runtime errors, 2 for usage errors) are unchanged from SPEC-0001 and ADR-0004.",
+        "New function hello.characters.count_characters(text: str) -> int, a pure function; hello.counter.count_words(text: str) -> int is unchanged."
+      ],
+      "data_models": [
+        "Input: the decoded UTF-8 text of one file as str.",
+        "Output: two non-negative integers, the word count and the visible-character count, rendered in one stdout line.",
+        "Visible character: a code point that is not whitespace (str.isspace() false) and whose unicodedata.category does not start with 'M' (Mn, Mc, Me); combining marks therefore never add to the count."
+      ],
+      "dependencies": [
+        "hello.counter.count_words (existing, SPEC-0001)",
+        "Python standard library unicodedata module (no third-party dependency, per ADR-0001)",
+        "SPEC-0001 (existing): this spec supersedes only its bare-integer successful-output requirement and retains its other requirements",
+        "Quality Gate toolchain from ADR-0003 (existing)"
+      ],
+      "needed_by": [
+        "Documentation and tests of the changed success-output contract",
+        "Any consumer of wordcount output, which must now parse the labeled line instead of a bare integer"
+      ],
+      "constraints": [
+        "No new command-line flags, no compatibility mode and no separate invocation; every successful invocation prints both counts.",
+        "hello.characters performs no file, process or console I/O; all I/O stays in hello.cli (ADR-0002).",
+        "The character count is neither a byte count nor a raw code-point count; it uses the same whitespace definition as the word rule (str.isspace()).",
+        "No third-party runtime dependencies; [project].dependencies stays empty (ADR-0001).",
+        "Runtime errors keep the one-line stderr form and exit status 1, with no traceback (ADR-0004)."
+      ],
+      "decisions": [
+        {
+          "text": "We will define a visible character as a code point that is not whitespace under str.isspace() and whose unicodedata category does not start with 'M', and implement it as the pure function hello.characters.count_characters in src/hello/characters.py, separate from the word counter and from all I/O.",
+          "binds_beyond_feature": true,
+          "title": "Visible-character rule in a pure character counter",
+          "context": "The command must report non-whitespace visible characters, where a base letter followed by a combining accent counts once, and the character rule must stay consistent with the word rule's whitespace definition and with the architecture's no-I/O counting core.",
+          "alternatives": [
+            "len(text) minus whitespace: rejected, it counts combining marks separately so decomposed '\u00e9' counts 2",
+            "Count UTF-8 bytes: rejected, it misrepresents non-ASCII text",
+            "Unicode extended grapheme cluster segmentation: rejected, the standard library has no segmentation and a third-party dependency would violate ADR-0001",
+            "Put the rule inside hello.counter: rejected, it mixes two rules in one module and blurs ADR-0002's single-rule boundary"
+          ],
+          "positive_consequences": [
+            "Decomposed and precomposed text give the same count",
+            "The counter is testable without files or processes",
+            "The runtime stays standard-library only"
+          ],
+          "negative_consequences": [
+            "Category-M exclusion is an approximation of grapheme clusters: emoji sequences joined by zero-width joiners and Hangul jamo sequences are not merged",
+            "A combining mark that follows whitespace or starts the text counts 0 rather than 1"
+          ],
+          "enforcement": [
+            {
+              "rule": "Combining marks do not add to the character count and whitespace is excluded.",
+              "kind": "deterministic",
+              "mechanism": "tests/test_characters.py::test_combining_marks_do_not_add_to_count",
+              "scope": "character-counter"
+            },
+            {
+              "rule": "hello.characters performs no file, process or console I/O and imports only the standard library.",
+              "kind": "deterministic",
+              "mechanism": "tests/arch/test_layering.py::test_characters_module_performs_no_io",
+              "scope": "character-counter"
+            }
+          ]
+        },
+        {
+          "text": "We will print exactly one labeled line, `words: <N> characters: <M>`, on stdout for every successful invocation of wordcount, and we accept that this breaks consumers that parsed the earlier bare integer.",
+          "binds_beyond_feature": true,
+          "title": "Labeled combined success output for wordcount",
+          "context": "Users need both counts from the existing invocation without flags, so the success output must carry two values and cannot remain a bare integer.",
+          "alternatives": [
+            "Keep the bare word count by default and add a flag for characters: rejected, it conflicts with the no-flags, always-both requirement",
+            "Provide a separate command for character counting: rejected, users would need an extra action",
+            "Print two lines: rejected, a single line is simpler for consumers to parse and was the requested form"
+          ],
+          "positive_consequences": [
+            "Both measures are available in every successful invocation",
+            "Labels make the output self-describing"
+          ],
+          "negative_consequences": [
+            "Consumers that parse a bare integer break and must be updated",
+            "The labeled format becomes a contract that later changes must treat as breaking"
+          ],
+          "enforcement": [
+            {
+              "rule": "Every successful wordcount invocation prints exactly one line `words: <N> characters: <M>` to stdout.",
+              "kind": "deterministic",
+              "mechanism": "tests/test_cli.py::test_success_output_is_labeled_combined_line",
+              "scope": "word-count-command"
+            }
+          ]
+        }
+      ],
+      "adr_references": [
+        "ADR-0001",
+        "ADR-0002",
+        "ADR-0003",
+        "ADR-0004",
+        "ADR-0005",
+        "ADR-0006"
+      ],
+      "critical_components": [],
+      "architecture_change": {
+        "summary": "Add a pure character-counter component beside the word counter, and have the command print both counts on one line (a deliberate break from SPEC-0001's bare integer), so users get words and non-whitespace characters in one invocation.",
+        "added": [
+          {
+            "id": "character-counter",
+            "name": "Character counter",
+            "level": "component",
+            "parent": "hello-cli",
+            "owns": "The character rule: a visible character is a non-whitespace character, using the same whitespace definition as the word rule, and a base character followed by combining marks counts once. It counts the visible characters in a given text and returns the number.",
+            "does_not_own": "The definition of a word, file access, encoding, argument handling, output formatting or exit codes; it never touches the filesystem or the process, and it counts neither bytes nor raw code points.",
+            "deployment": "",
+            "technology": "Python standard library"
+          }
+        ],
+        "changed": [
+          {
+            "id": "hello",
+            "name": "hello",
+            "level": "system",
+            "parent": "",
+            "owns": "Giving users local, dependency-free text utilities, currently reporting the word count and the non-whitespace character count of one text file in a single invocation.",
+            "does_not_own": "Other text statistics beyond word and character counts, batch or stdin processing, non-UTF-8 encodings, or distribution through a public package index.",
+            "deployment": "Installed from the repository into a local Python environment on the user's machine.",
+            "technology": "Python (current stable release), standard library only"
+          },
+          {
+            "id": "hello-cli",
+            "name": "hello command-line package",
+            "level": "container",
+            "parent": "hello",
+            "owns": "The installable src-layout hello package and its console command that takes one file path, prints that file's word count and character count on one line, and exits with a status code.",
+            "does_not_own": "Any network access, persistent state, configuration files, or third-party runtime dependencies.",
+            "deployment": "Run as a local process on the user's machine after installing the package from the repository into the project environment.",
+            "technology": "Python standard library; console entry point declared in pyproject.toml; environment managed with the existing lockfile tooling"
+          },
+          {
+            "id": "word-count-command",
+            "name": "Word-count command",
+            "level": "component",
+            "parent": "hello-cli",
+            "owns": "Parsing the single file-path argument, reading the file as UTF-8 text, passing the text to the word counter and the character counter, printing both counts as one line in the form `words: <N> characters: <M>`, and turning a missing file, unreadable file or undecodable content into a one-line message on standard error with a non-zero exit status and no counts on standard output.",
+            "does_not_own": "The definition of what a word or a visible character is, or counting logic of any kind.",
+            "deployment": "",
+            "technology": "Python standard library"
+          }
+        ],
+        "removed": [],
+        "relations_added": [
+          {
+            "source": "word-count-command",
+            "target": "character-counter",
+            "description": "Passes the decoded file text in an in-process function call and receives the integer count of non-whitespace visible characters."
+          }
+        ],
+        "relations_removed": [],
+        "sections": {}
+      },
+      "path": "docs/specs/SPEC-0002.md"
+    }
+  },
   "quiz_questions": {
     "DEFINE": [
       {
@@ -73,6 +569,39 @@
           "The heuristic is acceptable provided it reuses an existing error message and exit status, because the error contract governs diagnostic formatting rather than which inputs fail.",
           "The heuristic is unacceptable only if it uses a third-party dependency; an internal check would preserve the strategy's existing error behavior.",
           "The heuristic creates a new failure category for otherwise accepted input; preserving the specified error contract does not authorize rejecting valid UTF-8 merely because it appears binary-like."
+        ]
+      }
+    ],
+    "SPEC": [
+      {
+        "text": "The decision defining a visible character rejected 'len(text) minus whitespace characters'. What is the reasoning behind rejecting it?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
+        "options": [
+          "It counts combining marks as separate characters, so decomposed '\u00e9' (e + U+0301) would count 2 while precomposed '\u00e9' counts 1, making visually identical text give different counts.",
+          "It counts UTF-8 bytes rather than code points, so any non-ASCII character would be over-counted.",
+          "It would need a third-party Unicode segmentation library, which violates the no-runtime-dependencies rule in ADR-0001.",
+          "It uses a different whitespace definition from the word rule, so the word count and character count could disagree about what is whitespace."
+        ]
+      },
+      {
+        "text": "The character rule excludes code points whose Unicode category starts with 'M' instead of segmenting grapheme clusters. Explain why grapheme-cluster segmentation was not used, and describe at least one input where the chosen rule gives a different answer from true grapheme-cluster counting, or a case where the rule gives a surprising result.",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "Why was 'keep the bare word count by default and add a flag for characters' rejected as the way to deliver the character count, and what cost does the chosen design knowingly accept?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
+        "options": [
+          "The requirement is that every invocation reports both counts with no flags and no second command, so an opt-in flag cannot satisfy it; the chosen single labeled line knowingly breaks consumers that parse a bare integer.",
+          "Adding a flag would require argparse to be replaced by a third-party parser, and the chosen design accepts a new runtime dependency.",
+          "A flag would make count_words perform I/O, and the chosen design accepts moving file reading into the counting modules.",
+          "A flag would change the exit status for usage errors from 2 to 1, and the chosen design accepts that error output changes instead."
         ]
       }
     ]
