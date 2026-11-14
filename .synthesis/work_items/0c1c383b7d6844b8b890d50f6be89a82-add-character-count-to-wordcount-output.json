@@ -31,8 +31,8 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 5,
-  "rejection_count": 1,
+  "current_index": 6,
+  "rejection_count": 0,
   "pbi_id": "add-character-count-to-wordcount-output",
   "child_ids": [],
   "artifact_paths": {
