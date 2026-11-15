@@ -11,8 +11,22 @@
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
-  "artifact_paths": {},
-  "pending_artifacts": {},
+  "artifact_paths": {
+    "CONSTITUTION": "docs/constitution/CON-0001.md"
+  },
+  "pending_artifacts": {
+    "CONSTITUTION": {
+      "intent": "Revise the project's AGENTS.md (constitution) as a general tidy-up: review the current toolchain table, judgment boundaries and ADR conventions, and propose improvements that make the directives clearer, non-redundant, accurate to the codebase and accepted ADRs, and checkable where possible. Keep the four Quality Gate commands (ADR-0003) intact.",
+      "summary": "No change to the directives: the two Judgment Boundaries are already short, distinct and need an agent's judgment, so the tidy-up keeps them word for word, which the guardrails in SPEC-0001 to SPEC-0003 also require. The Toolchain table, with its four ADR-0003 Quality Gate commands, and the ADR Conventions section belong to the human and to land_conventions, so this review does not edit them.",
+      "directives": [
+        "Every external dependency requires a documented rationale in SPECs or ADRs.",
+        "Never bypass the Quality Gate."
+      ],
+      "checks_to_build": [],
+      "path": "docs/constitution/CON-0001.md",
+      "constitution_version": null
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
