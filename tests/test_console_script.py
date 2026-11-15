@@ -21,4 +21,4 @@ def test_console_script_is_installed_and_runs(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 0, result.stderr
-    assert result.stdout == "words: 3 characters: 11\n"
+    assert result.stdout == "words: 3 characters: 11 lines: 0\n"
