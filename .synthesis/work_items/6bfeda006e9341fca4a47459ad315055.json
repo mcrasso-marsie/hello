@@ -35,22 +35,95 @@
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
-  "artifact_paths": {},
-  "pending_artifacts": {},
+  "artifact_paths": {
+    "DISCOVER": "docs/discovery/DG-0003.md"
+  },
+  "pending_artifacts": {
+    "DISCOVER": {
+      "graph_type": "opportunity",
+      "signals": [
+        {
+          "identity": "line-count-missing",
+          "text": "The wordcount command reports the number of words and visible characters in the input file, but not how many lines it has; users want the line count too.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "line-count-missing",
+          "text": "Every successful run of `wordcount PATH` should print the line count on the same stdout line, in the form `words: <N> characters: <M> lines: <L>`.",
+          "consequence_of": "line-count-missing",
+          "possible_indication": "The existing `words: <N> characters: <M>` output contract changes, so anything documenting or checking the old line (README, tests) is affected."
+        },
+        {
+          "identity": "line-count-missing",
+          "text": "The line count is always printed: no new flag or option, and the single positional PATH invocation stays as it is.",
+          "consequence_of": null,
+          "possible_indication": "The scope is limited to output content, not the CLI's argument interface."
+        },
+        {
+          "identity": "line-boundary-definition",
+          "text": "A line is a terminated segment: every boundary that Python's str.splitlines() recognises counts as a line terminator (including lone CR, U+2028 and form feed), CRLF counts as one terminator, and an unterminated final segment is not counted.",
+          "consequence_of": null,
+          "possible_indication": "This is deliberately broader than literal `wc -l`, which counts only LF characters; users who compare output with `wc -l` will see different numbers on files with other separators."
+        },
+        {
+          "identity": "line-boundary-definition",
+          "text": "A file containing 'a', LF, 'b' reports 1 line, because the final 'b' has no terminator.",
+          "consequence_of": "line-boundary-definition",
+          "possible_indication": null
+        },
+        {
+          "identity": "line-boundary-definition",
+          "text": "A whitespace-only file such as LF LF reports 2 lines, even though it reports 0 words and 0 characters.",
+          "consequence_of": "line-boundary-definition",
+          "possible_indication": "The line count is independent of the word and character rules; whitespace-only input is not treated as empty for line counting."
+        },
+        {
+          "identity": "line-boundary-definition",
+          "text": "A file containing 'a', CR, LF reports 1 line: CRLF is a single line break, not two.",
+          "consequence_of": "line-boundary-definition",
+          "possible_indication": null
+        }
+      ],
+      "core_issue": "Users of the wordcount CLI can see the word and visible-character counts of a file but cannot see how many lines it contains, so they have to use a separate tool to get it.",
+      "impact_value": "Users get a complete count of a file (words, characters, lines) from one invocation. The line count uses a clearly defined, Unicode-aware boundary rule instead of leaving it to whatever tool they would otherwise use.",
+      "discovery_method": "Written feature intent from the project owner, refined through one clarification round. In that round the human fixed the line-boundary rule, the whitespace-only behaviour, the output format and the invocation.",
+      "pattern_dependencies": "The missing line count is the core opportunity. The line-boundary definition determines what number appears in the new `lines: <L>` field, so the output-format change depends on that rule being settled. The rule is independent of the existing word and character rules, which stay unchanged.",
+      "pattern_narratives": [
+        {
+          "identity": "line-count-missing",
+          "applies_to": "The `wordcount PATH` command's successful stdout output line",
+          "frequency": "Every successful invocation of the command",
+          "severity": "Moderate: a feature gap, not a defect. Existing output keeps working, but its format will change.",
+          "confidence": "High: the output format and always-on behaviour were confirmed explicitly by the human.",
+          "current_state": "The command prints exactly `words: <N> characters: <M>` and gives no line information. Users must count lines with another tool."
+        },
+        {
+          "identity": "line-boundary-definition",
+          "applies_to": "How lines are counted in any decoded UTF-8 input file, including empty, whitespace-only, CRLF and Unicode-separator files",
+          "frequency": "Applies to every file. The edge cases (unterminated final segment, CRLF, U+2028, form feed, lone CR) show up whenever files come from mixed platforms or contain Unicode text.",
+          "severity": "High for correctness: an ambiguous rule would produce counts that users and tests disagree on.",
+          "confidence": "High: the human answered each boundary question and explicitly confirmed that the rule is broader than `wc -l`.",
+          "current_state": "No line-counting rule exists in the project yet. The rule is now defined only in the clarified requirements."
+        }
+      ],
+      "questions": []
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {
-    "DISCOVER": [
-      "Should the line count follow `wc -l` (count newline characters, so a file 'a\\nb' without a trailing newline reports 1) or count logical lines (so 'a\\nb' reports 2 and 'a\\nb\\n' also reports 2)?",
-      "What should a whitespace-only file such as '\\n\\n' report: 2 lines, or 0 lines to match its 0 words and 0 characters?",
-      "Which line terminators count as line breaks: only '\\n', also '\\r\\n' and lone '\\r', or every boundary Python's str.splitlines() recognises (including U+2028 and form feed)?",
-      "What exact stdout line should replace `words: <N> characters: <M>`: for example `words: <N> characters: <M> lines: <L>`, or a different label or field order?",
-      "Should the line count always be printed with no new flag, keeping the single-PATH invocation, or only when the user passes a new option, and if so which flag name?"
-    ]
+  "clarification_questions": {},
+  "clarifications": {
+    "DISCOVER": {
+      "Should the line count follow `wc -l` (count newline characters, so a file 'a\\nb' without a trailing newline reports 1) or count logical lines (so 'a\\nb' reports 2 and 'a\\nb\\n' also reports 2)?": "Follow the terminated-line convention: a followed by LF followed by b reports 1; do not count an unterminated final segment. Use the broader separators specified below.",
+      "What should a whitespace-only file such as '\\n\\n' report: 2 lines, or 0 lines to match its 0 words and 0 characters?": "2 lines. The human explicitly confirmed this correction.",
+      "Which line terminators count as line breaks: only '\\n', also '\\r\\n' and lone '\\r', or every boundary Python's str.splitlines() recognises (including U+2028 and form feed)?": "Every boundary Python str.splitlines() recognizes, with CRLF counted once. The human confirmed combining broader separators with not counting an unterminated final line.",
+      "What exact stdout line should replace `words: <N> characters: <M>`: for example `words: <N> characters: <M> lines: <L>`, or a different label or field order?": "words: <N> characters: <M> lines: <L>",
+      "Should the line count always be printed with no new flag, keeping the single-PATH invocation, or only when the user passes a new option, and if so which flag name?": "Always print the line count, with no new flag, retaining the single-PATH invocation."
+    }
   },
-  "clarifications": {},
   "clarification_rounds": {
     "DISCOVER": 1
   },
