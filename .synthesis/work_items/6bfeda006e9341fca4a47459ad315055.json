@@ -34,19 +34,17 @@
   "current_index": 3,
   "rejection_count": 0,
   "pbi_id": null,
-  "child_ids": [],
+  "child_ids": [
+    "6bfeda006e9341fca4a47459ad315055-spec0003-pure-line-counter",
+    "6bfeda006e9341fca4a47459ad315055-spec0003-three-field-command",
+    "6bfeda006e9341fca4a47459ad315055-spec0003-line-rule-documentation"
+  ],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0003.md",
     "DEFINE": "docs/strategy/STRAT-0003.md",
     "SPEC": "docs/specs/SPEC-0003.md"
   },
-  "pending_artifacts": {
-    "PBI_PLANNING": {
-      "spec0003-pure-line-counter": "docs/pbis/SPEC-0003/PBI-0001.md",
-      "spec0003-three-field-command": "docs/pbis/SPEC-0003/PBI-0002.md",
-      "spec0003-line-rule-documentation": "docs/pbis/SPEC-0003/PBI-0003.md"
-    }
-  },
+  "pending_artifacts": {},
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,

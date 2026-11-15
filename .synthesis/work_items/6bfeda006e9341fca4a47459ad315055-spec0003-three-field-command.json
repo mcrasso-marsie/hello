@@ -1,0 +1,63 @@
+{
+  "id": "6bfeda006e9341fca4a47459ad315055-spec0003-three-field-command",
+  "preset": "feature",
+  "sequence": [
+    {
+      "stage": "DISCOVER",
+      "gate": "PROBLEM_GATE"
+    },
+    {
+      "stage": "DEFINE",
+      "gate": "STRATEGY_GATE"
+    },
+    {
+      "stage": "SPEC",
+      "gate": "SPEC_GATE"
+    },
+    {
+      "stage": "PBI_PLANNING",
+      "gate": "PLAN_GATE"
+    },
+    {
+      "stage": "ASSEMBLE",
+      "gate": "QUALITY_GATE"
+    },
+    {
+      "stage": "REVIEW",
+      "gate": "REVIEW_GATE"
+    },
+    {
+      "stage": "INTEGRATE",
+      "gate": "ACCEPTANCE_GATE"
+    }
+  ],
+  "current_index": 4,
+  "rejection_count": 0,
+  "pbi_id": "spec0003-three-field-command",
+  "child_ids": [],
+  "artifact_paths": {
+    "DISCOVER": "docs/discovery/DG-0003.md",
+    "DEFINE": "docs/strategy/STRAT-0003.md",
+    "SPEC": "docs/specs/SPEC-0003.md",
+    "PBI_PLANNING": "docs/pbis/SPEC-0003/PBI-0002.md"
+  },
+  "pending_artifacts": {},
+  "quiz_questions": {},
+  "passed_quizzes": {},
+  "rework_notes": null,
+  "trunk_merge_pending": false,
+  "clarification_questions": {},
+  "clarifications": {},
+  "clarification_rounds": {},
+  "settings": {
+    "token_quota": null
+  },
+  "resume_index": null,
+  "waiting_on_amendment": false,
+  "intent": null,
+  "spec_judge": "",
+  "amendment_owner": "",
+  "intent_reviewed": false,
+  "handed_over_to": null,
+  "owner": "Marco <mcrasso@marsie.io>"
+}
