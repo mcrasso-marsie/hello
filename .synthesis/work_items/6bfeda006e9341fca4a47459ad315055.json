@@ -269,36 +269,7 @@
       "path": "docs/strategy/STRAT-0003.md"
     }
   },
-  "quiz_questions": {
-    "DEFINE": [
-      {
-        "text": "The strategy rejects counting an unterminated final segment as a line, even though some editors do. Which reason best explains that choice?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "Counting it would break the confirmed DG-0003 example that 'a\\nb' reports 1, and an unterminated single-line file would report 1 instead of the agreed 0, reopening a boundary that was already settled.",
-        "options": [
-          "Counting it would make CRLF line endings count twice, producing off-by-one counts on Windows-origin files.",
-          "Counting it would break the confirmed DG-0003 example that 'a\\nb' reports 1, and an unterminated single-line file would report 1 instead of the agreed 0, reopening a boundary that was already settled.",
-          "Counting it would require a second read of the file, adding a decoding path that could change the invalid-UTF-8 error behaviour.",
-          "Counting it would make the result differ from POSIX wc -l, which the strategy treats as its compatibility baseline."
-        ]
-      },
-      {
-        "text": "A file containing only '\\n\\n' reports 0 words and 0 characters but 2 lines. What does this show about how the line rule relates to the existing word and character rules? What concretely could go wrong if line counting were folded into the existing word or character counter instead of being a separate pure unit?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "The strategy assumes the line count can be derived from the same decoded text already used for words and characters. Why does this assumption matter for the missing-file, unreadable-file and invalid-UTF-8 paths? What does the strategy say to do if the assumption turns out to be false, and why not simply fix the error handling as part of this change?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      }
-    ]
-  },
+  "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
