@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0003
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Complete the wordcount report by always appending a clearly defined, Unicode-aware line count to the existing success line, now that users have asked for it and the boundary rule is settled, without disturbing anything already built.
@@ -195,6 +195,6 @@ Leaves the existing line untouched, but breaks the agreed single-line `words: <N
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-opus-5.5  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
