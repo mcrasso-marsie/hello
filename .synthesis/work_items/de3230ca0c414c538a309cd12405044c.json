@@ -1,0 +1,34 @@
+{
+  "id": "de3230ca0c414c538a309cd12405044c",
+  "preset": "constitution",
+  "sequence": [
+    {
+      "stage": "CONSTITUTION",
+      "gate": "CONSTITUTION_REVIEW"
+    }
+  ],
+  "current_index": 0,
+  "rejection_count": 0,
+  "pbi_id": null,
+  "child_ids": [],
+  "artifact_paths": {},
+  "pending_artifacts": {},
+  "quiz_questions": {},
+  "passed_quizzes": {},
+  "rework_notes": null,
+  "trunk_merge_pending": false,
+  "clarification_questions": {},
+  "clarifications": {},
+  "clarification_rounds": {},
+  "settings": {
+    "token_quota": null
+  },
+  "resume_index": null,
+  "waiting_on_amendment": false,
+  "intent": null,
+  "spec_judge": "",
+  "amendment_owner": "",
+  "intent_reviewed": false,
+  "handed_over_to": null,
+  "owner": "Marco <mcrasso@marsie.io>"
+}
