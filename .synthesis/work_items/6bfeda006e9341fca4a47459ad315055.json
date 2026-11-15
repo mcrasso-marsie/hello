@@ -269,7 +269,36 @@
       "path": "docs/strategy/STRAT-0003.md"
     }
   },
-  "quiz_questions": {},
+  "quiz_questions": {
+    "DEFINE": [
+      {
+        "text": "The strategy keeps line counting as its own pure counting rule beside the existing word and character rules, instead of folding it into one of them. What is the main reason for that choice?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
+        "options": [
+          "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
+          "Folding it into an existing counter would need a new flag to choose which statistic runs, which contradicts the always-on, no-new-flag requirement.",
+          "Line counting has to read the raw bytes to see CR and CRLF, so it cannot share the decoded text that the word and character counters use.",
+          "The character counter does not count whitespace, so it could never see line terminators and cannot be extended to count lines."
+        ]
+      },
+      {
+        "text": "The strategy assumes the line count can be derived from the same decoded text already used for words and characters. Explain what this assumption protects. If it turned out to be false, why does the strategy say to revisit scope with the owner rather than simply add a new reading or decoding path?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "The line rule is defined by reference to the boundaries that the Python standard library's line-splitting recognises, not by an explicit list of terminators. What could go wrong with defining the rule that way? How do the acceptance examples detect it, and what is the fallback if it happens?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      }
+    ]
+  },
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
