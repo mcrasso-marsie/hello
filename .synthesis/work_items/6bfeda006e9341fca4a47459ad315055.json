@@ -41,9 +41,19 @@
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {},
+  "clarification_questions": {
+    "DISCOVER": [
+      "Should the line count follow `wc -l` (count newline characters, so a file 'a\\nb' without a trailing newline reports 1) or count logical lines (so 'a\\nb' reports 2 and 'a\\nb\\n' also reports 2)?",
+      "What should a whitespace-only file such as '\\n\\n' report: 2 lines, or 0 lines to match its 0 words and 0 characters?",
+      "Which line terminators count as line breaks: only '\\n', also '\\r\\n' and lone '\\r', or every boundary Python's str.splitlines() recognises (including U+2028 and form feed)?",
+      "What exact stdout line should replace `words: <N> characters: <M>`: for example `words: <N> characters: <M> lines: <L>`, or a different label or field order?",
+      "Should the line count always be printed with no new flag, keeping the single-PATH invocation, or only when the user passes a new option, and if so which flag name?"
+    ]
+  },
   "clarifications": {},
-  "clarification_rounds": {},
+  "clarification_rounds": {
+    "DISCOVER": 1
+  },
   "settings": {
     "token_quota": null
   },
