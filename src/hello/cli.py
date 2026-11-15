@@ -1,10 +1,11 @@
-"""Command-line entry point: ``wordcount PATH`` prints a UTF-8 file's word and character counts."""
+"""Command-line entry point: ``wordcount PATH`` prints a UTF-8 file's word, character and line counts."""
 
 import argparse
 import sys
 
 from hello.characters import count_characters
 from hello.counter import count_words
+from hello.lines import count_lines
 
 
 def _fail(message: str) -> int:
@@ -14,10 +15,10 @@ def _fail(message: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Parse ``PATH``, count the words and characters in that file and print them."""
+    """Parse ``PATH``, count the words, characters and lines in that file and print them."""
     parser = argparse.ArgumentParser(
         prog="wordcount",
-        description="Print the number of words and characters in a UTF-8 text file.",
+        description="Print the number of words, characters and lines in a UTF-8 text file.",
     )
     parser.add_argument("path", metavar="PATH", help="path to a UTF-8 text file")
     args = parser.parse_args(argv)
@@ -32,5 +33,8 @@ def main(argv: list[str] | None = None) -> int:
     except OSError:
         return _fail(f"cannot read file: {args.path}")
 
-    print(f"words: {count_words(text)} characters: {count_characters(text)}")
+    words = count_words(text)
+    characters = count_characters(text)
+    lines = count_lines(text)
+    print(f"words: {words} characters: {characters} lines: {lines}")
     return 0
