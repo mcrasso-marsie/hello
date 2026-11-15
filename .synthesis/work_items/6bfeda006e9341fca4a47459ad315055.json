@@ -725,37 +725,56 @@
       "path": "docs/specs/SPEC-0003.md"
     }
   },
-  "quiz_questions": {
-    "SPEC": [
-      {
-        "text": "The spec says no change to UTF-8 decoding or newline handling is needed, even if the existing file read applies universal-newline translation (CRLF\u2192LF, lone CR\u2192LF) before the text reaches count_lines. Why is that conclusion sound?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "Translation turns each CRLF pair and each lone CR into exactly one LF, so the number of terminators in the text, and therefore the line count, stays the same.",
-        "options": [
-          "Translation turns each CRLF pair and each lone CR into exactly one LF, so the number of terminators in the text, and therefore the line count, stays the same.",
-          "The existing UTF-8 read never applies universal-newline translation, so CR characters always reach count_lines unchanged.",
-          "The cross-check test against str.splitlines() would detect any line-count difference that translation introduces.",
-          "Line counting runs on the raw bytes before decoding, so newline translation never affects it."
-        ]
-      },
-      {
-        "text": "The spec enumerates LINE_TERMINATORS by hand. It also requires a test that scans every code point and checks the set against str.splitlines(). Explain why both are needed rather than just one. What would go wrong with only len(text.splitlines()), and what would go wrong with only a hand-written set and no cross-check?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "The spec requires hello.cli to read and decode the file once and pass the identical str object to count_words, count_characters and count_lines. It forbids a separate read or decode path for line counting. What could break or drift if line counting got its own read or decode, and why does the spec treat such a change as something to take back to the owner rather than an implementation detail?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      }
-    ]
+  "quiz_questions": {},
+  "passed_quizzes": {
+    "SPEC": {
+      "passed": true,
+      "justification": "Both answers show real understanding rather than paraphrase. On the terminator set, the respondent explained why an explicit enumeration and an interpreter cross-check are each insufficient alone. They also spotted that len(splitlines()) miscounts the unterminated final segment. On the single-decode constraint, they explained how a second read path could make counts diverge and change error behaviour. They correctly framed this as a change to frozen, owner-approved scope rather than an internal detail. The only gap is minor: they did not say explicitly that sharing one decoded string depends on newline translation preserving the number of terminators. Relying on line-number citations also adds little; the reasoning itself is what carries the answers. These grades record comprehension only and do not constitute approval of SPEC-0003, which still requires the human's explicit approval.",
+      "answers": [
+        {
+          "question": {
+            "text": "The spec says no change to UTF-8 decoding or newline handling is needed, even if the existing file read applies universal-newline translation (CRLF\u2192LF, lone CR\u2192LF) before the text reaches count_lines. Why is that conclusion sound?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "Translation turns each CRLF pair and each lone CR into exactly one LF, so the number of terminators in the text, and therefore the line count, stays the same.",
+            "options": [
+              "Translation turns each CRLF pair and each lone CR into exactly one LF, so the number of terminators in the text, and therefore the line count, stays the same.",
+              "The existing UTF-8 read never applies universal-newline translation, so CR characters always reach count_lines unchanged.",
+              "The cross-check test against str.splitlines() would detect any line-count difference that translation introduces.",
+              "Line counting runs on the raw bytes before decoding, so newline translation never affects it."
+            ]
+          },
+          "response": "Translation turns each CRLF pair and each lone CR into exactly one LF, so the number of terminators in the text, and therefore the line count, stays the same.",
+          "correct": true,
+          "note": ""
+        },
+        {
+          "question": {
+            "text": "The spec enumerates LINE_TERMINATORS by hand. It also requires a test that scans every code point and checks the set against str.splitlines(). Explain why both are needed rather than just one. What would go wrong with only len(text.splitlines()), and what would go wrong with only a hand-written set and no cross-check?",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "Each check covers a gap in the other. Only len(text.splitlines()): the rule stays implicit. Nobody can read the terminator set from the spec or the code, and a change in Python would silently change the counts. It also gets one agreed case wrong: splitlines() counts an unterminated final segment, so 'a\nb' gives 2 where the rule says 1. Only a handwritten set: a typo or a missing code point (say U+001E) would go unnoticed, and so would a later Python change. The scan over every code point (line 151) catches any difference in either direction.",
+          "correct": true,
+          "note": "The answer shows the complementary failure modes. With splitlines() alone, the rule is implicit and unreviewable, and it can change silently with the interpreter. The answer also gives a concrete correctness bug: splitlines() counts an unterminated final segment, so 'a\\nb' gives 2 instead of the agreed 1. With a hand-written set alone, a typo or omission, or later interpreter drift, would go undetected. The answer correctly says the full scan catches differences in both directions. The line-number citations are unnecessary, but the reasoning stands on its own."
+        },
+        {
+          "question": {
+            "text": "The spec requires hello.cli to read and decode the file once and pass the identical str object to count_words, count_characters and count_lines. It forbids a separate read or decode path for line counting. What could break or drift if line counting got its own read or decode, and why does the spec treat such a change as something to take back to the owner rather than an implementation detail?",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "If all three counters get the identical str (line 48), they describe the same text, and the read/decode/error code runs once and stays as it is. A separate path for lines could decode or translate newlines differently, so the line count no longer matches the words and characters; fail differently on bad files, adding new errors, partial output or tracebacks. Either outcome changes UTF-8 decoding, newline handling or error behaviour. Those are frozen in the guardrails (lines 174-178) and out of scope, so the spec says to stop and take it back to the owner (line 49).",
+          "correct": true,
+          "note": "The answer names both risks. Different decoding or newline translation would make the line count describe different text from the word and character counts. Different failure behaviour could add new errors, partial output or tracebacks. It ties escalation to the fact that this would change user-visible behaviour the approved scope froze: decoding, newline handling and error messages or statuses. That makes it a scope change, not an implementation choice. One point is not drawn out: the single shared text works only because universal-newline translation, if applied, preserves the number of terminators. A second path is the place where that guarantee could quietly fail."
+        }
+      ]
+    }
   },
-  "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
