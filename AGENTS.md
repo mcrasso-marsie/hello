@@ -1,7 +1,7 @@
 ---
 artifact_type: agent constitution
-status: Draft
-version: 2
+status: Approved
+version: 3
 ---
 
 # AGENTS.md
@@ -25,6 +25,7 @@ version: 2
 
 - Every external dependency requires a documented rationale in SPECs or ADRs.
 - Never bypass the Quality Gate.
+- Accept changes only through a Synthesis workflow; never land a change made outside one.
 
 ## ADR Conventions
 
