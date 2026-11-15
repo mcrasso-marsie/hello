@@ -1,0 +1,557 @@
+{
+  "version": "1.0.0",
+  "id": "c3d6fdd7-ce07-42d8-8e1e-d4c1d144d17f",
+  "timestamp": "2026-11-15T04:22:17Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "src/hello/lines.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 40,
+              "content_hash": "sha256:14ba93387c034e74da101996666afb844962635564a94cc3f943079138147b93"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/arch/test_layering.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 3,
+              "content_hash": "sha256:122513881c9e1f321e397e9ba40ba4b35f264de3e8bd0850d961984aa77ed53c"
+            },
+            {
+              "start_line": 6,
+              "end_line": 6,
+              "content_hash": "sha256:9e77b3746ea081eb4c557e71cc84ca29dc66a89d18a07e85dba66a336e7310ae"
+            },
+            {
+              "start_line": 12,
+              "end_line": 12,
+              "content_hash": "sha256:7dccce8c19f3129b2449a39d68d2471ecf5973e0c2208f039a5a88832e418e7b"
+            },
+            {
+              "start_line": 16,
+              "end_line": 19,
+              "content_hash": "sha256:515969ada65a555ff8992beeb559f89d2a90f135e367e612e2888a294e7c014d"
+            },
+            {
+              "start_line": 66,
+              "end_line": 94,
+              "content_hash": "sha256:fb5a0705fdfe75b6b7df9ffb54057a9e1bf767224106261fb3a574440087e379"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-blank-only-terminated-lines-are-counted.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:2222367d282329aef12e99555b99710b016550f9343f28f7834a94e886a7e62c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-blank-text-without-terminators-has-zero-lines.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:0ccfc8dfe00a490fa9e6ceea08341f3a253ae1167e572a4dbd847de129fab59a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-crlf-is-a-single-boundary.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:d0cff624149d730d4a7f3c5446ac568791ddcac28225adcb2ca701642c2cd9ae"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-each-terminator-alone-ends-one-line.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:759c14eca2374680c2c9f430c215f02be83a72dd93a6cbaf74987394d7da3d47"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-empty-text-has-zero-lines.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:f2ad2f1777129dc9d195507df6aa75ec2b97098c3b743d846df121454053e4f6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-enumerated-terminator-set-matches-splitlines-boundaries.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 7,
+              "content_hash": "sha256:77b18b99feca7b6019bffc8f348350e7f2e859336c48d7e085f89c050158f5dc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-enumerates-the-ten-terminator-code-points.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 7,
+              "content_hash": "sha256:de425321b9da8ee8769292e522672220cb9ea30335d4a97f1e0ea28e83abdb58"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-lf-followed-by-cr-is-two-boundaries.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:1ce678248d419d4f6bf442833751e39f6c4a7eb62f689300601d1a5aaaf976e5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-lone-cr-followed-by-crlf-is-two-boundaries.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:29607ef7c8dc87b1cf67dbadf4228e05a3dff5770afc7e78e4399e637ea65816"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-mixed-terminators-are-each-counted-once.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:04ee69fa29edc6f6b3d0a2c220f010b18a7149ccc862096196b25de05ba1279e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-non-boundary-characters-do-not-end-a-line.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 6,
+              "content_hash": "sha256:940fe62e30108a1af9ae02f4a3c4fd00ac746dcf79ee4024378160f9d89ce6a0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-performs-no-io.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 7,
+              "content_hash": "sha256:2572735ff94bd1828c0011a9a1e7151ea65719456e66c90118eab6b2d8078e5e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/line-counter-unterminated-final-segment-is-not-counted.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 7,
+              "content_hash": "sha256:5c448799b927184f6a969b7cf01a1574198cd9511beef32963a471228efa52a2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_blank_only_terminated_lines_are_counted.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:9d7fd935d9bb9568671fb9a22ae304bc7ffc61663360fcab342cf3c656964fee"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_blank_text_without_terminators_has_zero_lines.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:3c8146bbc514f02675acb88523fc26a67a1200eac3e0ce2ff6103f67001efa53"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_crlf_is_a_single_boundary.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:2818b8f8287e5ffbbc844b8ba5c2fd1b96f57cf79f869d38b44c41a9e7c327f8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_each_terminator_alone_ends_one_line.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 48,
+              "content_hash": "sha256:a5b318c0862108bb391cddcdb984edcc8afc7a92484d6ba54e4e79070d10893f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_empty_text_has_zero_lines.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:e5961917f4af60cf7f88d2490d8afeceba6307887371f1f2ea9bc8a719b6965e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_enumerated_terminator_set_matches_splitlines_boundaries.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 57,
+              "content_hash": "sha256:31440d165bf722629b0f3c605f2d95a20ee66e060e59c6a153abe0688ccfe89f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_enumerates_the_ten_terminator_code_points.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 42,
+              "content_hash": "sha256:184b4cd25eb77d18e6633e53dd81c7e0489645dae0b95c929b160f31a0199229"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_lf_followed_by_cr_is_two_boundaries.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:7c2f820b59b180e4f4b58b28d3b3041afab909b7786d49fa6a5a33f1ec9b620d"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_lone_cr_followed_by_crlf_is_two_boundaries.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 28,
+              "content_hash": "sha256:3edf84f12e508590fef72c964fd3aa56e003d59a353b2593ad521e400cb83743"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_mixed_terminators_are_each_counted_once.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 31,
+              "content_hash": "sha256:2114e6ffa0660df51b5698f1e52050d81859919524f5dbb6e24d621d15a98d34"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_non_boundary_characters_do_not_end_a_line.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 42,
+              "content_hash": "sha256:c9d94a854a559ac893515efb8d15e373cdf36a17781b8494ccddd857e1edcfba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_performs_no_io.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 95,
+              "content_hash": "sha256:4a46c8b47b7f930c38a221cb5dd9888252b39cccd1bf4663ad53cca005723cb8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_line_counter_unterminated_final_segment_is_not_counted.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 34,
+              "content_hash": "sha256:2579c400b2ce217be63587670e51df576dd4867e0827464b2f05337b8645c1af"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_lines.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 104,
+              "content_hash": "sha256:dec6d54d4774408356abcddceec381c5d52851fb3cfdb8ba88dc0d607ef5c703"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0003/PBI-0001",
+    "rev": 1,
+    "base_revision": "67ec98e2546c8260be7f32a545d2c36f8e47b970"
+  }
+}
