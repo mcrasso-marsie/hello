@@ -269,37 +269,56 @@
       "path": "docs/strategy/STRAT-0003.md"
     }
   },
-  "quiz_questions": {
-    "DEFINE": [
-      {
-        "text": "The strategy keeps line counting as its own pure counting rule beside the existing word and character rules, instead of folding it into one of them. What is the main reason for that choice?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
-        "options": [
-          "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
-          "Folding it into an existing counter would need a new flag to choose which statistic runs, which contradicts the always-on, no-new-flag requirement.",
-          "Line counting has to read the raw bytes to see CR and CRLF, so it cannot share the decoded text that the word and character counters use.",
-          "The character counter does not count whitespace, so it could never see line terminators and cannot be extended to count lines."
-        ]
-      },
-      {
-        "text": "The strategy assumes the line count can be derived from the same decoded text already used for words and characters. Explain what this assumption protects. If it turned out to be false, why does the strategy say to revisit scope with the owner rather than simply add a new reading or decoding path?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "The line rule is defined by reference to the boundaries that the Python standard library's line-splitting recognises, not by an explicit list of terminators. What could go wrong with defining the rule that way? How do the acceptance examples detect it, and what is the fallback if it happens?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      }
-    ]
+  "quiz_questions": {},
+  "passed_quizzes": {
+    "DEFINE": {
+      "passed": true,
+      "justification": "Both answers show real understanding of the strategy's reasoning rather than paraphrase. On the first question, the human explained that sharing the decoded text is what keeps the approved error-path and UTF-8 behaviour untouched and the counts consistent. They also explained why breaking that assumption is a scope decision for the owner, not an implementation detail. On the second question, the human identified that a rule defined by library behaviour leaves the terminator set implicit and version-dependent. They described how the acceptance examples detect drift and named the fallback of an explicit terminator list in the spec. Nothing material was missed. The human also raised two limitations, which should be carried forward as review feedback for the spec. First, relying on Python's splitlines silently admits terminators never agreed in DG-0003 (\\v, \\x85, U+2029, \\x1c\u2013\\x1e). Second, the current acceptance examples cover only the listed cases on the pinned Python version, so they cannot detect differences in unlisted terminators or on other interpreter versions. Together these suggest the spec should list the terminator set explicitly, with examples for each one, rather than relying on the fallback. This grading records quiz results only; it is not an approval of STRAT-0003, which has not yet been given.",
+      "answers": [
+        {
+          "question": {
+            "text": "The strategy keeps line counting as its own pure counting rule beside the existing word and character rules, instead of folding it into one of them. What is the main reason for that choice?",
+            "format": "choice",
+            "conceptual": true,
+            "key": "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
+            "options": [
+              "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
+              "Folding it into an existing counter would need a new flag to choose which statistic runs, which contradicts the always-on, no-new-flag requirement.",
+              "Line counting has to read the raw bytes to see CR and CRLF, so it cannot share the decoded text that the word and character counters use.",
+              "The character counter does not count whitespace, so it could never see line terminators and cannot be extended to count lines."
+            ]
+          },
+          "response": "Each counter owns exactly one rule, so a separate line rule keeps that boundary intact and avoids risking regressions in the word and character results that SPEC-0001 and SPEC-0002 guard.",
+          "correct": true,
+          "note": ""
+        },
+        {
+          "question": {
+            "text": "The strategy assumes the line count can be derived from the same decoded text already used for words and characters. Explain what this assumption protects. If it turned out to be false, why does the strategy say to revisit scope with the owner rather than simply add a new reading or decoding path?",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "Reusing the same decoded text keeps the error paths unchanged (missing, unreadable, invalid UTF-8: same stderr, nothing on stdout, same exit codes). It also means all three counts describe the same text. A new reading or decoding path would touch UTF-8 handling and error handling, which are out of scope and already approved. That makes it a scope change, and scope changes are the owner's decision.",
+          "correct": true,
+          "note": "The answer reconstructs the reasoning. Reusing the decoded text protects the approved error paths: missing, unreadable and invalid-UTF-8 files keep the same stderr, print nothing to stdout and keep the same exit codes. It also keeps all three counts consistent over one text. The answer explains why the fallback is escalation rather than a technical workaround: a new reading or decoding path would touch UTF-8 and error handling, which are explicitly out of scope and already approved. That makes it a scope change, and scope changes are the owner's decision."
+        },
+        {
+          "question": {
+            "text": "The line rule is defined by reference to the boundaries that the Python standard library's line-splitting recognises, not by an explicit list of terminators. What could go wrong with defining the rule that way? How do the acceptance examples detect it, and what is the fallback if it happens?",
+            "format": "free_form",
+            "conceptual": true,
+            "key": null,
+            "options": []
+          },
+          "response": "The rule depends on whatever the Python library does, so the terminator set isn't written down and could change between Python versions without any code change. It also quietly includes characters nobody agreed on (`\\v`, `\\x85`, U+2029, `\\x1c`\u2013`\\x1e`). The acceptance examples would catch a change in the listed cases. They miss the unlisted characters, and they only run on the pinned Python version. The fallback is to list the terminator set explicitly in the spec.",
+          "correct": true,
+          "note": "The answer covers all three parts. The risk is that the terminator set is implicit and could shift between Python versions without any code change. The detection is that the acceptance examples catch drift in the listed cases, run under the Quality Gate. The fallback is to define the terminator set explicitly in the spec. The answer goes beyond the artifact and should be kept as spec feedback. It notes that the library-defined set quietly includes characters nobody agreed on (\\v, \\x85, U+2029, \\x1c\u2013\\x1e). It also notes that the examples cannot detect drift in unlisted characters and only run on the pinned Python version, so the assumption's validation is weaker than the strategy implies."
+        }
+      ]
+    }
   },
-  "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
