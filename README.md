@@ -1,6 +1,6 @@
 # hello
 
-Local, dependency-free text utilities. The first utility is `wordcount`, which reports the number of words, the number of visible characters and the number of terminated lines in one text file.
+Local, dependency-free text utilities. The first utility is `wordcount`, which reports the number of words, the number of visible characters and the number of terminated lines in one text file or on standard input.
 
 ## Install
 
@@ -35,6 +35,23 @@ words: 3 characters: 13 lines: 2
 ```
 
 The line count adds no new flag: the three counts are always reported together.
+
+## Standard input
+
+```sh
+printf 'a b\n' | uv run wordcount -
+words: 2 characters: 2 lines: 1
+```
+
+`wordcount -` reads standard input instead of a file. The `-` argument reads all bytes from standard input until end of input, so when you type the text in a terminal, finish it with Ctrl-D. The bytes are decoded as UTF-8 and counted exactly like a file, so the same bytes give the same output line from a file and from standard input. Standard input is read only when the argument is exactly `-`: running `wordcount` with no argument never reads it and is a usage error.
+
+Errors on standard input have the same form and exit status as file errors, but name `<stdin>` instead of a path, for example `wordcount: error: file is not valid UTF-8 text: <stdin>`.
+
+To count a file literally named `-`, give its path as `./-`, which is not the standard input argument:
+
+```sh
+uv run wordcount ./-
+```
 
 ## Word rule
 
