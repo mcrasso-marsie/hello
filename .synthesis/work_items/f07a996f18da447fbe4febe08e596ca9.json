@@ -31,7 +31,7 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 3,
+  "current_index": 2,
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [
@@ -46,7 +46,205 @@
     "DEFINE": "docs/strategy/STRAT-0004.md",
     "SPEC": "docs/specs/SPEC-0004.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "SPEC": {
+      "definition_of_done": [
+        "Running `printf 'a b\\n' | wordcount -` prints exactly `words: 2 characters: 2 lines: 1` followed by a newline to stdout, prints nothing to stderr, and exits with status 0.",
+        "Running `wordcount -` with empty standard input prints exactly `words: 0 characters: 0 lines: 0` followed by a newline to stdout and exits with status 0.",
+        "Running `wordcount -` with the bytes b'\\xff\\xfe' on standard input prints exactly one stderr line `wordcount: error: file is not valid UTF-8 text: <stdin>`, prints nothing to stdout, writes no traceback, and exits with status 1.",
+        "For each byte sample b'a b\\n', b'a\\r\\nb\\r\\n', b'a\\rb\\r' and 'caf\u00e9 na\u00efve \u65e5\u672c\\n' encoded as UTF-8, `wordcount PATH` on a file holding the sample and `wordcount -` fed the sample on stdin print identical stdout lines.",
+        "Running `wordcount - extra` prints argparse usage to stderr, prints nothing to stdout, and exits with status 2.",
+        "README.md documents the `wordcount -` invocation, states that `-` reads standard input until end of input, and documents `wordcount ./-` for a file literally named `-`."
+      ],
+      "regression_guardrails": [
+        "Invoking `wordcount` with no argument still prints argparse usage to stderr and exits with status 2, and it does not read standard input.",
+        "A file literally named `-` is still counted through `wordcount ./-` with the unchanged three-field output line.",
+        "No existing test function in tests/ is modified or removed, and every test that passed before this change still passes. The only tests allowed to fail are the two that already failed before this change: tests/test_agents_md.py::test_judgment_boundaries_preserved and the test in tests/step_defs/test_quality_gate_passes_on_the_finished_change.py. Both fail because AGENTS.md gained a third Judgment Boundaries bullet in commit 517a777, and this change does not edit AGENTS.md."
+      ],
+      "scenarios": [
+        {
+          "name": "piped text is counted through the dash argument",
+          "given": [
+            "standard input holds the bytes b'a b\\n'"
+          ],
+          "when": [
+            "`wordcount -` runs"
+          ],
+          "then": [
+            "stdout is exactly `words: 2 characters: 2 lines: 1\\n`",
+            "stderr is empty",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "empty standard input reports all zeros",
+          "given": [
+            "standard input holds zero bytes and is closed"
+          ],
+          "when": [
+            "`wordcount -` runs"
+          ],
+          "then": [
+            "stdout is exactly `words: 0 characters: 0 lines: 0\\n`",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "invalid UTF-8 on standard input fails with one line naming <stdin>",
+          "given": [
+            "standard input holds the bytes b'\\xff\\xfe' and is closed"
+          ],
+          "when": [
+            "`wordcount -` runs"
+          ],
+          "then": [
+            "stderr is exactly one line `wordcount: error: file is not valid UTF-8 text: <stdin>`",
+            "stderr does not contain `Traceback`",
+            "stdout is empty",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "file and standard input give identical output for the same bytes",
+          "given": [
+            "the byte samples b'a b\\n', b'a\\r\\nb\\r\\n', b'a\\rb\\r' and 'caf\u00e9 na\u00efve \u65e5\u672c\\n' encoded as UTF-8",
+            "each sample is written unchanged to its own temporary file"
+          ],
+          "when": [
+            "for each sample, `wordcount PATH` runs on its file and `wordcount -` runs with the sample on standard input"
+          ],
+          "then": [
+            "for every sample, the two stdout lines are byte-for-byte identical",
+            "for every sample, both runs exit with status 0",
+            "the sample b'a\\rb\\r' reports `lines: 2` from both sources"
+          ]
+        },
+        {
+          "name": "dash with a second argument is a usage error",
+          "given": [
+            "standard input holds the bytes b'a b\\n'"
+          ],
+          "when": [
+            "`wordcount - extra` runs"
+          ],
+          "then": [
+            "stderr contains argparse usage text starting with `usage:`",
+            "stdout is empty",
+            "the exit status is 2"
+          ]
+        },
+        {
+          "name": "README documents the dash argument and its workaround",
+          "given": [
+            "the README.md file at the repository root"
+          ],
+          "when": [
+            "the README text is read"
+          ],
+          "then": [
+            "it contains `wordcount -`",
+            "it contains the phrase `end of input`",
+            "it contains `./-`"
+          ]
+        },
+        {
+          "name": "guardrail: no argument is still a usage error and does not read stdin",
+          "given": [
+            "standard input is an open pipe holding the bytes b'a b\\n' that is never closed"
+          ],
+          "when": [
+            "`wordcount` runs with no argument and a 10 second timeout"
+          ],
+          "then": [
+            "the process finishes before the timeout",
+            "stderr contains argparse usage text starting with `usage:`",
+            "stdout is empty",
+            "the exit status is 2"
+          ]
+        },
+        {
+          "name": "guardrail: a file literally named dash is still counted through ./-",
+          "given": [
+            "the working directory holds a file named `-` containing 'x y\\n'",
+            "standard input holds zero bytes and is closed"
+          ],
+          "when": [
+            "`wordcount ./-` runs in that directory"
+          ],
+          "then": [
+            "stdout is exactly `words: 2 characters: 2 lines: 1\\n`",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "guardrail: the existing test suite has no new failure and no edited test",
+          "given": [
+            "the test files tracked in tests/ before this change",
+            "at the pre-change commit, exactly two tests fail: tests/test_agents_md.py::test_judgment_boundaries_preserved and the test in tests/step_defs/test_quality_gate_passes_on_the_finished_change.py",
+            "every other test in tests/ passes at the pre-change commit"
+          ],
+          "when": [
+            "`uv run pytest` runs on the finished change"
+          ],
+          "then": [
+            "every test that passed at the pre-change commit passes",
+            "the set of failing tests is a subset of those two pre-existing failures",
+            "`git diff` against the pre-change commit shows no modified or removed test function in the pre-existing test files"
+          ]
+        }
+      ],
+      "feature_name": "Standard input through an explicit '-' argument",
+      "context": "Users want to count text piped into wordcount without writing a temporary file. Today `cat notes.txt | wordcount -` treats '-' as a path and fails with `file not found: -`. This gap was deferred across three strategies and DG-0004 names it as the core pipeline need.\n\nSTRAT-0004 commits to an explicit '-' argument whose text flows through the same single decode and counting path as a file. Counts, the output line and error contracts stay identical across sources. Only error messages name `<stdin>` instead of a path. No argument stays a usage error with exit status 2, and stdin is never read implicitly.",
+      "c4_elements": [
+        "hello",
+        "hello-cli",
+        "word-count-command"
+      ],
+      "api_contracts": [
+        "Console command `wordcount PATH | -`: exactly one positional argument, parsed by argparse in hello.cli.main(argv: list[str] | None = None) -> int.",
+        "`wordcount -` reads all bytes from sys.stdin.buffer until end of input.",
+        "`wordcount PATH` reads the file bytes as before.",
+        "Both sources pass their bytes to one shared UTF-8 decode step in src/hello/cli.py with no newline translation.",
+        "Success output for both sources: exactly one stdout line `words: <N> characters: <M> lines: <L>` (ADR-0008).",
+        "Invalid UTF-8 on stdin: one stderr line `wordcount: error: file is not valid UTF-8 text: <stdin>`, empty stdout, exit status 1 (ADR-0004).",
+        "Zero arguments, or more than one argument including `-` plus another: argparse usage on stderr, exit status 2."
+      ],
+      "data_models": [
+        "No new data model. The decoded text is a plain str passed unchanged to count_words, count_characters and count_lines.",
+        "The source name used in error messages is the PATH string for files and the literal `<stdin>` for '-'."
+      ],
+      "dependencies": [
+        "Architecture ARCH-0001 v1.2 update that moves stdin processing and the '-' argument out of the hello and hello-cli 'Does NOT own' lists.",
+        "hello.counter.count_words (existing, unchanged)",
+        "hello.characters.count_characters (existing, unchanged)",
+        "hello.lines.count_lines (existing, unchanged)",
+        "The four AGENTS.md Quality Gate commands (ADR-0003)"
+      ],
+      "needed_by": [
+        "(none planned)"
+      ],
+      "constraints": [
+        "Standard library only; [project].dependencies stays empty (ADR-0001).",
+        "Counting logic stays in the pure counters; stdin handling lives only in hello.cli (ADR-0002).",
+        "Stdin is decoded once, through the same decode step as files, never through sys.stdin's text layer.",
+        "Stdin is read only when the argument is exactly '-'.",
+        "File-path error messages and exit statuses are unchanged.",
+        "No new flags or arguments."
+      ],
+      "decisions": [],
+      "adr_references": [
+        "ADR-0001",
+        "ADR-0002",
+        "ADR-0003",
+        "ADR-0004",
+        "ADR-0008",
+        "ADR-0009"
+      ],
+      "critical_components": [],
+      "architecture_change": null,
+      "path": "docs/specs/SPEC-0004.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
@@ -57,7 +255,7 @@
   "settings": {
     "token_quota": null
   },
-  "resume_index": null,
+  "resume_index": 3,
   "waiting_on_amendment": false,
   "intent": null,
   "spec_judge": "",
