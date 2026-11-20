@@ -1,0 +1,1 @@
+{"at": "2026-11-20T20:20:16+00:00", "work_item_id": "f07a996f18da447fbe4febe08e596ca9-stdin-invalid-utf8-names-stdin", "stage": "ASSEMBLE", "pbi_id": "stdin-invalid-utf8-names-stdin", "model": "openrouter:anthropic/claude-sonnet-5.5", "requests": 5, "input_tokens": 75984, "output_tokens": 2406, "cache_read_tokens": 63489, "cache_write_tokens": 12483}
