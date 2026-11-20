@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0004
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Let wordcount count piped text through an explicit '-' argument now, closing a gap deferred across three strategies without changing any existing contract.
@@ -189,6 +189,6 @@ It adds filesystem writes and cleanup. Error messages would name a temporary pat
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-opus-5.5  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
