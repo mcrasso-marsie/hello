@@ -35,8 +35,89 @@
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
-  "artifact_paths": {},
-  "pending_artifacts": {},
+  "artifact_paths": {
+    "DISCOVER": "docs/discovery/DG-0004.md"
+  },
+  "pending_artifacts": {
+    "DISCOVER": {
+      "graph_type": "opportunity",
+      "signals": [
+        {
+          "identity": "stdin-counting",
+          "text": "Running `wordcount -` reads UTF-8 text from standard input instead of a file path.",
+          "consequence_of": null,
+          "possible_indication": "Lets wordcount sit at the end of a shell pipeline, which a PATH-only command cannot do."
+        },
+        {
+          "identity": "stdin-counting",
+          "text": "Standard input was deferred as a non-goal in STRAT-0001, STRAT-0002 and STRAT-0003, and this work item takes it up.",
+          "consequence_of": null,
+          "possible_indication": "A known, long-standing gap, not a new request."
+        },
+        {
+          "identity": "stdin-counting",
+          "text": "Input read from stdin prints the same `words: <N> characters: <M> lines: <L>` line, using the existing word, character and line rules.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "stdin-counting",
+          "text": "Empty stdin prints `words: 0 characters: 0 lines: 0`.",
+          "consequence_of": null,
+          "possible_indication": "Mirrors the empty-file case from SPEC-0003."
+        },
+        {
+          "identity": "stdin-invalid-utf8-error",
+          "text": "Invalid UTF-8 on stdin is a file-style error with exit status 1 that names `<stdin>`.",
+          "consequence_of": null,
+          "possible_indication": "The single-line, no-traceback error contract for files should also hold for stdin."
+        },
+        {
+          "identity": "no-argument-usage-preserved",
+          "text": "Running `wordcount` with no argument stays a usage error with exit status 2.",
+          "consequence_of": null,
+          "possible_indication": "Stdin is opt-in through '-', so the existing usage contract must not change."
+        },
+        {
+          "identity": "stdin-counting",
+          "text": "The README and acceptance tests must be updated to cover stdin input.",
+          "consequence_of": "stdin-counting",
+          "possible_indication": null
+        }
+      ],
+      "core_issue": "Users can count only a named file. They cannot count text piped into wordcount through standard input.",
+      "impact_value": "Stdin input lets wordcount join shell pipelines without temporary files. It closes a gap deferred across three strategy documents.",
+      "discovery_method": "Written feature request in the handoff, checked against STRAT-0001..0003 non-goals and SPEC-0001..0003.",
+      "pattern_dependencies": "Stdin counting is the root pattern. The invalid UTF-8 error on stdin only exists once stdin can be read. Keeping the no-argument usage error is a constraint on how stdin counting is invoked. The README and test updates follow from stdin counting.",
+      "pattern_narratives": [
+        {
+          "identity": "stdin-counting",
+          "applies_to": "wordcount command-line interface (hello.cli)",
+          "frequency": "Every pipeline use of wordcount",
+          "severity": "Medium",
+          "confidence": "High",
+          "current_state": "wordcount accepts only one PATH argument and reads only from that file."
+        },
+        {
+          "identity": "stdin-invalid-utf8-error",
+          "applies_to": "wordcount error output for stdin input",
+          "frequency": "Whenever non-UTF-8 bytes are piped in",
+          "severity": "Medium",
+          "confidence": "High",
+          "current_state": "Invalid UTF-8 handling exists only for files, with a message naming the file PATH."
+        },
+        {
+          "identity": "no-argument-usage-preserved",
+          "applies_to": "wordcount argument parsing",
+          "frequency": "Every invocation without arguments",
+          "severity": "High",
+          "confidence": "High",
+          "current_state": "No argument prints argparse usage to stderr and exits with status 2."
+        }
+      ],
+      "questions": []
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
