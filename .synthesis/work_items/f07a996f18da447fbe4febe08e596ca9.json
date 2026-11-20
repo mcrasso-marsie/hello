@@ -258,7 +258,48 @@
       "path": "docs/strategy/STRAT-0004.md"
     }
   },
-  "quiz_questions": {},
+  "quiz_questions": {
+    "DEFINE": [
+      {
+        "text": "Why does the strategy choose an explicit '-' argument rather than reading standard input when no argument is given, as wc does?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "Reading stdin with no argument would break the kept contract that a missing argument is a usage error with exit status 2.",
+        "options": [
+          "Reading stdin with no argument would break the kept contract that a missing argument is a usage error with exit status 2.",
+          "An explicit '-' is easier to detect than checking whether stdin is a pipe or a terminal.",
+          "Implicit stdin reading would need a second decoding path, which the architecture forbids.",
+          "The '-' argument lets users count a file and stdin together in one invocation."
+        ]
+      },
+      {
+        "text": "The strategy rejects giving stdin its own read, decode and error path. What could break if stdin were decoded separately from files, and how would a user notice?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      },
+      {
+        "text": "Why does the strategy reject copying stdin to a temporary file and reusing the file path unchanged, even though that keeps one decode path?",
+        "format": "choice",
+        "conceptual": true,
+        "key": "It adds filesystem writes and cleanup, and error messages would name a temporary path instead of <stdin>.",
+        "options": [
+          "It adds filesystem writes and cleanup, and error messages would name a temporary path instead of <stdin>.",
+          "Temporary files cannot hold invalid UTF-8, so the error case could not be tested.",
+          "It would change the counting rules for CR and CRLF line endings.",
+          "It would require a new external dependency, which needs an ADR rationale."
+        ]
+      },
+      {
+        "text": "What trade-off does choosing '-' as the stdin marker create, and how does the strategy plan to handle it if the assumption behind it proves false?",
+        "format": "free_form",
+        "conceptual": true,
+        "key": null,
+        "options": []
+      }
+    ]
+  },
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
