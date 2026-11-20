@@ -258,48 +258,7 @@
       "path": "docs/strategy/STRAT-0004.md"
     }
   },
-  "quiz_questions": {
-    "DEFINE": [
-      {
-        "text": "The strategy keeps 'no argument' as a usage error with exit status 2 instead of reading stdin implicitly, as wc does. Why was the implicit wc-style behavior rejected, and what would an implicit default have broken?",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "Why does the strategy route stdin text through the same single decode and counting path as a file, rather than giving stdin its own read and decode path?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "Separate paths could let counting rules and error messages diverge between sources, and the architecture forbids a second decoding path for counting.",
-        "options": [
-          "Separate paths could let counting rules and error messages diverge between sources, and the architecture forbids a second decoding path for counting.",
-          "A separate stdin path would need a new external dependency, which AGENTS.md requires to be justified in an ADR.",
-          "Reading stdin through its own path would be slower for large inputs, so a shared path is needed for performance.",
-          "A shared path lets the tool detect piped input automatically, so users do not need to pass any argument."
-        ]
-      },
-      {
-        "text": "The strategy flags a medium-likelihood risk that stdin decoding could differ from file decoding. Describe what could go wrong with CR and CRLF input, and how the strategy plans to catch it.",
-        "format": "free_form",
-        "conceptual": true,
-        "key": null,
-        "options": []
-      },
-      {
-        "text": "Why was copying standard input to a temporary file and reusing the unchanged file path rejected?",
-        "format": "choice",
-        "conceptual": true,
-        "key": "It adds filesystem writes and cleanup, and error messages would name a temporary path instead of <stdin>.",
-        "options": [
-          "It adds filesystem writes and cleanup, and error messages would name a temporary path instead of <stdin>.",
-          "It would change the word, character and line rules, because temporary files use a different encoding.",
-          "It would make the no-argument case read stdin, breaking the exit status 2 usage contract.",
-          "It duplicates the output and error contracts in a separate command, so they can drift apart."
-        ]
-      }
-    ]
-  },
+  "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
