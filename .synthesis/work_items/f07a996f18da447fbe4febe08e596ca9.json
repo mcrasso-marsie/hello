@@ -34,21 +34,19 @@
   "current_index": 3,
   "rejection_count": 0,
   "pbi_id": null,
-  "child_ids": [],
+  "child_ids": [
+    "f07a996f18da447fbe4febe08e596ca9-read-stdin-through-dash",
+    "f07a996f18da447fbe4febe08e596ca9-stdin-invalid-utf8-names-stdin",
+    "f07a996f18da447fbe4febe08e596ca9-file-and-stdin-identical-output",
+    "f07a996f18da447fbe4febe08e596ca9-readme-documents-dash",
+    "f07a996f18da447fbe4febe08e596ca9-existing-suite-passes-unchanged"
+  ],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0004.md",
     "DEFINE": "docs/strategy/STRAT-0004.md",
     "SPEC": "docs/specs/SPEC-0004.md"
   },
-  "pending_artifacts": {
-    "PBI_PLANNING": {
-      "read-stdin-through-dash": "docs/pbis/SPEC-0004/PBI-0001.md",
-      "stdin-invalid-utf8-names-stdin": "docs/pbis/SPEC-0004/PBI-0002.md",
-      "file-and-stdin-identical-output": "docs/pbis/SPEC-0004/PBI-0003.md",
-      "readme-documents-dash": "docs/pbis/SPEC-0004/PBI-0004.md",
-      "existing-suite-passes-unchanged": "docs/pbis/SPEC-0004/PBI-0005.md"
-    }
-  },
+  "pending_artifacts": {},
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
