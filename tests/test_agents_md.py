@@ -14,6 +14,7 @@ QUALITY_GATE_COMMANDS = {
 JUDGMENT_BOUNDARIES = [
     "- Every external dependency requires a documented rationale in SPECs or ADRs.",
     "- Never bypass the Quality Gate.",
+    "- Accept changes only through a Synthesis workflow; never land a change made outside one.",
 ]
 
 
