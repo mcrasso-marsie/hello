@@ -1,0 +1,123 @@
+{
+  "version": "1.0.0",
+  "id": "cb6211ec-ea81-4275-ad08-de4674c97c26",
+  "timestamp": "2026-11-20T20:29:28Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "tests/features/guardrail-file-literally-named-dash-is-counted-through-dot-slash.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 8,
+              "content_hash": "sha256:734de97e7f28ba090dc0621fbbabaf782039804bff38cb8d86da8d925a37658b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/guardrail-no-argument-is-still-a-usage-error-and-does-not-read-stdin.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 9,
+              "content_hash": "sha256:4b32b20bcf0891580fc79138de9cd2e3df797e17591cb954d8a7df4394c4e3aa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/guardrail-the-existing-spec-0001-to-spec-0003-test-suite-passes-unchanged.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 9,
+              "content_hash": "sha256:e77ecc3ab6d8850b3fbd7bdd37f6d2e41ae2c41b94c3f055da9e401854de8b2e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_guardrail_file_literally_named_dash_is_counted_through_dot_slash.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 60,
+              "content_hash": "sha256:718526ab55f5b79e675342a10f4aa7b1a56884b479f1b3e1c5cd8a558a86cbf1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_guardrail_no_argument_is_still_a_usage_error_and_does_not_read_stdin.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 103,
+              "content_hash": "sha256:01714a8d895bd4b7dede59e70ad2ddd838ddd6770ef0ccb71a245581f54f881a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 137,
+              "content_hash": "sha256:2c006d35aca09d3c5c0d0f8d0f7b3fdf78e08a9c1c0b71d468d700ad18dccdfa"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0004/PBI-0005",
+    "rev": 1,
+    "base_revision": "80950c84aab053cfd3bc8cc86d1cd0efc4ff1cce"
+  }
+}
