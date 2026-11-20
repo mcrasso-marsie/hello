@@ -31,7 +31,7 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 4,
+  "current_index": 5,
   "rejection_count": 0,
   "pbi_id": "read-stdin-through-dash",
   "child_ids": [],
@@ -44,7 +44,7 @@
   "pending_artifacts": {},
   "quiz_questions": {},
   "passed_quizzes": {},
-  "rework_notes": "The spec was amended after this report, and approved again: The PBI is implemented, but the Quality Gate cannot go green because of two failures that were there before this change. AGENTS.md now has a third Judgment Boundaries bullet, added by CON-0001 in commit 517a777. The existing tests/test_agents_md.py::test_judgment_boundaries_preserved expects exactly two bullets. tests/step_defs/test_quality_gate_passes_on_the_finished_change.py also fails, apparently because it runs the full suite. The spec requires these existing tests to pass unmodified, and this PBI may not edit AGENTS.md or existing tests. (it contradicted or extended: SPEC-0004 Regression Guardrails: \"The existing SPEC-0001 to SPEC-0003 tests pass unchanged: no existing test function in tests/ is modified or removed, and `uv run pytest` exits 0.\" The guardrail scenario \"the existing SPEC-0001 to SPEC-0003 test suite passes unchanged\" has the same problem. The PBI verification criterion \"All four Quality Gate commands exit 0\" also cannot be met.). Build against the amended spec.",
+  "rework_notes": null,
   "trunk_merge_pending": false,
   "clarification_questions": {},
   "clarifications": {},
@@ -53,7 +53,7 @@
     "token_quota": null
   },
   "resume_index": null,
-  "waiting_on_amendment": true,
+  "waiting_on_amendment": false,
   "intent": null,
   "spec_judge": "",
   "amendment_owner": "",
