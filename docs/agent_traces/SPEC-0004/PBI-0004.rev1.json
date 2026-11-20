@@ -1,0 +1,74 @@
+{
+  "version": "1.0.0",
+  "id": "a8607844-dd85-4e2b-a7ef-174c60083d33",
+  "timestamp": "2026-11-20T20:18:04Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 3,
+              "end_line": 3,
+              "content_hash": "sha256:8ee9b62be3abaf115b253675a2773383ec419cf5f98f7eac3f9dfac8c7fd4d4e"
+            },
+            {
+              "start_line": 39,
+              "end_line": 55,
+              "content_hash": "sha256:6e341349c5f99d93119f260412e2538e29c895ac36f3a15eb45c154e2c3a4b97"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/features/readme-documents-the-dash-argument-and-its-workaround.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 8,
+              "content_hash": "sha256:c38af34e2f5f4ff701300f33a71ab6b0c4b445ac0a8e287889f14a4432d99e94"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_readme_documents_the_dash_argument_and_its_workaround.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 41,
+              "content_hash": "sha256:b38ed44198899e86c36cf2867278f4cebf9d34f3502ae6aff83835d00dafcf82"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0004/PBI-0004",
+    "rev": 1,
+    "base_revision": "5dccc4d145beb91b67a09b306537104fa78fe34f"
+  }
+}
