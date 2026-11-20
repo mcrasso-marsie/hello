@@ -40,7 +40,15 @@
     "DEFINE": "docs/strategy/STRAT-0004.md",
     "SPEC": "docs/specs/SPEC-0004.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "PBI_PLANNING": {
+      "read-stdin-through-dash": "docs/pbis/SPEC-0004/PBI-0001.md",
+      "stdin-invalid-utf8-names-stdin": "docs/pbis/SPEC-0004/PBI-0002.md",
+      "file-and-stdin-identical-output": "docs/pbis/SPEC-0004/PBI-0003.md",
+      "readme-documents-dash": "docs/pbis/SPEC-0004/PBI-0004.md",
+      "existing-suite-passes-unchanged": "docs/pbis/SPEC-0004/PBI-0005.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
