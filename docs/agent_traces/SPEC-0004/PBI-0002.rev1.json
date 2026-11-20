@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "id": "ce2f5218-c8e6-4307-81bc-01cd672f6e96",
+  "timestamp": "2026-11-20T20:20:19Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "tests/features/invalid-utf-8-on-standard-input-fails-with-one-line-naming-stdin.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 9,
+              "content_hash": "sha256:1b7208e8c0e1e5bcdec0d8119a7f1bc4d554dc5ec7e7d90dbf1b00234f8277de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_invalid_utf_8_on_standard_input_fails_with_one_line_naming_stdin.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-sonnet-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 59,
+              "content_hash": "sha256:4ac44485d58e2ed851eb880d4de5391bd4bc5293078b6fb3b579fb3cb1483373"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0004/PBI-0002",
+    "rev": 1,
+    "base_revision": "4f902bed659578b8f3d1f81ee6cdc43737e1feec"
+  }
+}
