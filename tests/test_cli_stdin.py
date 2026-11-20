@@ -2,6 +2,7 @@
 
 import io
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -72,3 +73,47 @@ def test_dash_invalid_utf8_names_stdin(
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "wordcount: error: file is not valid UTF-8 text: <stdin>\n"
+
+
+SAMPLES = [
+    b"a b\n",
+    b"a\r\nb\r\n",
+    b"a\rb\r",
+    "café naïve 日本\n".encode(),
+]
+
+
+@pytest.mark.parametrize("data", SAMPLES)
+def test_file_and_stdin_give_byte_identical_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    data: bytes,
+) -> None:
+    path = tmp_path / "sample.txt"
+    path.write_bytes(data)
+
+    assert main([str(path)]) == 0
+    from_file = capsys.readouterr().out.encode("utf-8")
+
+    _feed_stdin(monkeypatch, data)
+    assert main(["-"]) == 0
+    from_stdin = capsys.readouterr().out.encode("utf-8")
+
+    assert from_file == from_stdin
+
+
+def test_lone_cr_sample_reports_two_lines_from_both_sources(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = tmp_path / "sample.txt"
+    path.write_bytes(b"a\rb\r")
+
+    assert main([str(path)]) == 0
+    assert capsys.readouterr().out == "words: 2 characters: 2 lines: 2\n"
+
+    _feed_stdin(monkeypatch, b"a\rb\r")
+    assert main(["-"]) == 0
+    assert capsys.readouterr().out == "words: 2 characters: 2 lines: 2\n"

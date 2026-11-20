@@ -1,0 +1,74 @@
+{
+  "version": "1.0.0",
+  "id": "02fd088e-933a-4fa4-86bd-de561f036ba6",
+  "timestamp": "2026-11-20T20:22:31Z",
+  "tool": {
+    "name": "synthesis"
+  },
+  "files": [
+    {
+      "path": "tests/features/file-and-standard-input-give-identical-output-for-the-same-bytes.feature",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 9,
+              "content_hash": "sha256:6c7026a366db04784e0ff210fe7eca5c59642b98acef4fb7102c4bf8224d4dd4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/step_defs/test_file_and_standard_input_give_identical_output_for_the_same_bytes.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 1,
+              "end_line": 100,
+              "content_hash": "sha256:4df8d0a17b316df3b658d86176a906c3f568092853acfe4c9582bd65a37b4154"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/test_cli_stdin.py",
+      "conversations": [
+        {
+          "contributor": {
+            "type": "ai",
+            "model_id": "openrouter/anthropic/claude-haiku-5.5"
+          },
+          "ranges": [
+            {
+              "start_line": 5,
+              "end_line": 5,
+              "content_hash": "sha256:6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627"
+            },
+            {
+              "start_line": 76,
+              "end_line": 119,
+              "content_hash": "sha256:b9d5cc2544fb1fca25d78f9f66fb678312cb8bbb586149c458689f5dd3b0951c"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pbi": "SPEC-0004/PBI-0003",
+    "rev": 1,
+    "base_revision": "c9cec9a1f4682b613fa4a0be9b3fdd845e533e37"
+  }
+}
