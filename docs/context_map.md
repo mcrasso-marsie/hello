@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 5b5cfca85a994a7155f9a2ac177edc8c34bb8c4f
+generated_from: 933c3edd94bd300b0fca843f503ec855b8339148
 ---
 
 # Context Map: hello
@@ -46,7 +46,6 @@ generated_from: 5b5cfca85a994a7155f9a2ac177edc8c34bb8c4f
 | Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
 | One-line error and exit-status contract for CLI commands (ADR-0004) | docs/adrs/ADR-0004.md | ADR |
 | Visible-character rule in a pure character counter (ADR-0005) | docs/adrs/ADR-0005.md | ADR |
-| Labeled combined success output for wordcount (ADR-0006) | docs/adrs/ADR-0006.md | ADR |
 | Explicit line-terminator rule in a pure line counter (ADR-0007) | docs/adrs/ADR-0007.md | ADR |
 | Three-field labeled success output for wordcount (supersedes ADR-0006) (ADR-0008) | docs/adrs/ADR-0008.md | ADR |
 | Explicit '-' stdin marker sharing the file decode path (ADR-0009) | docs/adrs/ADR-0009.md | ADR |
