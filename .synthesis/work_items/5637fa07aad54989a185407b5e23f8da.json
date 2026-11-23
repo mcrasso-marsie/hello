@@ -36,9 +36,202 @@
   "pbi_id": null,
   "child_ids": [],
   "artifact_paths": {
-    "DISCOVER": "docs/discovery/DG-0005.md"
+    "DISCOVER": "docs/discovery/DG-0005.md",
+    "DEFINE": "docs/strategy/STRAT-0005.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "DEFINE": {
+      "core_strategy": "Report the byte size of the input in the success line beside the character count. Measure it from the raw input as read, once, the same way for a file and for standard input. Keep every other count, error and invocation unchanged.",
+      "names_mechanism": false,
+      "rejected_alternatives": [
+        {
+          "direction": "Derive the byte count from the decoded text by turning it back into bytes",
+          "tradeoff": "It measures the decoded text, not the raw input. The count could drift from the true input size if decoding ever changes."
+        },
+        {
+          "direction": "Read the byte size from the file system's own record of file size",
+          "tradeoff": "Standard input has no such record, so file and '-' would take different paths. Parity between them would break."
+        },
+        {
+          "direction": "Offer the byte count only behind a new opt-in command-line flag",
+          "tradeoff": "The user wants it shown next to characters by default. A new flag also breaks the guardrail of no new arguments."
+        },
+        {
+          "direction": "Document that users should run a separate byte-counting tool",
+          "tradeoff": "It leaves the core problem unsolved. Users still need a second tool to size buffers, uploads or storage."
+        }
+      ],
+      "dependencies": [
+        {
+          "description": "The approved shared read and decode path for file and standard input from SPEC-0004",
+          "owner": "word-count-command maintainers",
+          "status": "available"
+        },
+        {
+          "description": "An architecture update that moves bytes from the hello system's 'Does NOT own' list into what it owns",
+          "owner": "architecture owner (ARCH-0001)",
+          "status": "needed"
+        },
+        {
+          "description": "The four Quality Gate commands recorded in AGENTS.md",
+          "owner": "project maintainers",
+          "status": "available"
+        }
+      ],
+      "assumptions": [
+        {
+          "description": "'Next to the characters count' means the byte field sits right after the character field and before the line field.",
+          "validator": "The user who asked for the byte count",
+          "how_checked": "Confirm the field order during strategy review, before SPEC fixes the exact output line",
+          "if_false": "Move the field to the position the user names. The strategy direction does not change."
+        },
+        {
+          "description": "Users expect invalid UTF-8 input to keep failing with the existing error, with no byte count printed.",
+          "validator": "The user who asked for the byte count",
+          "how_checked": "Confirm during strategy review that the error behavior stays unchanged",
+          "if_false": "Re-open DEFINE on whether undecodable input should report bytes only."
+        },
+        {
+          "description": "The raw bytes a file holds equal the bytes the same content sends on standard input.",
+          "validator": "The existing file-and-stdin parity tests from SPEC-0004, extended with the byte field",
+          "how_checked": "Feed each SPEC-0004 byte sample through a file and through '-' and compare the full output lines",
+          "if_false": "Re-open DISCOVER on what differs between the two sources."
+        }
+      ],
+      "risks": [
+        {
+          "description": "Adding a fourth field changes the success line again and breaks scripts that parse the three-field form",
+          "likelihood": "medium",
+          "impact": "Users' scripts could misread counts after upgrading",
+          "mitigation": "Document the new line in README.md and state that the three-field form no longer applies"
+        },
+        {
+          "description": "Existing tests assert the three-field line and must be updated",
+          "likelihood": "high",
+          "impact": "The Quality Gate fails until those tests change, and an edit could weaken a guardrail",
+          "mitigation": "Limit test edits to the expected success line and keep every other assertion unchanged"
+        },
+        {
+          "description": "The byte count could be taken from a second read of the input",
+          "likelihood": "low",
+          "impact": "Standard input cannot be read twice, so the '-' path could report a wrong count",
+          "mitigation": "Require one read per run, shared by the byte count and the decode"
+        }
+      ],
+      "thesis": "Show the raw byte size of the input beside the character count, so users stop needing a second tool, now that file and stdin share one path.",
+      "from_problem_graph": "DG-0005",
+      "goals": [
+        {
+          "description": "Users learn the byte size of their input from the same wordcount run that gives the other counts",
+          "why": "Users who size buffers, uploads or storage now need a second tool",
+          "success_metric": "100% of successful runs print a byte field equal to the raw input size",
+          "owner": "word-count-command maintainers"
+        },
+        {
+          "description": "The byte count is identical for a file and for standard input through '-' with the same bytes",
+          "why": "DG-0005 requires parity, and the existing output is already identical across both sources",
+          "success_metric": "All SPEC-0004 byte samples give identical four-field lines for file and '-'",
+          "owner": "word-count-command maintainers"
+        }
+      ],
+      "success_criteria": [
+        {
+          "criterion": "Byte count matches raw input size for non-ASCII text",
+          "measurement": "Automated test on 'caf\u00e9' encoded as UTF-8",
+          "target": "5 bytes reported beside 4 characters",
+          "baseline": "No byte field exists",
+          "cadence": "Every Quality Gate run"
+        },
+        {
+          "criterion": "File and standard input parity including bytes",
+          "measurement": "Parity tests over the SPEC-0004 byte samples",
+          "target": "100% identical output lines",
+          "baseline": "100% identical three-field lines, no byte field",
+          "cadence": "Every Quality Gate run"
+        },
+        {
+          "criterion": "Existing counts, errors and invocation unchanged",
+          "measurement": "Existing guardrail tests from SPEC-0001 to SPEC-0004",
+          "target": "All pass, with only the expected success line updated",
+          "baseline": "All pass",
+          "cadence": "Every Quality Gate run"
+        }
+      ],
+      "non_goals": [
+        {
+          "description": "Reporting a byte count for input that is not valid UTF-8",
+          "tradeoff": "Keeps the existing single-line error and empty stdout. Users with undecodable input still need another tool."
+        },
+        {
+          "description": "Other statistics such as longest line or per-line output",
+          "tradeoff": "Keeps the change small and focused on the approved byte-size problem."
+        },
+        {
+          "description": "Totals or several inputs in one invocation",
+          "tradeoff": "Keeps the single-input contract. Users who need totals must sum runs themselves."
+        },
+        {
+          "description": "Comprehension quizzes for this feature",
+          "tradeoff": "The user declined them. Review relies on the walkthrough and README instead."
+        }
+      ],
+      "in_scope": [
+        "A byte field in the success line, placed beside the character field",
+        "Byte count measured from the raw input, read once, for files and for '-'",
+        "README.md documents the new output line, the byte rule, and that the three-field form no longer applies",
+        "Updating existing tests only where they assert the success line",
+        "hello",
+        "hello-cli",
+        "word-count-command"
+      ],
+      "out_of_scope": [
+        "Changes to the word, character or line rules (existing, unchanged)",
+        "The '-' standard input invocation itself (existing, from SPEC-0004)",
+        "New command-line flags or arguments",
+        "Byte counts for invalid UTF-8 input",
+        "Non-UTF-8 encodings, totals or several inputs",
+        "Third-party runtime dependencies"
+      ],
+      "walkthrough": [
+        {
+          "name": "Sizing a non-ASCII file",
+          "today": [
+            "The user runs wordcount on a file holding 'caf\u00e9'.",
+            "The output shows words: 1 characters: 4 lines: 0.",
+            "The user runs a second tool to learn the file is 5 bytes."
+          ],
+          "with_strategy": [
+            "The user runs wordcount on the same file.",
+            "The output shows the 5-byte size beside the 4 characters, with words and lines unchanged.",
+            "The user needs no second tool."
+          ]
+        },
+        {
+          "name": "Piping the same bytes through standard input",
+          "today": [
+            "The user pipes 'a\\r\\nb\\r\\n' into wordcount -.",
+            "The output matches the file run but gives no byte size."
+          ],
+          "with_strategy": [
+            "The user pipes the same bytes into wordcount -.",
+            "The output shows 6 bytes, and the line is identical to the file run."
+          ]
+        },
+        {
+          "name": "Undecodable input",
+          "today": [
+            "The user passes a file with bytes that are not valid UTF-8.",
+            "wordcount prints one error line and exits with status 1."
+          ],
+          "with_strategy": [
+            "The same run prints the same error line and exits with status 1.",
+            "No byte count is printed."
+          ]
+        }
+      ],
+      "path": "docs/strategy/STRAT-0005.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
