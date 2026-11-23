@@ -31,73 +31,14 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 0,
+  "current_index": 1,
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
   "artifact_paths": {
     "DISCOVER": "docs/discovery/DG-0005.md"
   },
-  "pending_artifacts": {
-    "DISCOVER": {
-      "graph_type": "opportunity",
-      "signals": [
-        {
-          "identity": "byte-count-missing",
-          "text": "The wordcount output line reports words, characters and lines, but gives no byte size of the input.",
-          "consequence_of": null,
-          "possible_indication": null
-        },
-        {
-          "identity": "byte-count-missing",
-          "text": "For non-ASCII text the byte count differs from the character count: 'caf\u00e9' is 4 characters but 5 bytes in UTF-8.",
-          "consequence_of": "byte-count-missing",
-          "possible_indication": "The character count cannot stand in for the byte count, so users have no correct size today."
-        },
-        {
-          "identity": "byte-count-missing",
-          "text": "Users who size buffers, uploads or storage need the byte count of the input.",
-          "consequence_of": "byte-count-missing",
-          "possible_indication": "The byte count may need to reflect the raw input bytes, not a re-encoded form of the decoded text."
-        },
-        {
-          "identity": "byte-count-missing",
-          "text": "The user wants the byte count shown next to the characters count.",
-          "consequence_of": null,
-          "possible_indication": "The new field likely sits beside the existing counts on the same output line."
-        },
-        {
-          "identity": "byte-count-input-parity",
-          "text": "The byte count must be available for input read from a file and from standard input through '-'.",
-          "consequence_of": null,
-          "possible_indication": "The same bytes should give the same byte count whether read from a file or from standard input."
-        }
-      ],
-      "core_issue": "wordcount users cannot learn the byte size of their input. The existing counts do not give it for non-ASCII text.",
-      "impact_value": "Users who size buffers, uploads or storage could get the byte size from wordcount. They would not need a second tool.",
-      "discovery_method": "Written feature intent and user notes from the handoff.",
-      "pattern_dependencies": "The byte-count-input-parity pattern depends on byte-count-missing. Parity only matters once a byte count exists. Both patterns build on the existing file and standard input paths from SPEC-0004.",
-      "pattern_narratives": [
-        {
-          "identity": "byte-count-missing",
-          "applies_to": "The wordcount output line for file and standard input",
-          "frequency": "Every run on non-ASCII input",
-          "severity": "Medium",
-          "confidence": "High",
-          "current_state": "The output shows words, characters and lines. Users must use another tool to get the byte size."
-        },
-        {
-          "identity": "byte-count-input-parity",
-          "applies_to": "wordcount PATH and wordcount -",
-          "frequency": "Every run that reads standard input",
-          "severity": "Medium",
-          "confidence": "High",
-          "current_state": "File and standard input already give identical three-field output for the same bytes. No byte field exists on either path."
-        }
-      ],
-      "questions": []
-    }
-  },
+  "pending_artifacts": {},
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
@@ -116,5 +57,9 @@
   "intent_reviewed": false,
   "handed_over_to": null,
   "owner": "Marco <mcrasso@marsie.io>",
-  "reviewers": {}
+  "reviewers": {
+    "DEFINE": [
+      "Marco <mcrasso@marsie.io>"
+    ]
+  }
 }
