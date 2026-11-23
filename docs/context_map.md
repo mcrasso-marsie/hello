@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 82941ccf11248e9ab2d47892042922752309f7cc
+generated_from: f9734e4dbfcbdbd9994944f7cc92a19f1f7a4f80
 ---
 
 # Context Map: hello
@@ -47,8 +47,9 @@ generated_from: 82941ccf11248e9ab2d47892042922752309f7cc
 | One-line error and exit-status contract for CLI commands (ADR-0004) | docs/adrs/ADR-0004.md | ADR |
 | Visible-character rule in a pure character counter (ADR-0005) | docs/adrs/ADR-0005.md | ADR |
 | Explicit line-terminator rule in a pure line counter (ADR-0007) | docs/adrs/ADR-0007.md | ADR |
-| Three-field labeled success output for wordcount (supersedes ADR-0006) (ADR-0008) | docs/adrs/ADR-0008.md | ADR |
 | Explicit '-' stdin marker sharing the file decode path (ADR-0009) | docs/adrs/ADR-0009.md | ADR |
+| Four-field labeled success output for wordcount (supersedes ADR-0008) (ADR-0010) | docs/adrs/ADR-0010.md | ADR |
+| Raw-byte rule in a pure byte counter (ADR-0011) | docs/adrs/ADR-0011.md | ADR |
 | Architecture (ARCH-0001) | docs/architecture.md | architecture |
 
 ## Validation Checklist
