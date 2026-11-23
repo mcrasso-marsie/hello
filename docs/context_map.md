@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 434590bdc4df52037e3bae6aeabffc1346570093
+generated_from: d9a9a653beb67028e51de8693fdc0aae31a81449
 ---
 
 # Context Map: hello
@@ -22,10 +22,11 @@ generated_from: 434590bdc4df52037e3bae6aeabffc1346570093
 |------|------|----------|------------|
 | hello (hello) | system | docs/architecture.md#8-system-decomposition |  |
 | hello command-line package (hello-cli) | container | docs/architecture.md#8-system-decomposition |  |
-| Word-count command (word-count-command) | component | docs/architecture.md#8-system-decomposition | Word counter, Character counter, Line counter |
+| Word-count command (word-count-command) | component | docs/architecture.md#8-system-decomposition | Word counter, Character counter, Line counter, Byte counter |
 | Word counter (word-counter) | component | docs/architecture.md#8-system-decomposition |  |
 | Character counter (character-counter) | component | docs/architecture.md#8-system-decomposition |  |
 | Line counter (line-counter) | component | docs/architecture.md#8-system-decomposition |  |
+| Byte counter (byte-counter) | component | docs/architecture.md#8-system-decomposition |  |
 
 ## Glossary
 
@@ -41,6 +42,7 @@ generated_from: 434590bdc4df52037e3bae6aeabffc1346570093
 | Character count in word-count output (SPEC-0002) | docs/specs/SPEC-0002.md | spec |
 | Line count in word-count output (SPEC-0003) | docs/specs/SPEC-0003.md | spec |
 | Standard input through an explicit '-' argument (SPEC-0004) | docs/specs/SPEC-0004.md | spec |
+| Byte count in word-count output (SPEC-0005) | docs/specs/SPEC-0005.md | spec |
 | Standard-library-only runtime (ADR-0001) | docs/adrs/ADR-0001.md | ADR |
 | Pure word counter separated from command I/O (ADR-0002) | docs/adrs/ADR-0002.md | ADR |
 | Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
