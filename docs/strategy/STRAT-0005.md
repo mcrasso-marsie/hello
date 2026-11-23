@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0005
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Show the raw byte size of the input beside the character count, so users stop needing a second tool, now that file and stdin share one path.
@@ -176,6 +176,6 @@ It leaves the core problem unsolved. Users still need a second tool to size buff
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-opus-5.5  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
