@@ -35,20 +35,127 @@
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [],
-  "artifact_paths": {},
-  "pending_artifacts": {},
+  "artifact_paths": {
+    "DISCOVER": "docs/discovery/DG-0006.md"
+  },
+  "pending_artifacts": {
+    "DISCOVER": {
+      "graph_type": "opportunity",
+      "signals": [
+        {
+          "identity": "longest-line-metric-missing",
+          "text": "The owner wants the longest line, measured in words, added to the wordcount output.",
+          "consequence_of": null,
+          "possible_indication": "The owner needs a line-length view that words, characters and lines do not give."
+        },
+        {
+          "identity": "longest-line-metric-missing",
+          "text": "The output today reports `words: N characters: N lines: N` and has no longest-line figure.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "longest-line-metric-missing",
+          "text": "The new field reports a single number. It has no line number and no line text.",
+          "consequence_of": null,
+          "possible_indication": "The owner wants a compact figure, not a diagnostic report."
+        },
+        {
+          "identity": "final-segment-line-rule-mismatch",
+          "text": "The unterminated final segment counts as a line for the longest-line measure, so `a b c` with no terminator reports 3.",
+          "consequence_of": null,
+          "possible_indication": "The longest-line measure and the existing `lines` field treat the same final segment differently."
+        },
+        {
+          "identity": "final-segment-line-rule-mismatch",
+          "text": "The existing `lines` counter does not count an unterminated final segment, so `a b c` reports `lines: 0`.",
+          "consequence_of": null,
+          "possible_indication": "Readers may see `lines: 0` next to `longest_line_words: 3` and think the output contradicts itself."
+        },
+        {
+          "identity": "definitions-reuse-constraint",
+          "text": "The change must reuse the word definition and the line terminator set from SPEC-0001 to SPEC-0005.",
+          "consequence_of": null,
+          "possible_indication": "The owner wants one meaning of word and line across all fields."
+        },
+        {
+          "identity": "definitions-reuse-constraint",
+          "text": "The change adds no third-party runtime dependency.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "output-contract-stability",
+          "text": "The new field uses the label `longest_line_words: N` and comes last, so the line reads `words: W characters: C lines: L longest_line_words: N`.",
+          "consequence_of": null,
+          "possible_indication": null
+        },
+        {
+          "identity": "output-contract-stability",
+          "text": "The existing fields and their meaning must stay stable for both `wordcount PATH` and `wordcount -`.",
+          "consequence_of": null,
+          "possible_indication": "Existing users and scripts parse the current output."
+        },
+        {
+          "identity": "output-contract-stability",
+          "text": "The README and the existing tests assert the three-field output line, so they no longer match the new output.",
+          "consequence_of": "output-contract-stability",
+          "possible_indication": "The README, the tests and the specs need updates, and the Quality Gate must still pass."
+        }
+      ],
+      "core_issue": "The wordcount output does not report how many words the longest line holds, so users cannot see line length in words.",
+      "impact_value": "Users get a longest-line figure without extra tools. The value is convenience only, with no failure to fix. Existing parsers must keep working.",
+      "discovery_method": "Owner feature intent, the existing SPEC-0001 to SPEC-0005, and the human answers to three clarification questions.",
+      "pattern_dependencies": "The missing longest-line metric is the root pattern. The final-segment rule, the definition reuse and the output contract all constrain how that metric behaves. The final-segment rule differs from the existing `lines` rule, so the documentation must explain the difference. The new field changes the output line, so the README and the tests that assert the three-field line become stale.",
+      "pattern_narratives": [
+        {
+          "identity": "longest-line-metric-missing",
+          "applies_to": "The wordcount CLI output for files and standard input.",
+          "frequency": "Every run of wordcount.",
+          "severity": "Low. This is an enhancement, not a defect.",
+          "confidence": "High. The owner stated the need and answered the open questions.",
+          "current_state": "The output shows words, characters and lines. It shows no longest-line figure."
+        },
+        {
+          "identity": "final-segment-line-rule-mismatch",
+          "applies_to": "The longest-line measure and the existing `lines` field.",
+          "frequency": "Every input that does not end with a line terminator.",
+          "severity": "Medium. Readers may take the two fields as inconsistent.",
+          "confidence": "High. The owner decided that the final segment counts for the longest-line measure.",
+          "current_state": "The `lines` field excludes the unterminated final segment. The longest-line measure will include it."
+        },
+        {
+          "identity": "definitions-reuse-constraint",
+          "applies_to": "The word rule, the line terminator set and the runtime dependencies.",
+          "frequency": "Every run of wordcount.",
+          "severity": "Medium. A second definition of word or line would make fields disagree.",
+          "confidence": "High. The owner requires reuse of SPEC-0001 to SPEC-0005 and no new runtime dependency.",
+          "current_state": "The word rule and the line terminator set exist in the approved specs. The runtime dependency list is empty."
+        },
+        {
+          "identity": "output-contract-stability",
+          "applies_to": "The output line, the README and the existing tests.",
+          "frequency": "Every run of wordcount, and every test of the output line.",
+          "severity": "Medium. A wrong label, wrong position or changed field would break parsers and tests.",
+          "confidence": "High. The owner fixed the label and the position.",
+          "current_state": "The output line has three fields. The README and the tests assert that three-field line."
+        }
+      ],
+      "questions": []
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {
-    "DISCOVER": [
-      "Does the unterminated final segment count as a line for the longest-line measure? For 'a b c' with no terminator, should it report 3 or 0?",
-      "Should the output report only the word count of the longest line, or also its line number or text?",
-      "What exact label should the new field use, and should it follow `lines: <L>` at the end of the output line?"
-    ]
+  "clarification_questions": {},
+  "clarifications": {
+    "DISCOVER": {
+      "Does the unterminated final segment count as a line for the longest-line measure? For 'a b c' with no terminator, should it report 3 or 0?": "Include it \u2014 report 3. The unterminated final segment DOES count as a line for the longest-line measure, even though the existing `lines` counter excludes it. So `a b c` with no terminator reports longest_line_words: 3.",
+      "Should the output report only the word count of the longest line, or also its line number or text?": "Word count only. Report a single numeric field; no line number, no line text.",
+      "What exact label should the new field use, and should it follow `lines: <L>` at the end of the output line?": "Use the label `longest_line_words: N` and place it at the end, after `lines: <L>`. Output becomes `words: W characters: C lines: L longest_line_words: N`."
+    }
   },
-  "clarifications": {},
   "clarification_rounds": {
     "DISCOVER": 1
   },
