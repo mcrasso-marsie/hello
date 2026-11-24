@@ -41,9 +41,17 @@
   "passed_quizzes": {},
   "rework_notes": null,
   "trunk_merge_pending": false,
-  "clarification_questions": {},
+  "clarification_questions": {
+    "DISCOVER": [
+      "Does the unterminated final segment count as a line for the longest-line measure? For 'a b c' with no terminator, should it report 3 or 0?",
+      "Should the output report only the word count of the longest line, or also its line number or text?",
+      "What exact label should the new field use, and should it follow `lines: <L>` at the end of the output line?"
+    ]
+  },
   "clarifications": {},
-  "clarification_rounds": {},
+  "clarification_rounds": {
+    "DISCOVER": 1
+  },
   "settings": {
     "token_quota": null
   },
