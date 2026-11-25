@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 933c3edd94bd300b0fca843f503ec855b8339148
+generated_from: 82941ccf11248e9ab2d47892042922752309f7cc
 ---
 
 # Context Map: hello
