@@ -217,6 +217,6 @@ It shifts field positions and breaks parsers that read the three-field line. The
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-sonnet-5.5  
-**Reviewed by:** _(pending)_ — _(pending)_
+**Reviewed by:** Marco — mcrasso@marsie.io
 
 **Ready for SPEC:** [ ] Yes [ ] No
