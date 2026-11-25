@@ -1,7 +1,7 @@
 ---
 artifact_type: strategy
 id: STRAT-0006
-status: Draft
+status: Approved
 ---
 
 # Strategy Document: Give users the word count of the longest line in one run, without changing any existing field, so line length is visible without extra tools.
@@ -217,6 +217,7 @@ It shifts field positions and breaks parsers that read the three-field line. The
 ## Sign-Off
 
 **Authored by:** openrouter:anthropic/claude-sonnet-5.5  
-**Reviewed by:** Marco — mcrasso@marsie.io
+**Reviewed by:** Marco — mcrasso@marsie.io  
+**Reviewed by:** Marco — mcrasso@gmail.com
 
-**Ready for SPEC:** [ ] Yes [ ] No
+**Ready for SPEC:** [x] Yes [ ] No
