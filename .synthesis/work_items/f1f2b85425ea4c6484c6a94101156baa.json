@@ -31,7 +31,7 @@
       "gate": "ACCEPTANCE_GATE"
     }
   ],
-  "current_index": 3,
+  "current_index": 2,
   "rejection_count": 0,
   "pbi_id": null,
   "child_ids": [
@@ -44,7 +44,573 @@
     "DEFINE": "docs/strategy/STRAT-0006.md",
     "SPEC": "docs/specs/SPEC-0006.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "SPEC": {
+      "definition_of_done": [
+        "src/hello/longest_line.py defines longest_line_words(text: str) -> int, which returns the highest word count among the lines of text.",
+        "longest_line_words splits text at hello.lines.LINE_TERMINATORS, counting CRLF as one terminator, and counts the words of each line with hello.counter.count_words.",
+        "An unterminated final segment counts as a line for this measure only: longest_line_words('a b c') returns 3.",
+        "A trailing terminator adds no extra line: longest_line_words('a b\\n') returns 2.",
+        "longest_line_words returns 0 for '', for the blank-only text '  \\t ' and for '\\n\\n'.",
+        "longest_line_words('one two\\nthree four five\\nsix\\n') returns 3.",
+        "For each of the 11 terminators (LF, CR, CRLF, VT, FF, FS, GS, RS, NEL, LS, PS), longest_line_words('a b c' + terminator + 'd') returns 3.",
+        "longest_line_words('a b\\r\\nc d e\\rf') returns 3.",
+        "Separators that are not terminators keep words on one line: for TAB, SPACE, NBSP U+00A0, US U+001F and IDEOGRAPHIC SPACE U+3000, longest_line_words('a' + c + 'b') returns 2.",
+        "Text with no terminator agrees with the word rule: longest_line_words(text) equals count_words(text) for '', 'alpha\\t\\tbeta  gamma ', 'caf\\u00e9 na\\u00efve \\u65e5\\u672c' and 'Hello, world! It's-fine.'.",
+        "hello.longest_line performs no file, process or console I/O and imports only the standard library, hello.counter and hello.lines.",
+        "Running `wordcount PATH` on a readable UTF-8 file prints exactly one line of the form `words: <N> characters: <M> lines: <L> longest_line_words: <K>` followed by a newline to stdout, prints nothing to stderr and exits with status 0.",
+        "For a file containing 'a b c' with no terminator, `wordcount PATH` prints `words: 3 characters: 3 lines: 0 longest_line_words: 3`.",
+        "For a file containing 'one two\\nthree four five\\nsix\\n', `wordcount PATH` prints `words: 6 characters: 22 lines: 3 longest_line_words: 3`.",
+        "For a file containing 'a b\\n', `wordcount PATH` prints `words: 2 characters: 2 lines: 1 longest_line_words: 2`.",
+        "For an empty file, `wordcount PATH` prints `words: 0 characters: 0 lines: 0 longest_line_words: 0`.",
+        "Running `printf 'a b\\r\\nc d e\\rf' | wordcount -` prints `words: 6 characters: 6 lines: 2 longest_line_words: 3`.",
+        "For the byte samples b'a b c', b'a b\\r\\nc d e\\rf' and 'caf\\u00e9 na\\u00efve \\u65e5\\u672c\\n' encoded as UTF-8, `wordcount PATH` and `wordcount -` print identical stdout lines.",
+        "hello.cli.main reads and decodes the input once and passes the same decoded text string to count_words, count_characters, count_lines and longest_line_words.",
+        "Every existing test, feature file and step definition that asserts the three-field success line is updated to assert the four-field line. This applies to the file and standard-input cases in tests/test_cli.py, tests/test_cli_stdin.py and tests/features.",
+        "tests/arch/test_layering.py gains the two functions test_longest_line_reuses_word_and_terminator_definitions and test_longest_line_performs_no_io, plus the module-level constants they use.",
+        "ALLOWED_CHANGES in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py permits exactly those additions to tests/arch/test_layering.py, so the guardrail passes on the uncommitted working tree.",
+        "Each file under docs/specs/ that asserts the three-field line `words: <N> characters: <M> lines: <L>` as the current output is updated to the four-field line or marked as superseded by this spec.",
+        "README.md documents the `words: <N> characters: <M> lines: <L> longest_line_words: <K>` output line and the longest-line rule, and states that the earlier three-field output no longer applies.",
+        "README.md explains why `lines` excludes the unterminated final segment while `longest_line_words` includes it, with the examples 'a b c' giving lines 0 and longest_line_words 3, 'a b\\n' giving lines 1 and longest_line_words 2, and empty input giving longest_line_words 0.",
+        "All four Quality Gate commands exit 0 on the finished change."
+      ],
+      "regression_guardrails": [
+        "The first three fields keep their labels, order and meaning: a file containing 'caf\\u00e9' still reports `words: 1 characters: 4 lines: 0` before the new field, and a file containing '  alpha\\t\\tbeta\\n\\ngamma  ' reports `words: 3 characters: 14 lines: 2 longest_line_words: 2`.",
+        "The lines field still excludes an unterminated final segment: count_lines('a b c') returns 0, count_lines('a\\nb') returns 1, and `wordcount PATH` on a file containing 'a b c' reports lines: 0.",
+        "hello.counter.count_words, hello.characters.count_characters and hello.lines.count_lines return the same values as before, and hello.lines.LINE_TERMINATORS still holds exactly the same 10 code points.",
+        "UTF-8 decoding is unchanged: no new decoding path, encoding option or newline-translation setting is introduced, so a file with the bytes b'a b\\r\\nc' still reports lines: 1 and longest_line_words: 2.",
+        "A path that does not exist still prints exactly one line `wordcount: error: file not found: PATH` to stderr, prints nothing to stdout (no counts and no longest_line_words field) and exits with status 1.",
+        "A path that exists but cannot be read (a directory, or a file without read permission) still prints exactly one line starting with `wordcount: error: cannot read file:` to stderr, prints nothing to stdout and exits with status 1.",
+        "A file whose bytes are not valid UTF-8 still prints exactly one line `wordcount: error: file is not valid UTF-8 text: PATH` to stderr, prints nothing to stdout and exits with status 1.",
+        "Invalid UTF-8 on standard input through `wordcount -` still prints exactly one line `wordcount: error: file is not valid UTF-8 text: <stdin>` to stderr, prints nothing to stdout, writes no traceback and exits with status 1.",
+        "The invocation is unchanged: `wordcount` with no argument, with more than two... more than one argument, or `wordcount - extra` still prints argparse usage to stderr and exits with status 2, and the no-argument form does not read standard input.",
+        "A file literally named `-` is still counted through `wordcount ./-` with the four-field output line.",
+        "`import hello` still succeeds with every name src/hello/__init__.py exported before, src/hello/py.typed remains present and the src layout is unchanged.",
+        "pyproject.toml [project].dependencies stays empty, ruff, mypy and pytest stay declared only in the `dev` dependency group, the console script `wordcount = \"hello.cli:main\"` stays declared and `uv lock --check` exits 0.",
+        "The AGENTS.md Toolchain table keeps its four Quality Gate rows and its Judgment Boundaries bullets word for word."
+      ],
+      "scenarios": [
+        {
+          "name": "longest line is the line with the most words",
+          "given": [
+            "the text 'one two\\nthree four five\\nsix\\n'"
+          ],
+          "when": [
+            "longest_line_words is called with that text"
+          ],
+          "then": [
+            "the result is 3"
+          ]
+        },
+        {
+          "name": "unterminated final segment counts for the longest-line measure",
+          "given": [
+            "the text 'a b c' with no terminator"
+          ],
+          "when": [
+            "longest_line_words is called with that text"
+          ],
+          "then": [
+            "the result is 3"
+          ]
+        },
+        {
+          "name": "trailing terminator adds no extra line",
+          "given": [
+            "the text 'a b\\n'"
+          ],
+          "when": [
+            "longest_line_words is called with that text"
+          ],
+          "then": [
+            "the result is 2"
+          ]
+        },
+        {
+          "name": "text without words has a longest line of zero",
+          "given": [
+            "the texts '', '  \\t ' and '\\n\\n'"
+          ],
+          "when": [
+            "longest_line_words is called with each text"
+          ],
+          "then": [
+            "each result is 0"
+          ]
+        },
+        {
+          "name": "each of the 11 terminators ends a line",
+          "given": [
+            "the terminators LF, CR, CRLF, VT, FF, FS, GS, RS, NEL, LS and PS",
+            "the text 'a b c' + terminator + 'd' built for each terminator"
+          ],
+          "when": [
+            "longest_line_words is called with each text"
+          ],
+          "then": [
+            "each result is 3, not 4"
+          ]
+        },
+        {
+          "name": "mixed terminators split lines and CRLF counts once",
+          "given": [
+            "the text 'a b\\r\\nc d e\\rf'"
+          ],
+          "when": [
+            "longest_line_words is called with that text"
+          ],
+          "then": [
+            "the result is 3"
+          ]
+        },
+        {
+          "name": "non-terminator separators keep words on one line",
+          "given": [
+            "the separators TAB, SPACE, U+00A0, U+001F and U+3000"
+          ],
+          "when": [
+            "longest_line_words is called with 'a' + separator + 'b' for each separator"
+          ],
+          "then": [
+            "each result is 2"
+          ]
+        },
+        {
+          "name": "zero width space is not a word separator",
+          "given": [
+            "the text 'a\\u200bb'"
+          ],
+          "when": [
+            "longest_line_words is called with that text"
+          ],
+          "then": [
+            "the result is 1, equal to count_words of that text"
+          ]
+        },
+        {
+          "name": "single-line input agrees with the word count",
+          "given": [
+            "the terminator-free texts '', 'alpha\\t\\tbeta  gamma ', 'caf\\u00e9 na\\u00efve \\u65e5\\u672c' and 'Hello, world! It's-fine.'"
+          ],
+          "when": [
+            "longest_line_words and count_words are called with each text"
+          ],
+          "then": [
+            "the two results are equal for every text"
+          ]
+        },
+        {
+          "name": "CLI prints four fields for an unterminated file",
+          "given": [
+            "a UTF-8 file containing 'a b c' with no terminator"
+          ],
+          "when": [
+            "wordcount is run with the path of that file"
+          ],
+          "then": [
+            "stdout is exactly 'words: 3 characters: 3 lines: 0 longest_line_words: 3' followed by a newline",
+            "stderr is empty",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "CLI prints four fields for a multi-line file",
+          "given": [
+            "a UTF-8 file containing 'one two\\nthree four five\\nsix\\n'"
+          ],
+          "when": [
+            "wordcount is run with the path of that file"
+          ],
+          "then": [
+            "stdout is exactly 'words: 6 characters: 22 lines: 3 longest_line_words: 3' followed by a newline",
+            "stderr is empty",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "CLI reports a terminated single line",
+          "given": [
+            "a UTF-8 file containing 'a b\\n'"
+          ],
+          "when": [
+            "wordcount is run with the path of that file"
+          ],
+          "then": [
+            "stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "CLI reports zero for an empty file",
+          "given": [
+            "an empty file"
+          ],
+          "when": [
+            "wordcount is run with the path of that file"
+          ],
+          "then": [
+            "stdout is exactly 'words: 0 characters: 0 lines: 0 longest_line_words: 0' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "CLI reads mixed terminators from standard input",
+          "given": [
+            "standard input holding the bytes b'a b\\r\\nc d e\\rf'"
+          ],
+          "when": [
+            "wordcount - is run"
+          ],
+          "then": [
+            "stdout is exactly 'words: 6 characters: 6 lines: 2 longest_line_words: 3' followed by a newline",
+            "stderr is empty",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "file and standard input print identical lines",
+          "given": [
+            "the samples b'a b c', b'a b\\r\\nc d e\\rf' and 'caf\\u00e9 na\\u00efve \\u65e5\\u672c\\n' encoded as UTF-8",
+            "each sample written to a file and also available on standard input"
+          ],
+          "when": [
+            "wordcount PATH and wordcount - are run for each sample"
+          ],
+          "then": [
+            "the two stdout lines are identical for every sample"
+          ]
+        },
+        {
+          "name": "CLI passes the same decoded text to all four counters",
+          "given": [
+            "a file containing 'a b\\nc'",
+            "count_words, count_characters, count_lines and longest_line_words in hello.cli replaced by recorders"
+          ],
+          "when": [
+            "hello.cli.main is called with the path of that file"
+          ],
+          "then": [
+            "each recorder received the same decoded str object",
+            "the file was read and decoded once"
+          ]
+        },
+        {
+          "name": "success line has four labeled fields in order",
+          "given": [
+            "the node id tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order"
+          ],
+          "when": [
+            "the test tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "longest-line module reuses the word rule and the terminator set",
+          "given": [
+            "the node id tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions"
+          ],
+          "when": [
+            "the test tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions runs"
+          ],
+          "then": [
+            "it passes"
+          ]
+        },
+        {
+          "name": "longest-line module performs no I/O",
+          "given": [
+            "the node id tests/arch/test_layering.py::test_longest_line_performs_no_io"
+          ],
+          "when": [
+            "the test tests/arch/test_layering.py::test_longest_line_performs_no_io runs"
+          ],
+          "then": [
+            "it passes",
+            "hello.longest_line imports only the standard library, hello.counter and hello.lines"
+          ]
+        },
+        {
+          "name": "guardrail suite permits the two new arch tests and nothing else",
+          "given": [
+            "tests/arch/test_layering.py in the working tree with the two functions test_longest_line_reuses_word_and_terminator_definitions and test_longest_line_performs_no_io and their module-level constants added",
+            "no other pre-existing test file changed beyond the JUDGMENT_BOUNDARIES list in tests/test_agents_md.py and the three-field to four-field assertion updates",
+            "ALLOWED_CHANGES in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py extended to name those additions"
+          ],
+          "when": [
+            "the test tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py runs against the uncommitted working tree"
+          ],
+          "then": [
+            "it passes",
+            "it still fails when tests/arch/test_layering.py gains any other added function or any removed or modified existing function"
+          ]
+        },
+        {
+          "name": "updated tests assert the four-field line",
+          "given": [
+            "the tests, feature files and step definitions that asserted the three-field success line, now updated"
+          ],
+          "when": [
+            "uv run pytest is run"
+          ],
+          "then": [
+            "the exit status is 0",
+            "the file and standard-input success tests expect the line ending in 'longest_line_words: <K>'"
+          ]
+        },
+        {
+          "name": "README documents the four-field line and the final-segment difference",
+          "given": [
+            "README.md after the change"
+          ],
+          "when": [
+            "its text is read"
+          ],
+          "then": [
+            "it contains the line form 'words: <N> characters: <M> lines: <L> longest_line_words: <K>'",
+            "it states that the earlier three-field output no longer applies",
+            "it contains the examples 'a b c' giving lines 0 and longest_line_words 3, and 'a b\\n' giving lines 1 and longest_line_words 2",
+            "it states that empty input gives longest_line_words 0",
+            "it explains why lines excludes the unterminated final segment and longest_line_words includes it"
+          ]
+        },
+        {
+          "name": "Quality Gate passes on the finished change",
+          "given": [
+            "the finished change"
+          ],
+          "when": [
+            "uv run ruff format --check ., uv run ruff check ., uv run mypy --strict src tests and uv run pytest are run"
+          ],
+          "then": [
+            "all four commands exit 0"
+          ]
+        },
+        {
+          "name": "guardrail: lines still excludes the unterminated final segment",
+          "given": [
+            "a file containing 'a b c' and the existing line rule of SPEC-0003"
+          ],
+          "when": [
+            "count_lines('a b c'), count_lines('a\\nb') and wordcount on the file are run"
+          ],
+          "then": [
+            "count_lines('a b c') returns 0",
+            "count_lines('a\\nb') returns 1",
+            "the wordcount line contains 'lines: 0'"
+          ]
+        },
+        {
+          "name": "guardrail: the first three fields are unchanged",
+          "given": [
+            "a file containing 'caf\\u00e9' and a file containing '  alpha\\t\\tbeta\\n\\ngamma  '"
+          ],
+          "when": [
+            "wordcount is run on each file"
+          ],
+          "then": [
+            "the first line starts with 'words: 1 characters: 4 lines: 0'",
+            "the second line is exactly 'words: 3 characters: 14 lines: 2 longest_line_words: 2'"
+          ]
+        },
+        {
+          "name": "guardrail: existing counters return the same values",
+          "given": [
+            "the existing counters in hello.counter, hello.characters and hello.lines"
+          ],
+          "when": [
+            "count_words('  alpha\\t\\tbeta\\n\\ngamma  '), count_characters('caf\\u00e9'), count_lines('a\\r\\n') and len(LINE_TERMINATORS) are evaluated"
+          ],
+          "then": [
+            "the results are 3, 4, 1 and 10"
+          ]
+        },
+        {
+          "name": "guardrail: decoding does not translate newlines",
+          "given": [
+            "a file whose bytes are b'a b\\r\\nc'"
+          ],
+          "when": [
+            "wordcount is run on that file"
+          ],
+          "then": [
+            "stdout is exactly 'words: 3 characters: 3 lines: 1 longest_line_words: 2' followed by a newline"
+          ]
+        },
+        {
+          "name": "guardrail: missing file error is unchanged",
+          "given": [
+            "a path that does not exist"
+          ],
+          "when": [
+            "wordcount is run with that path"
+          ],
+          "then": [
+            "stderr is exactly the one line 'wordcount: error: file not found: PATH'",
+            "stdout is empty",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: unreadable path error is unchanged",
+          "given": [
+            "a directory path and a file without read permission"
+          ],
+          "when": [
+            "wordcount is run with each path"
+          ],
+          "then": [
+            "stderr is exactly one line starting with 'wordcount: error: cannot read file:'",
+            "stdout is empty",
+            "the exit status is 1",
+            "stderr has no traceback"
+          ]
+        },
+        {
+          "name": "guardrail: invalid UTF-8 file error is unchanged",
+          "given": [
+            "a file whose bytes are b'\\xff\\xfe'"
+          ],
+          "when": [
+            "wordcount is run with the path of that file"
+          ],
+          "then": [
+            "stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: PATH'",
+            "stdout is empty",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: invalid UTF-8 on standard input error is unchanged",
+          "given": [
+            "standard input holding the bytes b'\\xff\\xfe'"
+          ],
+          "when": [
+            "wordcount - is run"
+          ],
+          "then": [
+            "stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: <stdin>'",
+            "stdout is empty",
+            "stderr has no traceback",
+            "the exit status is 1"
+          ]
+        },
+        {
+          "name": "guardrail: usage errors still exit with status 2",
+          "given": [
+            "standard input holding 'a b\\n'"
+          ],
+          "when": [
+            "wordcount is run with no argument, then with two arguments, then as 'wordcount - extra'"
+          ],
+          "then": [
+            "each run prints argparse usage to stderr and nothing to stdout",
+            "each exit status is 2",
+            "the no-argument run did not read standard input"
+          ]
+        },
+        {
+          "name": "guardrail: a file named dash is still reached through dot-slash",
+          "given": [
+            "a file literally named '-' containing 'a b\\n'"
+          ],
+          "when": [
+            "wordcount ./- is run"
+          ],
+          "then": [
+            "stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline",
+            "the exit status is 0"
+          ]
+        },
+        {
+          "name": "guardrail: package layout and import are unchanged",
+          "given": [
+            "the package after the change"
+          ],
+          "when": [
+            "import hello is run and the tree is inspected"
+          ],
+          "then": [
+            "the import succeeds with every name exported before",
+            "src/hello/py.typed exists",
+            "package code stays under src/hello/"
+          ]
+        },
+        {
+          "name": "guardrail: dependencies, lockfile and AGENTS.md are unchanged",
+          "given": [
+            "pyproject.toml, uv.lock and AGENTS.md after the change"
+          ],
+          "when": [
+            "[project].dependencies is read and uv lock --check is run"
+          ],
+          "then": [
+            "[project].dependencies is empty",
+            "ruff, mypy and pytest are declared only in the dev dependency group",
+            "uv lock --check exits 0",
+            "the console script wordcount = \"hello.cli:main\" is still declared",
+            "the AGENTS.md Toolchain table keeps its four rows and the Judgment Boundaries bullets are word for word"
+          ]
+        }
+      ],
+      "feature_name": "Longest-line word count in word-count output",
+      "context": "The wordcount output line reports words, characters and terminated lines, but gives no figure for how long the longest line is. Users need other tools to find it. This feature appends one figure, the word count of the longest line, as the last field of the existing line.\n\nThe figure derives only from the word rule of SPEC-0001 and the terminator set of SPEC-0003, so no field can disagree with another. An unterminated final segment counts as a line for this figure only, while `lines` keeps excluding it. The README documents the difference with an example.",
+      "c4_elements": [
+        "hello",
+        "hello-cli",
+        "word-count-command",
+        "word-counter",
+        "line-counter",
+        "longest-line-counter"
+      ],
+      "api_contracts": [
+        "wordcount PATH and wordcount - print exactly one stdout line: `words: <N> characters: <M> lines: <L> longest_line_words: <K>`.",
+        "hello.longest_line.longest_line_words(text: str) -> int, pure and with no I/O, in src/hello/longest_line.py.",
+        "The invocation, error messages and exit statuses (0, 1, 2) are unchanged."
+      ],
+      "data_models": [
+        "longest_line_words result: a non-negative int, 0 when no line has a word.",
+        "Terminator set: hello.lines.LINE_TERMINATORS (frozenset[str] of 10 code points), reused unchanged, with CRLF as one terminator."
+      ],
+      "dependencies": [
+        "hello.counter.count_words (SPEC-0001, existing)",
+        "hello.lines.LINE_TERMINATORS (SPEC-0003, existing)",
+        "Shared stdin and file decode path in hello.cli (SPEC-0004, existing)",
+        "Python standard library only, with no new runtime dependency (ADR-0001)",
+        "Quality Gate commands from the AGENTS.md Toolchain table (ADR-0003)"
+      ],
+      "needed_by": [
+        "README.md output and line-rule documentation",
+        "Repository tests and features that assert the output line",
+        "Users or scripts parsing the output line (none known beyond the README and repository tests)"
+      ],
+      "constraints": [
+        "Existing fields keep their labels, order and meaning, and the new field is appended last.",
+        "The unterminated final segment counts for longest_line_words only, and the lines field stays unchanged.",
+        "No second definition of a word or a terminator is introduced.",
+        "No new flags or arguments, and no new third-party runtime dependency.",
+        "This spec supersedes the three-field success-line assertions of SPEC-0003 and SPEC-0004. Test edits are limited to those assertions and to adding the two arch tests and their constants to tests/arch/test_layering.py. They are the allowed exceptions to the SPEC-0004 rule on editing existing tests.",
+        "The guardrail test that compares the working tree to HEAD lists its allowed changes in ALLOWED_CHANGES. This spec extends that list by exactly the two arch tests and their constants in tests/arch/test_layering.py, and by nothing else.",
+        "The update of spec text under docs/specs/ has no behavioral test and is checked at review.",
+        "An input with no words on any line reports longest_line_words 0, as the strategy assumes. The owner confirms this at spec review."
+      ],
+      "decisions": [],
+      "adr_references": [
+        "ADR-0001",
+        "ADR-0002",
+        "ADR-0003",
+        "ADR-0004",
+        "ADR-0007",
+        "ADR-0009",
+        "ADR-0012",
+        "ADR-0013"
+      ],
+      "critical_components": [],
+      "architecture_change": null,
+      "path": "docs/specs/SPEC-0006.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
@@ -65,7 +631,7 @@
   "settings": {
     "token_quota": null
   },
-  "resume_index": null,
+  "resume_index": 3,
   "waiting_on_amendment": false,
   "intent": null,
   "spec_judge": "",

@@ -44,7 +44,7 @@
   "pending_artifacts": {},
   "quiz_questions": {},
   "passed_quizzes": {},
-  "rework_notes": null,
+  "rework_notes": "The spec was amended after this report, and approved again: PBI-0001 can't pass the full Quality Gate as scoped. A guardrail scenario carried over from SPEC-0003 forbids any addition to a test file already tracked in git, and this PBI must add two arch tests to tests/arch/test_layering.py. The implementation itself is done, and the other checks pass. (it contradicted or extended: The scenario \"guardrail: the existing SPEC-0001 to SPEC-0003 test suite passes unchanged\" says \"the only change to a pre-existing test file is the `JUDGMENT_BOUNDARIES` list in tests/test_agents_md.py\". It is implemented in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py as `ALLOWED_CHANGES`. SPEC-0006's PBI-0001 directive requires adding `test_longest_line_reuses_word_and_terminator_definitions` and `test_longest_line_performs_no_io` to tests/arch/test_layering.py, which is tracked in HEAD. That guardrail file is not in this PBI's Scope and I may not edit it.). Build against the amended spec.",
   "trunk_merge_pending": false,
   "rebase_pending": false,
   "landing_pending": false,
@@ -55,7 +55,7 @@
     "token_quota": null
   },
   "resume_index": null,
-  "waiting_on_amendment": false,
+  "waiting_on_amendment": true,
   "intent": null,
   "spec_judge": "",
   "amendment_owner": "",
