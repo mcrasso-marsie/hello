@@ -40,7 +40,13 @@
     "DEFINE": "docs/strategy/STRAT-0006.md",
     "SPEC": "docs/specs/SPEC-0006.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "PBI_PLANNING": {
+      "add-longest-line-module": "docs/pbis/SPEC-0006/PBI-0001.md",
+      "print-longest-line-field": "docs/pbis/SPEC-0006/PBI-0002.md",
+      "document-longest-line-field": "docs/pbis/SPEC-0006/PBI-0003.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
