@@ -44,7 +44,13 @@
     "DEFINE": "docs/strategy/STRAT-0006.md",
     "SPEC": "docs/specs/SPEC-0006.md"
   },
-  "pending_artifacts": {},
+  "pending_artifacts": {
+    "PBI_PLANNING": {
+      "longest-line-module-v2": "docs/pbis/SPEC-0006/PBI-0004.md",
+      "longest-line-arch-guardrail-v2": "docs/pbis/SPEC-0006/PBI-0005.md",
+      "four-field-output-and-docs-v2": "docs/pbis/SPEC-0006/PBI-0006.md"
+    }
+  },
   "quiz_questions": {},
   "passed_quizzes": {},
   "rework_notes": null,
