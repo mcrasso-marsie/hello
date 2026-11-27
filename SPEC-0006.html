@@ -1,0 +1,2323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SPEC-0006 · Feature: Longest-line word count in word-count output</title>
+<style>:root { color-scheme: light dark; --fg: #1d1d1f; --muted: #6e6e73; --line: #dcdce1; --soft: #f4f4f6;
+  --accent: #2f6fd6; --ok: #2e7d32; --bad: #c2412d; --wait: #a15c00; }
+@media (prefers-color-scheme: dark) { :root { --fg: #ececf1; --muted: #a1a1aa; --line: #3a3a40; --soft: #1f1f24;
+  --accent: #6ea0ff; --ok: #5cb85f; --bad: #ef6f5a; --wait: #e0a040; } }
+body { max-width: 1180px; margin: 0 auto; padding: 24px 20px 64px; color: var(--fg);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+h1 { margin: 0 0 2px; font-size: 24px; } h2 { margin: 36px 0 10px; font-size: 18px; }
+h3 { margin: 0 0 4px; font-size: 16px; } h4 { margin: 16px 0 4px; font-size: 13px; color: var(--muted); }
+small, .muted { color: var(--muted); } li small, td small { display: block; }
+nav { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 10px 0 18px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.card { background: var(--soft); border-radius: 10px; padding: 12px 14px; }
+.card b { display: block; font-size: 20px; margin: 2px 0; }
+.item { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; overflow-x: auto; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line);
+  overflow-wrap: break-word; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; white-space: nowrap; }
+.grid td { white-space: nowrap; } .grid td:last-child, .grid td small { white-space: normal; min-width: 12em; }
+.badge { display: inline-block; padding: 0 8px; border: 1px solid currentColor; border-radius: 999px;
+  font-size: 12px; font-weight: 500; white-space: nowrap; }
+.done, .passed { color: var(--ok); } .current { color: var(--accent); } .failed { color: var(--bad); }
+.waits { color: var(--wait); } .pending { color: var(--muted); }
+.boxes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.box { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--soft); }
+.box .box { background: transparent; }
+details summary { cursor: pointer; color: var(--accent); }
+details.item > summary { color: var(--fg); list-style: none; } details.item > summary::-webkit-details-marker { display: none; }
+details.item > summary::before { content: "▸ "; color: var(--muted); } details.item[open] > summary::before { content: "▾ "; }
+details.item > summary b { font-size: 16px; } details.item > summary small { display: block; margin: 2px 0 6px 1.2em; }
+.lead { max-width: 880px; color: var(--muted); font-size: 15px; display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden; }
+.doc { max-width: 880px; } .doc table { display: block; width: auto; overflow-x: auto; }
+.doc th, .doc td { min-width: 6em; }
+.doc pre { background: var(--soft); padding: 12px; border-radius: 8px; overflow-x: auto; }
+code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+/* Layout: a header, a sticky bar of section links, then one section per "##" heading of the document. A spec's
+   C4 section gets a full-width drawing stage and its Scenarios section the abstracted blocks. */
+/* Colours: the shared style's (page_style.STYLE), and tints mixed from them, so a style that changes them
+   changes these too. */
+:root {
+  --bg: Canvas; --surface: Canvas; --canvas: color-mix(in srgb, var(--soft) 50%, Canvas); --dot: var(--line);
+  --accent-soft: color-mix(in srgb, var(--accent) 15%, Canvas);
+  --add: var(--ok); --add-bg: color-mix(in srgb, var(--ok) 13%, Canvas); --add-edge: color-mix(in srgb, var(--ok) 60%, Canvas);
+  --chg: var(--wait); --chg-bg: color-mix(in srgb, var(--wait) 13%, Canvas); --chg-edge: color-mix(in srgb, var(--wait) 60%, Canvas);
+  --del: var(--bad); --del-bg: color-mix(in srgb, var(--bad) 13%, Canvas); --del-edge: color-mix(in srgb, var(--bad) 60%, Canvas);
+  --given: var(--soft); --when: var(--accent-soft); --then: var(--add-bg);
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1 { line-height: 1.2; overflow-wrap: anywhere; }
+p { margin: 0; max-width: 78ch; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: .72rem; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); white-space: nowrap; text-transform: none; letter-spacing: 0; }
+.pill.added, .pill[data-status="approved"], .pill[data-status="accepted"], .pill[data-status="generated"], .pill[data-status="pr: merged"], .pill[data-status="closed"] { background: var(--add-bg); color: var(--add); border-color: var(--add-edge); }
+.pill.changed, .pill[data-status="draft"], .pill[data-status="proposed"], .pill[data-status="backlog"], .pill[data-status="in progress"], .pill[data-status="pr: under review"] { background: var(--chg-bg); color: var(--chg); border-color: var(--chg-edge); }
+.pill.removed, .pill[data-status="rejected"], .pill[data-status="superseded"], .pill[data-status="deprecated"] { background: var(--del-bg); color: var(--del); border-color: var(--del-edge); }
+section.part { margin-top: 44px; display: grid; gap: 14px; scroll-margin-top: 64px; min-width: 0; }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pop { from { transform: scale(0); } 70% { transform: scale(1.2); } to { transform: none; } }
+@keyframes flash { 0% { box-shadow: 0 0 0 0 var(--accent); } 100% { box-shadow: 0 0 0 12px transparent; } }
+.reveal { animation: rise .5s var(--ease) both; }
+.js section.part { opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.js section.part.seen { opacity: 1; transform: none; }
+
+/* Header and section bar */
+header.top { display: grid; gap: 14px; }
+.meta { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.meta li { font: .74rem var(--font-mono); color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1px 8px; overflow-wrap: anywhere; }
+nav.sections { position: sticky; top: 0; z-index: 20; margin: 20px -8px 0; flex-wrap: nowrap; padding: 8px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px); display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); }
+nav.sections a { color: var(--muted); text-decoration: none; padding: 5px 12px; border-radius: 999px; font-size: .88rem; white-space: nowrap; transition: background .2s, color .2s; }
+nav.sections a.on { background: var(--accent); color: var(--surface); }
+
+/* The document's own text */
+.prose { display: grid; gap: 12px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; }
+.intro.prose { background: none; border: 0; padding: 0; }
+.intro.prose:empty { display: none; }
+.prose > * { margin: 0; }
+.prose h3 { margin-top: 10px; font-size: 1.08rem; }
+.prose h4 { margin-top: 6px; font-size: .95rem; color: var(--muted); }
+.prose ul, .prose ol { padding-left: 1.4em; display: grid; gap: 4px; max-width: 90ch; }
+.prose li > ul, .prose li > ol { margin-top: 4px; }
+.prose strong { font-weight: 650; }
+.prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: .88rem; max-width: 100%; }
+.prose th, .prose td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; min-width: 80px; }
+.prose th { background: var(--soft); font-weight: 650; white-space: nowrap; }
+.prose tr:hover td { background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.prose code { font: .86em var(--font-mono); background: var(--soft); border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; overflow-wrap: anywhere; }
+.prose pre { background: var(--soft); border-radius: 8px; padding: 10px 12px; overflow-x: auto; font-size: .84rem; line-height: 1.6; }
+.prose pre code { background: none; border: 0; padding: 0; }
+.prose blockquote { border-left: 4px solid var(--accent); padding: 4px 12px; color: var(--muted); }
+.prose details.source summary { cursor: pointer; color: var(--muted); font-size: .86rem; }
+.prose details.source[open] summary { margin-bottom: 8px; }
+.prose hr { border: 0; border-top: 1px solid var(--line); }
+.needs-script, .note { background: var(--chg-bg); border: 1px solid var(--chg-edge); color: var(--fg); border-radius: 10px; padding: 10px 14px; font-size: .9rem; }
+.component > .prose { margin-top: 0; }
+.task { display: inline-block; font-size: 1.05em; color: var(--muted); }
+.task.on { color: var(--add); font-weight: 700; }
+
+/* C4 stage */
+.stage { position: relative; background: var(--canvas); background-image: radial-gradient(var(--dot) 1px, transparent 1px); background-size: 18px 18px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; min-height: 420px; }
+.stage svg { display: block; width: 100%; height: auto; max-height: 78vh; min-height: 420px; }
+.stage-bar { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; pointer-events: none; z-index: 2; }
+.stage-bar > * { pointer-events: auto; }
+.level-note { background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: .84rem; display: grid; gap: 2px; max-width: 46ch; }
+.level-note b { font-size: .95rem; }
+.crumbs { margin: 0; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 2px; background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px; font-size: .86rem; box-shadow: 0 2px 10px rgb(0 0 0 / .06); }
+.crumbs button { border: 0; background: none; padding: 3px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); }
+.crumbs button:hover { background: var(--accent-soft); }
+.crumbs button[aria-current="true"] { color: var(--fg); font-weight: 600; cursor: default; background: none; }
+.crumbs .sep { color: var(--muted); }
+.stage-foot { position: absolute; left: 12px; bottom: 10px; right: 12px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: .78rem; color: var(--muted); pointer-events: none; z-index: 2; }
+.stage-foot label { pointer-events: auto; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+.swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid; vertical-align: -2px; margin-right: 4px; }
+svg .node { cursor: pointer; }
+svg .node rect.shape { transition: filter .2s, stroke-width .2s; }
+svg .node:hover rect.shape { filter: drop-shadow(0 6px 14px rgb(0 0 0 / .14)); stroke-width: 2.5; }
+svg .node.zoomable { cursor: zoom-in; }
+svg .dim { opacity: .22; transition: opacity .25s; }
+svg .edge path { fill: none; transition: stroke-width .2s, opacity .25s; }
+svg .edge.hot path { stroke-width: 3.5; }
+svg .edge.selected path { stroke-width: 4; }
+svg.has-selected .edge:not(.selected) { opacity: .3; }
+svg .edge .rel-badge { cursor: pointer; }
+svg text { font-family: var(--font-body); }
+.panel { position: absolute; top: 0; right: 0; bottom: 0; width: var(--panel-width); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -10px 0 30px rgb(0 0 0 / .08); padding: 56px 18px 18px; overflow-y: auto; transform: translateX(105%); transition: transform .35s var(--ease); z-index: 3; display: grid; gap: 12px; align-content: start; }
+.panel.open { transform: none; }
+/* With the details panel open the diagram narrows beside it, so both are seen; on a narrow screen the panel goes below. */
+.stage { --panel-width: min(360px, 40%); }
+.stage svg { transition: width .35s var(--ease); }
+.stage.with-panel svg { width: calc(100% - var(--panel-width)); }
+.stage.with-panel .stage-bar, .stage.with-panel .stage-foot { right: calc(var(--panel-width) + 12px); }
+@media (max-width: 760px) {
+  .stage.with-panel svg { width: 100%; }
+  .stage.with-panel .stage-bar, .stage.with-panel .stage-foot { right: 12px; }
+  .stage.with-panel { display: flex; flex-direction: column; }
+  .stage.with-panel .stage-foot { position: static; order: 1; padding: 0 12px 10px; }
+  .panel { position: relative; order: 2; width: auto; transform: none; transition: none; display: none; border-left: 0; border-top: 1px solid var(--line); box-shadow: none; }
+  .panel.open { display: grid; }
+}
+.panel .close { position: absolute; top: 12px; right: 12px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; width: 30px; height: 30px; cursor: pointer; }
+.panel dl { margin: 0; display: grid; gap: 8px; }
+.panel dt { font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.panel dd { margin: 0; font-size: .9rem; }
+.panel .rel { display: block; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--soft); border-radius: 8px; padding: 6px 8px; margin-top: 6px; cursor: pointer; font-size: .84rem; }
+.panel .primary { border: 1px solid var(--accent); background: var(--accent); color: var(--surface); border-radius: 8px; padding: 8px 12px; cursor: pointer; justify-self: start; }
+.component { display: grid; gap: 14px; min-width: 0; }
+.relations { margin: 0; padding: 0; display: grid; gap: 6px; }
+.relations li { list-style: none; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: .88rem; transition: border-color .2s, background .2s; }
+.relations li.hot, .relations li.selected { border-color: var(--accent); background: var(--accent-soft); }
+.panel .rel.selected { border-color: var(--accent); background: var(--accent-soft); }
+.relations li.removed .desc { text-decoration: line-through; color: var(--muted); }
+.relations .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--fg); color: var(--surface); font: 600 .74rem var(--font-mono); }
+.relations li.added .n { background: var(--add); } .relations li.removed .n { background: var(--del); }
+.relations .ends { font-weight: 600; }
+
+/* Scenarios */
+.scen-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; align-items: start; }
+.index { margin: 0; position: sticky; top: 60px; max-height: calc(100vh - 80px); overflow-y: auto; display: grid; gap: 8px; padding-right: 4px; }
+.index ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.index a { display: grid; grid-template-columns: 26px 1fr; gap: 4px; text-decoration: none; color: var(--fg); padding: 4px 8px; border-radius: 6px; font-size: .84rem; line-height: 1.35; border-left: 3px solid transparent; transition: background .15s, border-color .15s; }
+.index a:hover { background: var(--soft); }
+.index a.on { background: var(--accent-soft); border-left-color: var(--accent); }
+.index a .n { font-family: var(--font-mono); color: var(--muted); font-size: .76rem; }
+.views { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.views button { border: 0; border-right: 1px solid var(--line); background: transparent; padding: 6px 12px; cursor: pointer; font-size: .86rem; }
+.views button:last-child { border-right: 0; }
+.views button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.ent { display: inline-grid; place-items: center; min-width: 1.45em; height: 1.45em; padding: 0 .25em; border-radius: 6px; font: 700 .8em var(--font-mono); color: #fff; background: var(--ent); vertical-align: .05em; }
+code.lit { font: .86em var(--font-mono); background: var(--soft); border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; overflow-wrap: anywhere; }
+code.num { color: var(--accent); font-weight: 600; }
+.variants { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; }
+.variants span { font-size: .8rem; background: var(--surface); border: 1px dashed var(--accent); color: var(--accent); border-radius: 6px; padding: 0 7px; }
+.board { display: grid; gap: 14px; }
+.scene { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 12px; scroll-margin-top: 70px; opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.scene.seen { opacity: 1; transform: none; }
+.scene.flash { animation: flash .9s ease-out; }
+.scene-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; }
+.scene-head .n { font: 600 .82rem var(--font-mono); color: var(--muted); }
+.scene-head h3 { font-size: 1.06rem; flex: 1 1 320px; }
+.strip { display: grid; grid-template-columns: minmax(0, 1.05fr) 26px minmax(0, .9fr) 26px minmax(0, 1.15fr); align-items: stretch; }
+.panelg { border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.panelg .k { font: 600 .7rem var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.panelg ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.panelg li { font-size: .9rem; line-height: 1.45; overflow-wrap: anywhere; }
+.given { background: var(--given); }
+.given li { padding-left: 14px; position: relative; }
+.given li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.when { background: var(--when); border: 1.5px solid var(--accent); }
+.when li { font-weight: 600; font-size: .96rem; }
+.then { background: var(--then); }
+.then li { padding-left: 24px; position: relative; }
+.then li::before { content: "✓"; position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 700; color: #fff; background: var(--add); }
+.scene.seen .then li::before { animation: pop .45s var(--ease) both; }
+.scene.seen .then li:nth-child(2)::before { animation-delay: .08s; } .scene.seen .then li:nth-child(3)::before { animation-delay: .16s; }
+.scene.seen .then li:nth-child(4)::before { animation-delay: .24s; } .scene.seen .then li:nth-child(n+5)::before { animation-delay: .32s; }
+.arrow { display: grid; place-items: center; color: var(--accent); }
+.arrow svg { width: 22px; height: 22px; }
+.arrow path { stroke-dasharray: 30; stroke-dashoffset: 30; transition: stroke-dashoffset .6s var(--ease) .2s; }
+.scene.seen .arrow path, .block.seen .arrow path { stroke-dashoffset: 0; }
+.board[data-view="gherkin"] .strip { display: none; }
+.board:not([data-view="gherkin"]) pre.gherkin, .blocks pre.gherkin { display: none; }
+pre.gherkin { margin: 0; padding: 10px 12px; background: var(--soft); border-radius: 8px; font: .82rem/1.65 var(--font-mono); white-space: pre-wrap; overflow-x: auto; }
+pre.gherkin .kw { color: var(--accent); font-weight: 700; }
+
+/* Abstracted view: scenarios that share a step are one block; the shared step is the trunk, each scenario a branch. */
+#scen[data-view="abstract"] .board, #scen:not([data-view="abstract"]) .blocks { display: none; }
+.blocks { display: grid; gap: 16px; }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 12px; scroll-margin-top: 70px; opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.block.seen { opacity: 1; transform: none; }
+.block.flash, .branch.flash { animation: flash .9s ease-out; }
+.block-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.block-head .count { font: 600 .76rem var(--font-mono); color: var(--surface); background: var(--accent); border-radius: 999px; padding: 1px 9px; }
+.trunk { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; border-radius: 10px; padding: 10px 12px; border: 1.5px solid var(--accent); }
+.trunk.When { background: var(--when); } .trunk.Then { background: var(--then); border-color: var(--add); } .trunk.Given { background: var(--given); border-color: var(--muted); }
+.trunk .k { font: 700 .74rem var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); padding-top: 3px; }
+.trunk .text { font-weight: 650; font-size: 1.02rem; }
+.trunk .gap { color: var(--accent); font-weight: 400; padding: 0 2px; }
+.also { font-size: .88rem; display: grid; gap: 4px; padding-left: 12px; }
+.also .k { font: 600 .7rem var(--font-mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.also ul { margin: 0; }
+.branches { display: grid; gap: 10px; padding-left: 22px; position: relative; }
+.branches::before { content: ""; position: absolute; left: 8px; top: -12px; bottom: 22px; border-left: 2px solid var(--accent); }
+.branch { position: relative; display: grid; gap: 10px; align-items: stretch; background: var(--soft); border-radius: 10px; padding: 10px 12px; scroll-margin-top: 80px; }
+.branch::before { content: ""; position: absolute; left: -14px; top: 22px; width: 14px; border-top: 2px solid var(--accent); }
+.block.seen .branch { animation: rise .45s var(--ease) both; }
+.block.seen .branch:nth-child(2) { animation-delay: .08s; } .block.seen .branch:nth-child(3) { animation-delay: .16s; } .block.seen .branch:nth-child(n+4) { animation-delay: .24s; }
+.branch .who { display: grid; gap: 4px; align-content: start; }
+.branch .who .n { font: 600 .78rem var(--font-mono); color: var(--muted); }
+.branch .who b { font-size: .92rem; line-height: 1.35; }
+.branch .variant { font-size: .84rem; color: var(--muted); }
+.branch .panelg { background: var(--surface); }
+.branch .panelg.empty { opacity: .5; }
+footer { margin-top: 48px; color: var(--muted); font-size: .84rem; }
+
+@media (max-width: 980px) {
+  .scen-layout { grid-template-columns: 1fr; }
+  .index { position: static; max-height: none; }
+  .index ol { display: none; }
+  .strip, .branch { grid-template-columns: 1fr !important; gap: 6px; }
+  .arrow { transform: rotate(90deg); height: 20px; }
+}
+@media (max-width: 560px) { .level-note { display: none; } .prose { padding: 14px; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+  .scene, .block, .js section.part { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<script id="page-data" type="application/json">{
+ "c4": {
+  "elements": [
+   {
+    "id": "character-counter",
+    "name": "Character counter",
+    "level": "component",
+    "parent": "hello-cli",
+    "owns": "The character rule: a visible character is a non-whitespace character, using the same whitespace definition as the word rule, and a base character followed by combining marks counts once. It counts the visible characters in a given text and returns the number.",
+    "does_not_own": "The definition of a word, file access, encoding, argument handling, output formatting or exit codes; it never touches the filesystem or the process, and it counts neither bytes nor raw code points.",
+    "deployment": "",
+    "technology": "Python standard library",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "hello",
+    "name": "hello",
+    "level": "system",
+    "parent": "",
+    "owns": "Giving users local, dependency-free text utilities. It currently reports the word count, the non-whitespace character count, the terminated-line count and the longest-line word count of one input in a single invocation. The input is one text file or standard input.",
+    "does_not_own": "Other text statistics beyond word, character, line and longest-line word counts, such as bytes, the position or text of the longest line, or per-line output. Several inputs in one invocation, totals, implicit or auto-detected stdin, non-UTF-8 encodings, or distribution through a public package index.",
+    "deployment": "Installed from the repository into a local Python environment on the user's machine.",
+    "technology": "Python (current stable release), standard library only",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "hello-cli",
+    "name": "hello command-line package",
+    "level": "container",
+    "parent": "hello",
+    "owns": "The installable src-layout hello package and its console command. The command takes one file path, or the '-' argument for standard input. It prints that input's word, character, line and longest-line word counts on one line and exits with a status code.",
+    "does_not_own": "Any network access, persistent state, configuration files, or third-party runtime dependencies. Command-line flags or arguments beyond the single PATH or '-' argument. Reading standard input when no argument is given.",
+    "deployment": "Run as a local process on the user's machine after installing the package from the repository into the project environment.",
+    "technology": "Python standard library; console entry point declared in pyproject.toml; environment managed with the existing lockfile tooling",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "line-counter",
+    "name": "Line counter",
+    "level": "component",
+    "parent": "hello-cli",
+    "owns": "The line rule. A line is a segment of text ended by a line terminator, and a final segment with no terminator is not counted. The terminator set is exactly the boundaries str.splitlines() recognises, listed explicitly so the rule does not depend on library behaviour: LF (U+000A), CR (U+000D), the CRLF pair (U+000D U+000A, counted as one terminator), VT (U+000B), FF (U+000C), FS (U+001C), GS (U+001D), RS (U+001E), NEL (U+0085), LS (U+2028) and PS (U+2029). It counts the terminated lines in a given text and returns the number.",
+    "does_not_own": "The definition of a word or a visible character, file access, encoding or newline translation, argument handling, output formatting or exit codes. It never touches the filesystem or the process, and it does not follow the LF-only wc -l convention.",
+    "deployment": "",
+    "technology": "Python standard library",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "longest-line-counter",
+    "name": "Longest-line counter",
+    "level": "component",
+    "parent": "hello-cli",
+    "owns": "The longest-line rule. It splits text into lines at the existing terminator set, with CRLF as one terminator. An unterminated final segment counts as a line for this measure only. It counts the words in each line with the word counter and returns the highest count. It returns 0 when no line has a word.",
+    "does_not_own": "The definition of a word or of the terminator set. The terminated-line count, where an unterminated final segment stays uncounted. File access, encoding, argument handling, output formatting or exit codes. It never touches the filesystem or the process. It reports neither the position nor the text of the longest line.",
+    "deployment": "",
+    "technology": "Python standard library",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "word-count-command",
+    "name": "Word-count command",
+    "level": "component",
+    "parent": "hello-cli",
+    "owns": "Parsing the single argument: a file path, or '-' for standard input. It reads the chosen source once and decodes it as UTF-8 along one shared path. It passes that same decoded text to the word, character, line and longest-line counters. It prints the four counts as one line in the form `words: \u003cN\u003e characters: \u003cM\u003e lines: \u003cL\u003e longest_line_words: \u003cK\u003e`. It turns a missing file, an unreadable file or undecodable content into a one-line stderr message, a non-zero exit status and empty stdout. Messages for standard input name `\u003cstdin\u003e`, and file-path messages and statuses are unchanged.",
+    "does_not_own": "The definition of what a word, a visible character, a line or the longest line is, or counting logic of any kind. It does not decode text a second time, along a separate path per source, or with newline translation. It does not read standard input when no argument is given. A file literally named '-' is reached only through './-'.",
+    "deployment": "",
+    "technology": "Python standard library",
+    "status": "",
+    "critical": false
+   },
+   {
+    "id": "word-counter",
+    "name": "Word counter",
+    "level": "component",
+    "parent": "hello-cli",
+    "owns": "The word rule: a word is a run of non-whitespace characters separated by whitespace. It counts the words in a given text and returns the number.",
+    "does_not_own": "File access, encoding, argument handling, output or exit codes; it never touches the filesystem or the process.",
+    "deployment": "",
+    "technology": "Python standard library",
+    "status": "",
+    "critical": false
+   }
+  ],
+  "relations": [
+   {
+    "source": "word-count-command",
+    "target": "word-counter",
+    "description": "Passes the decoded text from the file or standard input in an in-process function call and receives the integer word count.",
+    "status": ""
+   },
+   {
+    "source": "word-count-command",
+    "target": "character-counter",
+    "description": "Passes the decoded text from the file or standard input in an in-process function call and receives the integer visible-character count.",
+    "status": ""
+   },
+   {
+    "source": "word-count-command",
+    "target": "line-counter",
+    "description": "Passes the same decoded text given to the word and character counters, in an in-process function call, and receives the terminated-line count.",
+    "status": ""
+   },
+   {
+    "source": "word-count-command",
+    "target": "longest-line-counter",
+    "description": "Passes the same decoded text given to the other counters, in an in-process function call, and receives the longest-line word count.",
+    "status": ""
+   },
+   {
+    "source": "longest-line-counter",
+    "target": "word-counter",
+    "description": "Passes each line's text in an in-process function call and receives that line's word count.",
+    "status": ""
+   },
+   {
+    "source": "longest-line-counter",
+    "target": "line-counter",
+    "description": "Imports the terminator set in-process, so both components split text at the same boundaries.",
+    "status": ""
+   }
+  ]
+ },
+ "scenarios": [
+  {
+   "number": 1,
+   "name": "longest line is the line with the most words",
+   "steps": [
+    [
+     "Given",
+     "the text 'one two\\nthree four five\\nsix\\n'"
+    ],
+    [
+     "When",
+     "longest_line_words is called with that text"
+    ],
+    [
+     "Then",
+     "the result is 3"
+    ]
+   ]
+  },
+  {
+   "number": 2,
+   "name": "unterminated final segment counts for the longest-line measure",
+   "steps": [
+    [
+     "Given",
+     "the text 'a b c' with no terminator"
+    ],
+    [
+     "When",
+     "longest_line_words is called with that text"
+    ],
+    [
+     "Then",
+     "the result is 3"
+    ]
+   ]
+  },
+  {
+   "number": 3,
+   "name": "trailing terminator adds no extra line",
+   "steps": [
+    [
+     "Given",
+     "the text 'a b\\n'"
+    ],
+    [
+     "When",
+     "longest_line_words is called with that text"
+    ],
+    [
+     "Then",
+     "the result is 2"
+    ]
+   ]
+  },
+  {
+   "number": 4,
+   "name": "text without words has a longest line of zero",
+   "steps": [
+    [
+     "Given",
+     "the texts '', '  \\t ' and '\\n\\n'"
+    ],
+    [
+     "When",
+     "longest_line_words is called with each text"
+    ],
+    [
+     "Then",
+     "each result is 0"
+    ]
+   ]
+  },
+  {
+   "number": 5,
+   "name": "each of the 11 terminators ends a line",
+   "steps": [
+    [
+     "Given",
+     "the terminators LF, CR, CRLF, VT, FF, FS, GS, RS, NEL, LS and PS"
+    ],
+    [
+     "And",
+     "the text 'a b c' + terminator + 'd' built for each terminator"
+    ],
+    [
+     "When",
+     "longest_line_words is called with each text"
+    ],
+    [
+     "Then",
+     "each result is 3, not 4"
+    ]
+   ]
+  },
+  {
+   "number": 6,
+   "name": "mixed terminators split lines and CRLF counts once",
+   "steps": [
+    [
+     "Given",
+     "the text 'a b\\r\\nc d e\\rf'"
+    ],
+    [
+     "When",
+     "longest_line_words is called with that text"
+    ],
+    [
+     "Then",
+     "the result is 3"
+    ]
+   ]
+  },
+  {
+   "number": 7,
+   "name": "non-terminator separators keep words on one line",
+   "steps": [
+    [
+     "Given",
+     "the separators TAB, SPACE, U+00A0, U+001F and U+3000"
+    ],
+    [
+     "When",
+     "longest_line_words is called with 'a' + separator + 'b' for each separator"
+    ],
+    [
+     "Then",
+     "each result is 2"
+    ]
+   ]
+  },
+  {
+   "number": 8,
+   "name": "zero width space is not a word separator",
+   "steps": [
+    [
+     "Given",
+     "the text 'a\\u200bb'"
+    ],
+    [
+     "When",
+     "longest_line_words is called with that text"
+    ],
+    [
+     "Then",
+     "the result is 1, equal to count_words of that text"
+    ]
+   ]
+  },
+  {
+   "number": 9,
+   "name": "single-line input agrees with the word count",
+   "steps": [
+    [
+     "Given",
+     "the terminator-free texts '', 'alpha\\t\\tbeta  gamma ', 'caf\\u00e9 na\\u00efve \\u65e5\\u672c' and 'Hello, world! It's-fine.'"
+    ],
+    [
+     "When",
+     "longest_line_words and count_words are called with each text"
+    ],
+    [
+     "Then",
+     "the two results are equal for every text"
+    ]
+   ]
+  },
+  {
+   "number": 10,
+   "name": "CLI prints four fields for an unterminated file",
+   "steps": [
+    [
+     "Given",
+     "a UTF-8 file containing 'a b c' with no terminator"
+    ],
+    [
+     "When",
+     "wordcount is run with the path of that file"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 3 characters: 3 lines: 0 longest_line_words: 3' followed by a newline"
+    ],
+    [
+     "And",
+     "stderr is empty"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 11,
+   "name": "CLI prints four fields for a multi-line file",
+   "steps": [
+    [
+     "Given",
+     "a UTF-8 file containing 'one two\\nthree four five\\nsix\\n'"
+    ],
+    [
+     "When",
+     "wordcount is run with the path of that file"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 6 characters: 22 lines: 3 longest_line_words: 3' followed by a newline"
+    ],
+    [
+     "And",
+     "stderr is empty"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 12,
+   "name": "CLI reports a terminated single line",
+   "steps": [
+    [
+     "Given",
+     "a UTF-8 file containing 'a b\\n'"
+    ],
+    [
+     "When",
+     "wordcount is run with the path of that file"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 13,
+   "name": "CLI reports zero for an empty file",
+   "steps": [
+    [
+     "Given",
+     "an empty file"
+    ],
+    [
+     "When",
+     "wordcount is run with the path of that file"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 0 characters: 0 lines: 0 longest_line_words: 0' followed by a newline"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 14,
+   "name": "CLI reads mixed terminators from standard input",
+   "steps": [
+    [
+     "Given",
+     "standard input holding the bytes b'a b\\r\\nc d e\\rf'"
+    ],
+    [
+     "When",
+     "wordcount - is run"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 6 characters: 6 lines: 2 longest_line_words: 3' followed by a newline"
+    ],
+    [
+     "And",
+     "stderr is empty"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 15,
+   "name": "file and standard input print identical lines",
+   "steps": [
+    [
+     "Given",
+     "the samples b'a b c', b'a b\\r\\nc d e\\rf' and 'caf\\u00e9 na\\u00efve \\u65e5\\u672c\\n' encoded as UTF-8"
+    ],
+    [
+     "And",
+     "each sample written to a file and also available on standard input"
+    ],
+    [
+     "When",
+     "wordcount PATH and wordcount - are run for each sample"
+    ],
+    [
+     "Then",
+     "the two stdout lines are identical for every sample"
+    ]
+   ]
+  },
+  {
+   "number": 16,
+   "name": "CLI passes the same decoded text to all four counters",
+   "steps": [
+    [
+     "Given",
+     "a file containing 'a b\\nc'"
+    ],
+    [
+     "And",
+     "count_words, count_characters, count_lines and longest_line_words in hello.cli replaced by recorders"
+    ],
+    [
+     "When",
+     "hello.cli.main is called with the path of that file"
+    ],
+    [
+     "Then",
+     "each recorder received the same decoded str object"
+    ],
+    [
+     "And",
+     "the file was read and decoded once"
+    ]
+   ]
+  },
+  {
+   "number": 17,
+   "name": "success line has four labeled fields in order",
+   "steps": [
+    [
+     "Given",
+     "the node id tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order"
+    ],
+    [
+     "When",
+     "the test tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order runs"
+    ],
+    [
+     "Then",
+     "it passes"
+    ]
+   ]
+  },
+  {
+   "number": 18,
+   "name": "longest-line module reuses the word rule and the terminator set",
+   "steps": [
+    [
+     "Given",
+     "the node id tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions"
+    ],
+    [
+     "When",
+     "the test tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions runs"
+    ],
+    [
+     "Then",
+     "it passes"
+    ]
+   ]
+  },
+  {
+   "number": 19,
+   "name": "longest-line module performs no I/O",
+   "steps": [
+    [
+     "Given",
+     "the node id tests/arch/test_layering.py::test_longest_line_performs_no_io"
+    ],
+    [
+     "When",
+     "the test tests/arch/test_layering.py::test_longest_line_performs_no_io runs"
+    ],
+    [
+     "Then",
+     "it passes"
+    ],
+    [
+     "And",
+     "hello.longest_line imports only the standard library, hello.counter and hello.lines"
+    ]
+   ]
+  },
+  {
+   "number": 20,
+   "name": "guardrail suite permits the two new arch tests and nothing else",
+   "steps": [
+    [
+     "Given",
+     "tests/arch/test_layering.py in the working tree with the two functions test_longest_line_reuses_word_and_terminator_definitions and test_longest_line_performs_no_io and their module-level constants added"
+    ],
+    [
+     "And",
+     "no other pre-existing test file changed beyond the JUDGMENT_BOUNDARIES list in tests/test_agents_md.py and the three-field to four-field assertion updates"
+    ],
+    [
+     "And",
+     "ALLOWED_CHANGES in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py extended to name those additions"
+    ],
+    [
+     "When",
+     "the test tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py runs against the uncommitted working tree"
+    ],
+    [
+     "Then",
+     "it passes"
+    ],
+    [
+     "And",
+     "it still fails when tests/arch/test_layering.py gains any other added function or any removed or modified existing function"
+    ]
+   ]
+  },
+  {
+   "number": 21,
+   "name": "updated tests assert the four-field line",
+   "steps": [
+    [
+     "Given",
+     "the tests, feature files and step definitions that asserted the three-field success line, now updated"
+    ],
+    [
+     "When",
+     "uv run pytest is run"
+    ],
+    [
+     "Then",
+     "the exit status is 0"
+    ],
+    [
+     "And",
+     "the file and standard-input success tests expect the line ending in 'longest_line_words: \u003cK\u003e'"
+    ]
+   ]
+  },
+  {
+   "number": 22,
+   "name": "README documents the four-field line and the final-segment difference",
+   "steps": [
+    [
+     "Given",
+     "README.md after the change"
+    ],
+    [
+     "When",
+     "its text is read"
+    ],
+    [
+     "Then",
+     "it contains the line form 'words: \u003cN\u003e characters: \u003cM\u003e lines: \u003cL\u003e longest_line_words: \u003cK\u003e'"
+    ],
+    [
+     "And",
+     "it states that the earlier three-field output no longer applies"
+    ],
+    [
+     "And",
+     "it contains the examples 'a b c' giving lines 0 and longest_line_words 3, and 'a b\\n' giving lines 1 and longest_line_words 2"
+    ],
+    [
+     "And",
+     "it states that empty input gives longest_line_words 0"
+    ],
+    [
+     "And",
+     "it explains why lines excludes the unterminated final segment and longest_line_words includes it"
+    ]
+   ]
+  },
+  {
+   "number": 23,
+   "name": "Quality Gate passes on the finished change",
+   "steps": [
+    [
+     "Given",
+     "the finished change"
+    ],
+    [
+     "When",
+     "uv run ruff format --check ., uv run ruff check ., uv run mypy --strict src tests and uv run pytest are run"
+    ],
+    [
+     "Then",
+     "all four commands exit 0"
+    ]
+   ]
+  },
+  {
+   "number": 24,
+   "name": "guardrail: lines still excludes the unterminated final segment",
+   "steps": [
+    [
+     "Given",
+     "a file containing 'a b c' and the existing line rule of SPEC-0003"
+    ],
+    [
+     "When",
+     "count_lines('a b c'), count_lines('a\\nb') and wordcount on the file are run"
+    ],
+    [
+     "Then",
+     "count_lines('a b c') returns 0"
+    ],
+    [
+     "And",
+     "count_lines('a\\nb') returns 1"
+    ],
+    [
+     "And",
+     "the wordcount line contains 'lines: 0'"
+    ]
+   ]
+  },
+  {
+   "number": 25,
+   "name": "guardrail: the first three fields are unchanged",
+   "steps": [
+    [
+     "Given",
+     "a file containing 'caf\\u00e9' and a file containing '  alpha\\t\\tbeta\\n\\ngamma  '"
+    ],
+    [
+     "When",
+     "wordcount is run on each file"
+    ],
+    [
+     "Then",
+     "the first line starts with 'words: 1 characters: 4 lines: 0'"
+    ],
+    [
+     "And",
+     "the second line is exactly 'words: 3 characters: 14 lines: 2 longest_line_words: 2'"
+    ]
+   ]
+  },
+  {
+   "number": 26,
+   "name": "guardrail: existing counters return the same values",
+   "steps": [
+    [
+     "Given",
+     "the existing counters in hello.counter, hello.characters and hello.lines"
+    ],
+    [
+     "When",
+     "count_words('  alpha\\t\\tbeta\\n\\ngamma  '), count_characters('caf\\u00e9'), count_lines('a\\r\\n') and len(LINE_TERMINATORS) are evaluated"
+    ],
+    [
+     "Then",
+     "the results are 3, 4, 1 and 10"
+    ]
+   ]
+  },
+  {
+   "number": 27,
+   "name": "guardrail: decoding does not translate newlines",
+   "steps": [
+    [
+     "Given",
+     "a file whose bytes are b'a b\\r\\nc'"
+    ],
+    [
+     "When",
+     "wordcount is run on that file"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 3 characters: 3 lines: 1 longest_line_words: 2' followed by a newline"
+    ]
+   ]
+  },
+  {
+   "number": 28,
+   "name": "guardrail: missing file error is unchanged",
+   "steps": [
+    [
+     "Given",
+     "a path that does not exist"
+    ],
+    [
+     "When",
+     "wordcount is run with that path"
+    ],
+    [
+     "Then",
+     "stderr is exactly the one line 'wordcount: error: file not found: PATH'"
+    ],
+    [
+     "And",
+     "stdout is empty"
+    ],
+    [
+     "And",
+     "the exit status is 1"
+    ]
+   ]
+  },
+  {
+   "number": 29,
+   "name": "guardrail: unreadable path error is unchanged",
+   "steps": [
+    [
+     "Given",
+     "a directory path and a file without read permission"
+    ],
+    [
+     "When",
+     "wordcount is run with each path"
+    ],
+    [
+     "Then",
+     "stderr is exactly one line starting with 'wordcount: error: cannot read file:'"
+    ],
+    [
+     "And",
+     "stdout is empty"
+    ],
+    [
+     "And",
+     "the exit status is 1"
+    ],
+    [
+     "And",
+     "stderr has no traceback"
+    ]
+   ]
+  },
+  {
+   "number": 30,
+   "name": "guardrail: invalid UTF-8 file error is unchanged",
+   "steps": [
+    [
+     "Given",
+     "a file whose bytes are b'\\xff\\xfe'"
+    ],
+    [
+     "When",
+     "wordcount is run with the path of that file"
+    ],
+    [
+     "Then",
+     "stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: PATH'"
+    ],
+    [
+     "And",
+     "stdout is empty"
+    ],
+    [
+     "And",
+     "the exit status is 1"
+    ]
+   ]
+  },
+  {
+   "number": 31,
+   "name": "guardrail: invalid UTF-8 on standard input error is unchanged",
+   "steps": [
+    [
+     "Given",
+     "standard input holding the bytes b'\\xff\\xfe'"
+    ],
+    [
+     "When",
+     "wordcount - is run"
+    ],
+    [
+     "Then",
+     "stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: \u003cstdin\u003e'"
+    ],
+    [
+     "And",
+     "stdout is empty"
+    ],
+    [
+     "And",
+     "stderr has no traceback"
+    ],
+    [
+     "And",
+     "the exit status is 1"
+    ]
+   ]
+  },
+  {
+   "number": 32,
+   "name": "guardrail: usage errors still exit with status 2",
+   "steps": [
+    [
+     "Given",
+     "standard input holding 'a b\\n'"
+    ],
+    [
+     "When",
+     "wordcount is run with no argument, then with two arguments, then as 'wordcount - extra'"
+    ],
+    [
+     "Then",
+     "each run prints argparse usage to stderr and nothing to stdout"
+    ],
+    [
+     "And",
+     "each exit status is 2"
+    ],
+    [
+     "And",
+     "the no-argument run did not read standard input"
+    ]
+   ]
+  },
+  {
+   "number": 33,
+   "name": "guardrail: a file named dash is still reached through dot-slash",
+   "steps": [
+    [
+     "Given",
+     "a file literally named '-' containing 'a b\\n'"
+    ],
+    [
+     "When",
+     "wordcount ./- is run"
+    ],
+    [
+     "Then",
+     "stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline"
+    ],
+    [
+     "And",
+     "the exit status is 0"
+    ]
+   ]
+  },
+  {
+   "number": 34,
+   "name": "guardrail: package layout and import are unchanged",
+   "steps": [
+    [
+     "Given",
+     "the package after the change"
+    ],
+    [
+     "When",
+     "import hello is run and the tree is inspected"
+    ],
+    [
+     "Then",
+     "the import succeeds with every name exported before"
+    ],
+    [
+     "And",
+     "src/hello/py.typed exists"
+    ],
+    [
+     "And",
+     "package code stays under src/hello/"
+    ]
+   ]
+  },
+  {
+   "number": 35,
+   "name": "guardrail: dependencies, lockfile and AGENTS.md are unchanged",
+   "steps": [
+    [
+     "Given",
+     "pyproject.toml, uv.lock and AGENTS.md after the change"
+    ],
+    [
+     "When",
+     "[project].dependencies is read and uv lock --check is run"
+    ],
+    [
+     "Then",
+     "[project].dependencies is empty"
+    ],
+    [
+     "And",
+     "ruff, mypy and pytest are declared only in the dev dependency group"
+    ],
+    [
+     "And",
+     "uv lock --check exits 0"
+    ],
+    [
+     "And",
+     "the console script wordcount = \"hello.cli:main\" is still declared"
+    ],
+    [
+     "And",
+     "the AGENTS.md Toolchain table keeps its four rows and the Judgment Boundaries bullets are word for word"
+    ]
+   ]
+  }
+ ],
+ "blocks": [
+  {
+   "section": "When",
+   "scenarios": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8
+   ],
+   "steps": [
+    "longest_line_words is called with that text",
+    "longest_line_words is called with that text",
+    "longest_line_words is called with that text",
+    "longest_line_words is called with each text",
+    "longest_line_words is called with each text",
+    "longest_line_words is called with that text",
+    "longest_line_words is called with that text"
+   ]
+  },
+  {
+   "section": "Then",
+   "scenarios": [
+    7,
+    32
+   ],
+   "steps": [
+    "each result is 2",
+    "each exit status is 2"
+   ]
+  },
+  {
+   "section": "",
+   "scenarios": [
+    9
+   ],
+   "steps": []
+  },
+  {
+   "section": "When",
+   "scenarios": [
+    10,
+    11,
+    12,
+    13,
+    16,
+    27,
+    28,
+    29,
+    30
+   ],
+   "steps": [
+    "wordcount is run with the path of that file",
+    "wordcount is run with the path of that file",
+    "wordcount is run with the path of that file",
+    "wordcount is run with the path of that file",
+    "hello.cli.main is called with the path of that file",
+    "wordcount is run on that file",
+    "wordcount is run with that path",
+    "wordcount is run with each path",
+    "wordcount is run with the path of that file"
+   ]
+  },
+  {
+   "section": "When",
+   "scenarios": [
+    14,
+    25,
+    31,
+    33
+   ],
+   "steps": [
+    "wordcount - is run",
+    "wordcount is run on each file",
+    "wordcount - is run",
+    "wordcount ./- is run"
+   ]
+  },
+  {
+   "section": "",
+   "scenarios": [
+    15
+   ],
+   "steps": []
+  },
+  {
+   "section": "When",
+   "scenarios": [
+    17,
+    18,
+    19,
+    20
+   ],
+   "steps": [
+    "the test tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order runs",
+    "the test tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions runs",
+    "the test tests/arch/test_layering.py::test_longest_line_performs_no_io runs",
+    "the test tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py runs against the uncommitted working tree"
+   ]
+  },
+  {
+   "section": "",
+   "scenarios": [
+    21
+   ],
+   "steps": []
+  },
+  {
+   "section": "Given",
+   "scenarios": [
+    22,
+    34
+   ],
+   "steps": [
+    "README.md after the change",
+    "the package after the change"
+   ]
+  },
+  {
+   "section": "",
+   "scenarios": [
+    23
+   ],
+   "steps": []
+  },
+  {
+   "section": "",
+   "scenarios": [
+    24
+   ],
+   "steps": []
+  },
+  {
+   "section": "",
+   "scenarios": [
+    26
+   ],
+   "steps": []
+  },
+  {
+   "section": "",
+   "scenarios": [
+    35
+   ],
+   "steps": []
+  }
+ ]
+}</script>
+<div class="wrap">
+<header class="top reveal" id="top"><div class="eyebrow">SPEC-0006 <span class="pill status" data-status="approved">Approved</span></div><h1>Feature: Longest-line word count in word-count output</h1><div class="prose intro"></div><ul class="meta" aria-label="Frontmatter"><li>artifact_type: spec</li><li>id: SPEC-0006</li><li>version: 1.0</li><li>status: Approved</li></ul></header><nav class="sections" aria-label="Sections"><a href="#part-1">Blueprint</a><a href="#part-2">Architecture changes</a><a href="#part-3">Scenarios</a><a href="#part-4">Contract</a><a href="#part-5">Changelog</a><a href="#part-6">Sign-Off</a></nav><section class="part" id="part-1"><h2>Blueprint</h2><div class="prose"><h3>Context</h3>
+<p>The wordcount output line reports words, characters and terminated lines, but gives no figure for how long the longest line is. Users need other tools to find it. This feature appends one figure, the word count of the longest line, as the last field of the existing line.</p>
+<p>The figure derives only from the word rule of SPEC-0001 and the terminator set of SPEC-0003, so no field can disagree with another. An unterminated final segment counts as a line for this figure only, while <code>lines</code> keeps excluding it. The README documents the difference with an example.</p>
+<h3>Feature Contract</h3>
+<ul>
+<li><strong>C4 model elements involved:</strong>
+<ul>
+<li>hello</li>
+<li>hello-cli</li>
+<li>word-count-command</li>
+<li>word-counter</li>
+<li>line-counter</li>
+<li>longest-line-counter</li>
+</ul>
+</li>
+<li><strong>API Contracts:</strong>
+<ul>
+<li>wordcount PATH and wordcount - print exactly one stdout line: <code>words: &lt;N&gt; characters: &lt;M&gt; lines: &lt;L&gt; longest_line_words: &lt;K&gt;</code>.</li>
+<li>hello.longest_line.longest_line_words(text: str) -&gt; int, pure and with no I/O, in src/hello/longest_line.py.</li>
+<li>The invocation, error messages and exit statuses (0, 1, 2) are unchanged.</li>
+</ul>
+</li>
+<li><strong>Data Models:</strong>
+<ul>
+<li>longest_line_words result: a non-negative int, 0 when no line has a word.</li>
+<li>Terminator set: hello.lines.LINE_TERMINATORS (frozenset[str] of 10 code points), reused unchanged, with CRLF as one terminator.</li>
+</ul>
+</li>
+<li><strong>Dependencies:</strong>
+<ul>
+<li>Depends on:
+<ul>
+<li>hello.counter.count_words (SPEC-0001, existing)</li>
+<li>hello.lines.LINE_TERMINATORS (SPEC-0003, existing)</li>
+<li>Shared stdin and file decode path in hello.cli (SPEC-0004, existing)</li>
+<li>Python standard library only, with no new runtime dependency (ADR-0001)</li>
+<li>Quality Gate commands from the AGENTS.md Toolchain table (ADR-0003)</li>
+</ul>
+</li>
+<li>Needed by:
+<ul>
+<li>README.md output and line-rule documentation</li>
+<li>Repository tests and features that assert the output line</li>
+<li>Users or scripts parsing the output line (none known beyond the README and repository tests)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Constraints:</strong>
+<ul>
+<li>Existing fields keep their labels, order and meaning, and the new field is appended last.</li>
+<li>The unterminated final segment counts for longest_line_words only, and the lines field stays unchanged.</li>
+<li>No second definition of a word or a terminator is introduced.</li>
+<li>No new flags or arguments, and no new third-party runtime dependency.</li>
+<li>This spec supersedes the three-field success-line assertions of SPEC-0003 and SPEC-0004. Test edits are limited to those assertions and to adding the two arch tests and their constants to tests/arch/test_layering.py. They are the allowed exceptions to the SPEC-0004 rule on editing existing tests.</li>
+<li>The guardrail test that compares the working tree to HEAD lists its allowed changes in ALLOWED_CHANGES. This spec extends that list by exactly the two arch tests and their constants in tests/arch/test_layering.py, and by nothing else.</li>
+<li>The update of spec text under docs/specs/ has no behavioral test and is checked at review.</li>
+<li>An input with no words on any line reports longest_line_words 0, as the strategy assumes. The owner confirms this at spec review.</li>
+</ul>
+</li>
+<li><strong>ADRs:</strong>
+<ul>
+<li>ADR-0001</li>
+<li>ADR-0002</li>
+<li>ADR-0003</li>
+<li>ADR-0004</li>
+<li>ADR-0007</li>
+<li>ADR-0009</li>
+<li>ADR-0012</li>
+<li>ADR-0013</li>
+</ul>
+</li>
+<li><strong>Critical components:</strong> (none)</li>
+</ul>
+</div></section><section class="part" id="part-2"><h2>Architecture changes</h2><div class="prose"><p>(none)</p>
+</div></section><section class="part" id="part-3"><h2>Scenarios</h2><div class="component" data-component="scenarios"><div class="needs-script" role="note"><p>The scenario views are not shown here: this page's script draws them, and this viewer did not run it. Open this page in a browser to see them; the scenarios as written follow.</p></div><div class="prose"><pre><code class="language-gherkin">Scenario: longest line is the line with the most words
+  Given  the text 'one two\nthree four five\nsix\n'
+  When  longest_line_words is called with that text
+  Then  the result is 3
+
+Scenario: unterminated final segment counts for the longest-line measure
+  Given  the text 'a b c' with no terminator
+  When  longest_line_words is called with that text
+  Then  the result is 3
+
+Scenario: trailing terminator adds no extra line
+  Given  the text 'a b\n'
+  When  longest_line_words is called with that text
+  Then  the result is 2
+
+Scenario: text without words has a longest line of zero
+  Given  the texts '', '  \t ' and '\n\n'
+  When  longest_line_words is called with each text
+  Then  each result is 0
+
+Scenario: each of the 11 terminators ends a line
+  Given  the terminators LF, CR, CRLF, VT, FF, FS, GS, RS, NEL, LS and PS
+  And  the text 'a b c' + terminator + 'd' built for each terminator
+  When  longest_line_words is called with each text
+  Then  each result is 3, not 4
+
+Scenario: mixed terminators split lines and CRLF counts once
+  Given  the text 'a b\r\nc d e\rf'
+  When  longest_line_words is called with that text
+  Then  the result is 3
+
+Scenario: non-terminator separators keep words on one line
+  Given  the separators TAB, SPACE, U+00A0, U+001F and U+3000
+  When  longest_line_words is called with 'a' + separator + 'b' for each separator
+  Then  each result is 2
+
+Scenario: zero width space is not a word separator
+  Given  the text 'a\u200bb'
+  When  longest_line_words is called with that text
+  Then  the result is 1, equal to count_words of that text
+
+Scenario: single-line input agrees with the word count
+  Given  the terminator-free texts '', 'alpha\t\tbeta  gamma ', 'caf\u00e9 na\u00efve \u65e5\u672c' and 'Hello, world! It's-fine.'
+  When  longest_line_words and count_words are called with each text
+  Then  the two results are equal for every text
+
+Scenario: CLI prints four fields for an unterminated file
+  Given  a UTF-8 file containing 'a b c' with no terminator
+  When  wordcount is run with the path of that file
+  Then  stdout is exactly 'words: 3 characters: 3 lines: 0 longest_line_words: 3' followed by a newline
+  And  stderr is empty
+  And  the exit status is 0
+
+Scenario: CLI prints four fields for a multi-line file
+  Given  a UTF-8 file containing 'one two\nthree four five\nsix\n'
+  When  wordcount is run with the path of that file
+  Then  stdout is exactly 'words: 6 characters: 22 lines: 3 longest_line_words: 3' followed by a newline
+  And  stderr is empty
+  And  the exit status is 0
+
+Scenario: CLI reports a terminated single line
+  Given  a UTF-8 file containing 'a b\n'
+  When  wordcount is run with the path of that file
+  Then  stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline
+  And  the exit status is 0
+
+Scenario: CLI reports zero for an empty file
+  Given  an empty file
+  When  wordcount is run with the path of that file
+  Then  stdout is exactly 'words: 0 characters: 0 lines: 0 longest_line_words: 0' followed by a newline
+  And  the exit status is 0
+
+Scenario: CLI reads mixed terminators from standard input
+  Given  standard input holding the bytes b'a b\r\nc d e\rf'
+  When  wordcount - is run
+  Then  stdout is exactly 'words: 6 characters: 6 lines: 2 longest_line_words: 3' followed by a newline
+  And  stderr is empty
+  And  the exit status is 0
+
+Scenario: file and standard input print identical lines
+  Given  the samples b'a b c', b'a b\r\nc d e\rf' and 'caf\u00e9 na\u00efve \u65e5\u672c\n' encoded as UTF-8
+  And  each sample written to a file and also available on standard input
+  When  wordcount PATH and wordcount - are run for each sample
+  Then  the two stdout lines are identical for every sample
+
+Scenario: CLI passes the same decoded text to all four counters
+  Given  a file containing 'a b\nc'
+  And  count_words, count_characters, count_lines and longest_line_words in hello.cli replaced by recorders
+  When  hello.cli.main is called with the path of that file
+  Then  each recorder received the same decoded str object
+  And  the file was read and decoded once
+
+Scenario: success line has four labeled fields in order
+  Given  the node id tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order
+  When  the test tests/test_cli.py::test_success_line_is_four_labeled_fields_in_order runs
+  Then  it passes
+
+Scenario: longest-line module reuses the word rule and the terminator set
+  Given  the node id tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions
+  When  the test tests/arch/test_layering.py::test_longest_line_reuses_word_and_terminator_definitions runs
+  Then  it passes
+
+Scenario: longest-line module performs no I/O
+  Given  the node id tests/arch/test_layering.py::test_longest_line_performs_no_io
+  When  the test tests/arch/test_layering.py::test_longest_line_performs_no_io runs
+  Then  it passes
+  And  hello.longest_line imports only the standard library, hello.counter and hello.lines
+
+Scenario: guardrail suite permits the two new arch tests and nothing else
+  Given  tests/arch/test_layering.py in the working tree with the two functions test_longest_line_reuses_word_and_terminator_definitions and test_longest_line_performs_no_io and their module-level constants added
+  And  no other pre-existing test file changed beyond the JUDGMENT_BOUNDARIES list in tests/test_agents_md.py and the three-field to four-field assertion updates
+  And  ALLOWED_CHANGES in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py extended to name those additions
+  When  the test tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py runs against the uncommitted working tree
+  Then  it passes
+  And  it still fails when tests/arch/test_layering.py gains any other added function or any removed or modified existing function
+
+Scenario: updated tests assert the four-field line
+  Given  the tests, feature files and step definitions that asserted the three-field success line, now updated
+  When  uv run pytest is run
+  Then  the exit status is 0
+  And  the file and standard-input success tests expect the line ending in 'longest_line_words: &lt;K&gt;'
+
+Scenario: README documents the four-field line and the final-segment difference
+  Given  README.md after the change
+  When  its text is read
+  Then  it contains the line form 'words: &lt;N&gt; characters: &lt;M&gt; lines: &lt;L&gt; longest_line_words: &lt;K&gt;'
+  And  it states that the earlier three-field output no longer applies
+  And  it contains the examples 'a b c' giving lines 0 and longest_line_words 3, and 'a b\n' giving lines 1 and longest_line_words 2
+  And  it states that empty input gives longest_line_words 0
+  And  it explains why lines excludes the unterminated final segment and longest_line_words includes it
+
+Scenario: Quality Gate passes on the finished change
+  Given  the finished change
+  When  uv run ruff format --check ., uv run ruff check ., uv run mypy --strict src tests and uv run pytest are run
+  Then  all four commands exit 0
+
+Scenario: guardrail: lines still excludes the unterminated final segment
+  Given  a file containing 'a b c' and the existing line rule of SPEC-0003
+  When  count_lines('a b c'), count_lines('a\nb') and wordcount on the file are run
+  Then  count_lines('a b c') returns 0
+  And  count_lines('a\nb') returns 1
+  And  the wordcount line contains 'lines: 0'
+
+Scenario: guardrail: the first three fields are unchanged
+  Given  a file containing 'caf\u00e9' and a file containing '  alpha\t\tbeta\n\ngamma  '
+  When  wordcount is run on each file
+  Then  the first line starts with 'words: 1 characters: 4 lines: 0'
+  And  the second line is exactly 'words: 3 characters: 14 lines: 2 longest_line_words: 2'
+
+Scenario: guardrail: existing counters return the same values
+  Given  the existing counters in hello.counter, hello.characters and hello.lines
+  When  count_words('  alpha\t\tbeta\n\ngamma  '), count_characters('caf\u00e9'), count_lines('a\r\n') and len(LINE_TERMINATORS) are evaluated
+  Then  the results are 3, 4, 1 and 10
+
+Scenario: guardrail: decoding does not translate newlines
+  Given  a file whose bytes are b'a b\r\nc'
+  When  wordcount is run on that file
+  Then  stdout is exactly 'words: 3 characters: 3 lines: 1 longest_line_words: 2' followed by a newline
+
+Scenario: guardrail: missing file error is unchanged
+  Given  a path that does not exist
+  When  wordcount is run with that path
+  Then  stderr is exactly the one line 'wordcount: error: file not found: PATH'
+  And  stdout is empty
+  And  the exit status is 1
+
+Scenario: guardrail: unreadable path error is unchanged
+  Given  a directory path and a file without read permission
+  When  wordcount is run with each path
+  Then  stderr is exactly one line starting with 'wordcount: error: cannot read file:'
+  And  stdout is empty
+  And  the exit status is 1
+  And  stderr has no traceback
+
+Scenario: guardrail: invalid UTF-8 file error is unchanged
+  Given  a file whose bytes are b'\xff\xfe'
+  When  wordcount is run with the path of that file
+  Then  stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: PATH'
+  And  stdout is empty
+  And  the exit status is 1
+
+Scenario: guardrail: invalid UTF-8 on standard input error is unchanged
+  Given  standard input holding the bytes b'\xff\xfe'
+  When  wordcount - is run
+  Then  stderr is exactly the one line 'wordcount: error: file is not valid UTF-8 text: &lt;stdin&gt;'
+  And  stdout is empty
+  And  stderr has no traceback
+  And  the exit status is 1
+
+Scenario: guardrail: usage errors still exit with status 2
+  Given  standard input holding 'a b\n'
+  When  wordcount is run with no argument, then with two arguments, then as 'wordcount - extra'
+  Then  each run prints argparse usage to stderr and nothing to stdout
+  And  each exit status is 2
+  And  the no-argument run did not read standard input
+
+Scenario: guardrail: a file named dash is still reached through dot-slash
+  Given  a file literally named '-' containing 'a b\n'
+  When  wordcount ./- is run
+  Then  stdout is exactly 'words: 2 characters: 2 lines: 1 longest_line_words: 2' followed by a newline
+  And  the exit status is 0
+
+Scenario: guardrail: package layout and import are unchanged
+  Given  the package after the change
+  When  import hello is run and the tree is inspected
+  Then  the import succeeds with every name exported before
+  And  src/hello/py.typed exists
+  And  package code stays under src/hello/
+
+Scenario: guardrail: dependencies, lockfile and AGENTS.md are unchanged
+  Given  pyproject.toml, uv.lock and AGENTS.md after the change
+  When  [project].dependencies is read and uv lock --check is run
+  Then  [project].dependencies is empty
+  And  ruff, mypy and pytest are declared only in the dev dependency group
+  And  uv lock --check exits 0
+  And  the console script wordcount = &quot;hello.cli:main&quot; is still declared
+  And  the AGENTS.md Toolchain table keeps its four rows and the Judgment Boundaries bullets are word for word
+</code></pre>
+</div></div></section><section class="part" id="part-4"><h2>Contract</h2><div class="prose"><h3>Definition of Done</h3>
+<ul>
+<li><span class="task" role="img" aria-label="not checked">☐</span> src/hello/longest_line.py defines longest_line_words(text: str) -&gt; int, which returns the highest word count among the lines of text.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> longest_line_words splits text at hello.lines.LINE_TERMINATORS, counting CRLF as one terminator, and counts the words of each line with hello.counter.count_words.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> An unterminated final segment counts as a line for this measure only: longest_line_words('a b c') returns 3.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> A trailing terminator adds no extra line: longest_line_words('a b\n') returns 2.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> longest_line_words returns 0 for '', for the blank-only text '  \t ' and for '\n\n'.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> longest_line_words('one two\nthree four five\nsix\n') returns 3.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For each of the 11 terminators (LF, CR, CRLF, VT, FF, FS, GS, RS, NEL, LS, PS), longest_line_words('a b c' + terminator + 'd') returns 3.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> longest_line_words('a b\r\nc d e\rf') returns 3.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Separators that are not terminators keep words on one line: for TAB, SPACE, NBSP U+00A0, US U+001F and IDEOGRAPHIC SPACE U+3000, longest_line_words('a' + c + 'b') returns 2.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Text with no terminator agrees with the word rule: longest_line_words(text) equals count_words(text) for '', 'alpha\t\tbeta  gamma ', 'caf\u00e9 na\u00efve \u65e5\u672c' and 'Hello, world! It's-fine.'.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> hello.longest_line performs no file, process or console I/O and imports only the standard library, hello.counter and hello.lines.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Running <code>wordcount PATH</code> on a readable UTF-8 file prints exactly one line of the form <code>words: &lt;N&gt; characters: &lt;M&gt; lines: &lt;L&gt; longest_line_words: &lt;K&gt;</code> followed by a newline to stdout, prints nothing to stderr and exits with status 0.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For a file containing 'a b c' with no terminator, <code>wordcount PATH</code> prints <code>words: 3 characters: 3 lines: 0 longest_line_words: 3</code>.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For a file containing 'one two\nthree four five\nsix\n', <code>wordcount PATH</code> prints <code>words: 6 characters: 22 lines: 3 longest_line_words: 3</code>.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For a file containing 'a b\n', <code>wordcount PATH</code> prints <code>words: 2 characters: 2 lines: 1 longest_line_words: 2</code>.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For an empty file, <code>wordcount PATH</code> prints <code>words: 0 characters: 0 lines: 0 longest_line_words: 0</code>.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Running <code>printf 'a b\r\nc d e\rf' | wordcount -</code> prints <code>words: 6 characters: 6 lines: 2 longest_line_words: 3</code>.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> For the byte samples b'a b c', b'a b\r\nc d e\rf' and 'caf\u00e9 na\u00efve \u65e5\u672c\n' encoded as UTF-8, <code>wordcount PATH</code> and <code>wordcount -</code> print identical stdout lines.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> hello.cli.main reads and decodes the input once and passes the same decoded text string to count_words, count_characters, count_lines and longest_line_words.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Every existing test, feature file and step definition that asserts the three-field success line is updated to assert the four-field line. This applies to the file and standard-input cases in tests/test_cli.py, tests/test_cli_stdin.py and tests/features.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> tests/arch/test_layering.py gains the two functions test_longest_line_reuses_word_and_terminator_definitions and test_longest_line_performs_no_io, plus the module-level constants they use.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> ALLOWED_CHANGES in tests/step_defs/test_guardrail_the_existing_spec_0001_to_spec_0003_test_suite_passes_unchanged.py permits exactly those additions to tests/arch/test_layering.py, so the guardrail passes on the uncommitted working tree.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> Each file under docs/specs/ that asserts the three-field line <code>words: &lt;N&gt; characters: &lt;M&gt; lines: &lt;L&gt;</code> as the current output is updated to the four-field line or marked as superseded by this spec.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> README.md documents the <code>words: &lt;N&gt; characters: &lt;M&gt; lines: &lt;L&gt; longest_line_words: &lt;K&gt;</code> output line and the longest-line rule, and states that the earlier three-field output no longer applies.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> README.md explains why <code>lines</code> excludes the unterminated final segment while <code>longest_line_words</code> includes it, with the examples 'a b c' giving lines 0 and longest_line_words 3, 'a b\n' giving lines 1 and longest_line_words 2, and empty input giving longest_line_words 0.</li>
+<li><span class="task" role="img" aria-label="not checked">☐</span> All four Quality Gate commands exit 0 on the finished change.</li>
+</ul>
+<h3>Regression Guardrails</h3>
+<ul>
+<li>The first three fields keep their labels, order and meaning: a file containing 'caf\u00e9' still reports <code>words: 1 characters: 4 lines: 0</code> before the new field, and a file containing '  alpha\t\tbeta\n\ngamma  ' reports <code>words: 3 characters: 14 lines: 2 longest_line_words: 2</code>.</li>
+<li>The lines field still excludes an unterminated final segment: count_lines('a b c') returns 0, count_lines('a\nb') returns 1, and <code>wordcount PATH</code> on a file containing 'a b c' reports lines: 0.</li>
+<li>hello.counter.count_words, hello.characters.count_characters and hello.lines.count_lines return the same values as before, and hello.lines.LINE_TERMINATORS still holds exactly the same 10 code points.</li>
+<li>UTF-8 decoding is unchanged: no new decoding path, encoding option or newline-translation setting is introduced, so a file with the bytes b'a b\r\nc' still reports lines: 1 and longest_line_words: 2.</li>
+<li>A path that does not exist still prints exactly one line <code>wordcount: error: file not found: PATH</code> to stderr, prints nothing to stdout (no counts and no longest_line_words field) and exits with status 1.</li>
+<li>A path that exists but cannot be read (a directory, or a file without read permission) still prints exactly one line starting with <code>wordcount: error: cannot read file:</code> to stderr, prints nothing to stdout and exits with status 1.</li>
+<li>A file whose bytes are not valid UTF-8 still prints exactly one line <code>wordcount: error: file is not valid UTF-8 text: PATH</code> to stderr, prints nothing to stdout and exits with status 1.</li>
+<li>Invalid UTF-8 on standard input through <code>wordcount -</code> still prints exactly one line <code>wordcount: error: file is not valid UTF-8 text: &lt;stdin&gt;</code> to stderr, prints nothing to stdout, writes no traceback and exits with status 1.</li>
+<li>The invocation is unchanged: <code>wordcount</code> with no argument, with more than two... more than one argument, or <code>wordcount - extra</code> still prints argparse usage to stderr and exits with status 2, and the no-argument form does not read standard input.</li>
+<li>A file literally named <code>-</code> is still counted through <code>wordcount ./-</code> with the four-field output line.</li>
+<li><code>import hello</code> still succeeds with every name src/hello/<strong>init</strong>.py exported before, src/hello/py.typed remains present and the src layout is unchanged.</li>
+<li>pyproject.toml [project].dependencies stays empty, ruff, mypy and pytest stay declared only in the <code>dev</code> dependency group, the console script <code>wordcount = &quot;hello.cli:main&quot;</code> stays declared and <code>uv lock --check</code> exits 0.</li>
+<li>The AGENTS.md Toolchain table keeps its four Quality Gate rows and its Judgment Boundaries bullets word for word.</li>
+</ul>
+</div></section><section class="part" id="part-5"><h2>Changelog</h2><div class="prose"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Summary</th>
+<th>Triggered by</th>
+</tr>
+</thead>
+</table>
+</div></section><section class="part" id="part-6"><h2>Sign-Off</h2><div class="prose"><p><strong>Authored by:</strong> openrouter:anthropic/claude-sonnet-5.5<br />
+<strong>Reviewed by:</strong> Marco — mcrasso@marsie.io</p>
+<p><strong>Ready for PBI_PLANNING:</strong> <span class="task on" role="img" aria-label="checked">☑</span> Yes <span class="task" role="img" aria-label="not checked">☐</span> No</p>
+</div></section>
+<footer>Rendered by Synthesis from the document's Markdown. Every sentence is the document's own text.</footer>
+</div>
+<script>
+"use strict";
+document.body.classList.add("js");
+const DATA = JSON.parse(document.getElementById("page-data").textContent);
+const SVGNS = "http://www.w3.org/2000/svg";
+
+function el(tag, cls, text) {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined && text !== null) node.textContent = text;
+  return node;
+}
+function svg(tag, attrs, text) {
+  const node = document.createElementNS(SVGNS, tag);
+  Object.entries(attrs || {}).forEach(([k, v]) => node.setAttribute(k, v));
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function pill(status) { return el("span", "pill " + status, status || "unchanged"); }
+// A colour as the browser resolves it, so a mixed one (color-mix, Canvas) reaches an SVG attribute as a plain colour.
+const probe = document.head.appendChild(document.createElement("meta"));
+function css(name) { probe.style.color = `var(${name})`; return getComputedStyle(probe).color; }
+function reduced() { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+
+/* ---------- C4: one level at a time, drawn from the elements and relations ---------- */
+const ELEMENTS = DATA.c4 ? DATA.c4.elements : [];
+const BY_ID = Object.fromEntries(ELEMENTS.map(e => [e.id, e]));
+const RELATIONS = DATA.c4 ? DATA.c4.relations : [];
+const W = 250, H = 112, COL = 150, ROW = 44, PAD = 40, TOP = 92, BOTTOM = 64, BOUND = 38;
+let focus = null, busy = false, highlightChanges = false, frameSize = null;
+let selected = null;  // the relation picked in the details panel, marked wherever it is drawn
+
+function childrenOf(id) { return ELEMENTS.filter(e => (e.parent || null) === id); }
+function chain(id) { const out = []; let at = BY_ID[id]; while (at) { out.unshift(at.id); at = at.parent ? BY_ID[at.parent] : null; } return out; }
+function zoomable(id) { return childrenOf(id).length > 0; }
+function representative(id, focusId) {
+  // The element a relation end is drawn as at this level: the focus itself, one of its children, or the outermost
+  // ancestor whose parent is on the focus's own path (a sibling at some level above).
+  const path = chain(id), focusPath = focusId ? chain(focusId) : [];
+  if (!path.length) return id;
+  if (focusId && path.includes(focusId)) return path.length === focusPath.length ? "@boundary" : path[focusPath.length];
+  for (const at of path) { const parent = BY_ID[at].parent || null; if (parent === null || focusPath.includes(parent)) return at; }
+  return path[0];
+}
+function levelOf(focusId) {
+  const inside = childrenOf(focusId).map(e => e.id);
+  const edges = [];
+  RELATIONS.forEach(r => {
+    const source = representative(r.source, focusId), target = representative(r.target, focusId);
+    if (source === target || !(source in BY_ID || source === "@boundary") || !(target in BY_ID || target === "@boundary")) return;
+    const touches = [source, target].some(n => n === "@boundary" || inside.includes(n));
+    if (focusId && !touches) return;
+    edges.push({ source, target, relation: r });
+  });
+  const outside = [...new Set(edges.flatMap(e => [e.source, e.target]))].filter(n => n !== "@boundary" && !inside.includes(n));
+  return { inside, outside, edges };
+}
+function ranks(nodes, edges) {
+  // Longest path over the relations among `nodes`, ignoring edges that close a cycle.
+  const out = Object.fromEntries(nodes.map(n => [n, []]));
+  edges.forEach(e => { if (out[e.source] && out[e.target]) out[e.source].push(e.target); });
+  const state = {}, order = [];
+  const visit = n => { state[n] = 1; out[n] = out[n].filter(t => state[t] !== 1); out[n].forEach(t => { if (!state[t]) visit(t); }); state[n] = 2; order.unshift(n); };
+  nodes.forEach(n => { if (!state[n]) visit(n); });
+  const rank = Object.fromEntries(nodes.map(n => [n, 0]));
+  order.forEach(n => out[n].forEach(t => { rank[t] = Math.max(rank[t], rank[n] + 1); }));
+  return rank;
+}
+function column(nodes, x, top, height) {
+  const total = nodes.length * H + (nodes.length - 1) * ROW;
+  return nodes.map((n, i) => ({ id: n, x, y: top + (height - total) / 2 + i * (H + ROW), w: W, h: H }));
+}
+function layout(level, focusId) {
+  const rank = ranks(level.inside, level.edges);
+  const columns = [];
+  level.inside.forEach(n => { (columns[rank[n]] = columns[rank[n]] || []).push(n); });
+  const tallest = Math.max(1, ...columns.map(c => c.length));
+  const innerHeight = tallest * H + (tallest - 1) * ROW;
+  const calls = n => level.edges.filter(e => e.source === n).length, called = n => level.edges.filter(e => e.target === n).length;
+  const left = level.outside.filter(n => calls(n) > called(n)), right = level.outside.filter(n => !left.includes(n));
+  const sideHeight = Math.max(left.length, right.length) * (H + ROW) - ROW;
+  const height = Math.max(innerHeight + (focusId ? 2 * BOUND + 26 : 0), sideHeight);
+  const boxes = {};
+  let x = PAD;
+  if (left.length) { column(left, x, TOP, height).forEach(b => { boxes[b.id] = b; }); x += W + COL; }
+  const boundaryX = x;
+  if (focusId) x += BOUND;
+  columns.forEach(c => { column(c, x, TOP + (focusId ? 13 : 0), height).forEach(b => { boxes[b.id] = b; }); x += W + COL * .7; });
+  x -= COL * .7;
+  const boundary = focusId ? { x: boundaryX, y: TOP + (height - innerHeight) / 2 - BOUND - 13, w: x - boundaryX + BOUND, h: innerHeight + 2 * BOUND + 26 } : null;
+  if (focusId) x += BOUND;
+  if (right.length) { x += COL; column(right, x, TOP, height).forEach(b => { boxes[b.id] = b; }); x += W; }
+  return { boxes, boundary, width: x + PAD, height: height + TOP + BOTTOM };
+}
+function wrap(text, width) {
+  const words = text.split(/\s+/), lines = [];
+  let line = "";
+  words.forEach(w => { if ((line + " " + w).trim().length > width && line) { lines.push(line); line = w; } else line = (line + " " + w).trim(); });
+  if (line) lines.push(line);
+  return lines;
+}
+const FILL = { added: ["--add-bg", "--add-edge"], changed: ["--chg-bg", "--chg-edge"], removed: ["--del-bg", "--del-edge"], "": ["--surface", "--line"] };
+function drawNode(layer, box, element) {
+  const [fill, stroke] = FILL[element.status || ""];
+  const g = svg("g", { class: "node" + (zoomable(element.id) ? " zoomable" : ""), "data-id": element.id, transform: `translate(${box.x},${box.y})`, tabindex: 0, role: "button" });
+  g.append(svg("rect", { class: "shape", width: box.w, height: box.h, rx: 12, fill: css(fill), stroke: css(stroke), "stroke-width": 1.6 }));
+  if (element.status === "removed") g.lastChild.setAttribute("stroke-dasharray", "6 4");
+  const lines = wrap(element.name, 24).slice(0, 2);
+  lines.forEach((line, i) => g.append(svg("text", { x: 16, y: 30 + i * 19, "font-size": 15.5, "font-weight": 650, fill: css("--fg") }, line)));
+  const meta = [element.level, element.technology].filter(Boolean).join(" · ");
+  g.append(svg("text", { x: 16, y: 30 + lines.length * 19 + 4, "font-size": 12, fill: css("--muted") }, meta.length > 36 ? meta.slice(0, 35) + "…" : meta));
+  g.append(svg("title", {}, element.name));
+  if (element.status) g.append(svg("text", { x: box.w - 14, y: 22, "font-size": 11, "text-anchor": "end", "font-family": "ui-monospace, monospace", fill: css({ added: "--add", changed: "--chg", removed: "--del" }[element.status]) }, element.status));
+  if (element.critical) g.append(svg("text", { x: box.w - 14, y: box.h - 14, "font-size": 11, "text-anchor": "end", fill: css("--del") }, "critical"));
+  if (zoomable(element.id)) g.append(svg("text", { x: 16, y: box.h - 14, "font-size": 12, "font-weight": 600, fill: css("--accent") }, "⤢ open · " + childrenOf(element.id).length + " inside"));
+  g.addEventListener("click", event => { event.stopPropagation(); if (busy) return; selected = null; zoomable(element.id) ? zoomInto(element.id) : openPanel(element.id); });
+  g.addEventListener("keydown", event => { if (event.key === "Enter") g.dispatchEvent(new Event("click")); });
+  g.addEventListener("mouseenter", () => heat(element.id, true));
+  g.addEventListener("mouseleave", () => heat(element.id, false));
+  layer.append(g);
+}
+function border(box, toward) {
+  const cx = box.x + box.w / 2, cy = box.y + box.h / 2, dx = toward[0] - cx, dy = toward[1] - cy;
+  const t = Math.min(Math.abs(box.w / 2 / (dx || 1e-9)), Math.abs(box.h / 2 / (dy || 1e-9)));
+  return [cx + dx * t, cy + dy * t];
+}
+function inside(outer, box) { return box.x >= outer.x && box.x + box.w <= outer.x + outer.w && box.y >= outer.y && box.y + box.h <= outer.y + outer.h; }
+function nearestSide(outer, box) {
+  const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+  const sides = [[cx, outer.y, cy - outer.y], [cx, outer.y + outer.h, outer.y + outer.h - cy], [outer.x, cy, cx - outer.x], [outer.x + outer.w, cy, outer.x + outer.w - cx]];
+  const [x, y] = sides.sort((m, n) => m[2] - n[2])[0];
+  return [x, y];
+}
+const EDGE = { added: "--add", removed: "--del", "": "--muted" };
+function drawEdges(layer, level, boxes, boundary) {
+  const pairs = {};
+  level.edges.forEach(e => { const key = [e.source, e.target].sort().join("|"); (pairs[key] = pairs[key] || []).push(e); });
+  Object.values(pairs).forEach(group => group.forEach((e, i) => {
+    const a = e.source === "@boundary" ? boundary : boxes[e.source], b = e.target === "@boundary" ? boundary : boxes[e.target];
+    const ca = [a.x + a.w / 2, a.y + a.h / 2], cb = [b.x + b.w / 2, b.y + b.h / 2];
+    const len = Math.hypot(cb[0] - ca[0], cb[1] - ca[1]) || 1, nx = -(cb[1] - ca[1]) / len, ny = (cb[0] - ca[0]) / len;
+    const sign = e.source < e.target ? 1 : -1, bend = (i - (group.length - 1) / 2) * 34 * sign;
+    let mid = [(ca[0] + cb[0]) / 2 + nx * bend, (ca[1] + cb[1]) / 2 + ny * bend];
+    let p0 = border(a, mid), p1 = border(b, mid);
+    // The focus's own relations to its children run from the side of the boundary nearest the child.
+    const child = e.source === "@boundary" ? b : e.target === "@boundary" ? a : null;
+    if (child && child !== boundary && inside(boundary, child)) {
+      const side = nearestSide(boundary, child), end = border(child, side);
+      [p0, p1] = e.source === "@boundary" ? [side, end] : [end, side];
+      mid = [(p0[0] + p1[0]) / 2 + bend * 1.8, (p0[1] + p1[1]) / 2];
+    }
+    const colour = css(EDGE[e.relation.status || ""]);
+    const g = svg("g", { class: "edge", "data-status": e.relation.status || "", "data-n": e.number, "data-r": RELATIONS.indexOf(e.relation), "data-source": e.source, "data-target": e.target });
+    const path = svg("path", { d: `M${p0[0]},${p0[1]} Q${mid[0]},${mid[1]} ${p1[0]},${p1[1]}`, stroke: colour, "stroke-width": e.relation.status === "added" ? 2.4 : 1.8, "marker-end": `url(#arrow-${e.relation.status || "same"})` });
+    if (e.relation.status === "removed") path.setAttribute("stroke-dasharray", "7 5");
+    const at = [.25 * p0[0] + .5 * mid[0] + .25 * p1[0], .25 * p0[1] + .5 * mid[1] + .25 * p1[1]];
+    const badge = svg("g", { class: "rel-badge", transform: `translate(${at[0]},${at[1]})` });
+    badge.append(svg("circle", { r: 12, fill: colour, stroke: css("--canvas"), "stroke-width": 3 }), svg("text", { "text-anchor": "middle", dy: 4.5, "font-size": 12, "font-weight": 700, fill: css("--canvas") }, String(e.number)));
+    badge.append(svg("title", {}, e.relation.description));
+    g.append(path, badge);
+    g.addEventListener("mouseenter", () => hotRelation(e.number, true));
+    g.addEventListener("mouseleave", () => hotRelation(e.number, false));
+    badge.addEventListener("click", () => { const item = document.getElementById("rel-" + e.number); if (item) item.scrollIntoView({ block: "nearest", behavior: "smooth" }); });
+    layer.append(g);
+  }));
+}
+function markers(defs) {
+  Object.entries({ added: "--add", removed: "--del", same: "--muted" }).forEach(([name, colour]) => {
+    const m = svg("marker", { id: "arrow-" + name, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    m.append(svg("path", { d: "M0,0 L10,5 L0,10 z", fill: css(colour) }));
+    defs.append(m);
+  });
+}
+function heat(id, on) {
+  document.querySelectorAll("#c4 .edge").forEach(g => {
+    if (g.dataset.source === id || g.dataset.target === id) { g.classList.toggle("hot", on); hotRelation(Number(g.dataset.n), on, true); }
+  });
+}
+function hotRelation(n, on, fromNode) {
+  const item = document.getElementById("rel-" + n);
+  if (item) item.classList.toggle("hot", on);
+  if (!fromNode) document.querySelectorAll(`#c4 .edge[data-n="${n}"]`).forEach(g => g.classList.toggle("hot", on));
+}
+function frame() {
+  // One viewBox for every level, the largest level's, so a box is drawn the same size at every level; a smaller level
+  // sits in its middle.
+  if (!frameSize) {
+    const shapes = [null, ...ELEMENTS.filter(e => zoomable(e.id)).map(e => e.id)].map(id => layout(levelOf(id), id));
+    frameSize = { width: Math.max(...shapes.map(s => s.width)), height: Math.max(...shapes.map(s => s.height)) };
+  }
+  return frameSize;
+}
+function drawLevel(focusId) {
+  const level = levelOf(focusId);
+  level.edges.forEach((e, i) => { e.number = i + 1; });
+  const shape = layout(level, focusId);
+  const root = document.getElementById("c4");
+  root.replaceChildren();
+  const defs = svg("defs"); markers(defs); root.append(defs);
+  const content = svg("g", { class: "content" });
+  if (shape.boundary) {
+    const b = shape.boundary, f = BY_ID[focusId];
+    const g = svg("g", { class: "boundary" });
+    g.append(svg("rect", { x: b.x, y: b.y, width: b.w, height: b.h, rx: 16, fill: "none", stroke: css("--accent"), "stroke-width": 1.6, "stroke-dasharray": "8 6" }));
+    g.append(svg("text", { x: b.x + 16, y: b.y + 24, "font-size": 14, "font-weight": 700, fill: css("--accent") }, f.name + "  [" + f.level + "]"));
+    g.append(svg("text", { x: b.x + b.w - 16, y: b.y + 24, "font-size": 12, "text-anchor": "end", fill: css("--accent"), style: "cursor:pointer" }, "ⓘ details"));
+    g.lastChild.addEventListener("click", event => { event.stopPropagation(); openPanel(focusId); });
+    content.append(g);
+  }
+  const edgeLayer = svg("g"), nodeLayer = svg("g");
+  drawEdges(edgeLayer, level, shape.boxes, shape.boundary);
+  Object.values(shape.boxes).forEach(box => drawNode(nodeLayer, box, BY_ID[box.id]));
+  content.append(edgeLayer, nodeLayer);
+  root.append(content);
+  const size = frame(), view = `${(shape.width - size.width) / 2} ${(shape.height - size.height) / 2} ${size.width} ${size.height}`;
+  root.setAttribute("viewBox", view);
+  root.dataset.full = view;
+  applyHighlight();
+  renderCrumbs(focusId);
+  renderLevelNote(focusId, level);
+  renderRelations(level);
+  applySelection();
+  return shape;
+}
+function applySelection() {
+  const n = selected ? RELATIONS.indexOf(selected) : -1;
+  document.querySelectorAll("#c4 .edge, #relation-list li, #panel .rel").forEach(x => x.classList.toggle("selected", Number(x.dataset.r) === n));
+  const c4 = document.getElementById("c4");
+  c4.classList.toggle("has-selected", Boolean(c4.querySelector(".edge.selected")));
+}
+function homeLevel(r) {
+  // The level that draws relation `r`: the one shown if it does, else the one around both its ends, closest first.
+  const draws = id => levelOf(id).edges.some(e => e.relation === r);
+  if (draws(focus)) return focus;
+  const around = chain(r.source).reverse().filter(id => zoomable(id) && chain(r.target).includes(id));
+  return [...around, null, ...ELEMENTS.filter(e => zoomable(e.id)).map(e => e.id)].find(draws);
+}
+function selectRelation(r, other) {
+  if (busy) return;
+  selected = r;
+  const level = homeLevel(r);
+  if (level !== undefined && level !== focus) go(level, null, null);
+  applySelection();
+  openPanel(other);
+}
+function dismiss() { selected = null; applySelection(); closePanel(); }
+function applyHighlight() {
+  document.querySelectorAll("#c4 .node").forEach(g => g.classList.toggle("dim", highlightChanges && !BY_ID[g.dataset.id].status));
+  document.querySelectorAll("#c4 .edge").forEach(g => g.classList.toggle("dim", highlightChanges && !g.dataset.status));
+}
+function tween(root, from, to, ms, done) {
+  const start = performance.now();
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => {
+    const t = Math.min(1, (now - start) / ms), k = ease(t);
+    root.setAttribute("viewBox", from.map((v, i) => v + (to[i] - v) * k).join(" "));
+    if (t < 1) requestAnimationFrame(step); else done && done();
+  };
+  requestAnimationFrame(step);
+}
+function boxRect(id) {
+  const g = document.querySelector(`#c4 .node[data-id="${id}"]`);
+  if (!g) return null;
+  const m = /translate\(([-\d.]+),([-\d.]+)\)/.exec(g.getAttribute("transform"));
+  return [Number(m[1]), Number(m[2]), W, H];
+}
+function fit(rect, full) {
+  // A viewBox around `rect` with the full view's aspect ratio.
+  const ratio = full[2] / full[3], pad = 30;
+  let w = rect[2] + pad * 2, h = rect[3] + pad * 2;
+  if (w / h > ratio) h = w / ratio; else w = h * ratio;
+  return [rect[0] + rect[2] / 2 - w / 2, rect[1] + rect[3] / 2 - h / 2, w, h];
+}
+function go(focusId, intoRect, outOfChild) {
+  const root = document.getElementById("c4");
+  closePanel();
+  if (reduced()) { focus = focusId; drawLevel(focusId); return; }
+  busy = true;
+  const full = root.dataset.full.split(" ").map(Number);
+  const leave = intoRect ? fit(intoRect, full) : [full[0] - full[2] * .3, full[1] - full[3] * .3, full[2] * 1.6, full[3] * 1.6];
+  root.style.transition = "opacity .25s";
+  tween(root, full, leave, 420, () => {
+    root.style.opacity = 0;
+    focus = focusId;
+    drawLevel(focusId);
+    const next = root.dataset.full.split(" ").map(Number);
+    let enter = [next[0] - next[2] * .35, next[1] - next[3] * .35, next[2] * 1.7, next[3] * 1.7];
+    if (outOfChild) { const r = boxRect(outOfChild); if (r) enter = fit(r, next); }
+    root.setAttribute("viewBox", enter.join(" "));
+    requestAnimationFrame(() => { root.style.opacity = 1; tween(root, enter, next, 480, () => { busy = false; }); });
+  });
+}
+function zoomInto(id) { go(id, boxRect(id), null); }
+function zoomOutTo(focusId) { const from = focus; go(focusId, null, chain(from).find(n => (BY_ID[n].parent || null) === focusId)); }
+function renderCrumbs(focusId) {
+  const crumbs = document.getElementById("crumbs");
+  crumbs.replaceChildren();
+  const path = [null, ...(focusId ? chain(focusId) : [])];
+  path.forEach((id, i) => {
+    if (i) crumbs.append(el("span", "sep", "›"));
+    const b = el("button", null, id ? BY_ID[id].name : "Context");
+    b.type = "button";
+    if (i === path.length - 1) b.setAttribute("aria-current", "true");
+    else b.addEventListener("click", () => { if (!busy) zoomOutTo(id); });
+    crumbs.append(b);
+  });
+}
+const LEVEL_NAMES = { system: "Container level", container: "Component level", component: "Code level" };
+function renderLevelNote(focusId, level) {
+  const note = document.getElementById("level-note");
+  note.replaceChildren();
+  const f = focusId ? BY_ID[focusId] : null;
+  note.append(el("b", null, f ? (LEVEL_NAMES[f.level] || "Inside") + ": " + f.name : "System context"));
+  const kinds = f ? childrenOf(focusId).length + " inside, " + level.outside.length + " outside" : level.inside.length + " systems";
+  note.append(el("span", "muted", kinds + " · " + level.edges.length + " relations. Click a box with ⤢ to open it."));
+}
+function renderRelations(level) {
+  const list = document.getElementById("relation-list");
+  list.replaceChildren();
+  level.edges.forEach(e => {
+    const li = el("li", e.relation.status || "");
+    li.id = "rel-" + e.number;
+    li.dataset.r = RELATIONS.indexOf(e.relation);
+    const body = el("div");
+    const name = id => BY_ID[id] ? BY_ID[id].name : id;
+    const ends = el("div", "ends", name(e.relation.source) + " → " + name(e.relation.target) + " ");
+    if (e.relation.status) ends.append(pill(e.relation.status));
+    body.append(ends, el("div", "desc", e.relation.description));
+    li.append(el("span", "n", String(e.number)), body);
+    li.addEventListener("mouseenter", () => hotRelation(e.number, true));
+    li.addEventListener("mouseleave", () => hotRelation(e.number, false));
+    list.append(li);
+  });
+}
+function openPanel(id) {
+  const e = BY_ID[id], panel = document.getElementById("panel");
+  panel.replaceChildren();
+  const close = el("button", "close", "×"); close.type = "button"; close.setAttribute("aria-label", "Close details");
+  close.addEventListener("click", dismiss);
+  const head = el("div");
+  head.append(el("div", "eyebrow", e.level + (e.critical ? " · critical" : "")), el("h3", null, e.name + " "), pill(e.status));
+  const dl = el("dl");
+  [["Owns", e.owns], ["Does not own", e.does_not_own], ["Technology", e.technology], ["Deployment", e.deployment], ["Part of", e.parent && BY_ID[e.parent] ? BY_ID[e.parent].name : ""]]
+    .forEach(([k, v]) => { if (v) dl.append(el("dt", null, k), el("dd", null, v)); });
+  const rels = RELATIONS.filter(r => (r.source === id || r.target === id) && BY_ID[r.source] && BY_ID[r.target]);
+  if (rels.length) {
+    const dd = el("dd");
+    rels.forEach(r => {
+      const other = r.source === id ? r.target : r.source;
+      const b = el("button", "rel");
+      b.type = "button";
+      b.append(el("b", null, (r.source === id ? "→ " : "← ") + BY_ID[other].name + " "), r.status ? pill(r.status) : "", el("div", "muted", r.description));
+      b.dataset.r = RELATIONS.indexOf(r);
+      b.addEventListener("click", () => selectRelation(r, other));
+      dd.append(b);
+    });
+    dl.append(el("dt", null, "Relations"), dd);
+  }
+  panel.append(close, head, dl);
+  if (zoomable(id) && id !== focus) {
+    const open = el("button", "primary", "⤢ Open " + e.name); open.type = "button";
+    open.addEventListener("click", () => zoomInto(id));
+    panel.append(open);
+  }
+  applySelection();
+  panel.classList.add("open");
+  panel.closest(".stage").classList.add("with-panel");
+}
+function closePanel() {
+  const panel = document.getElementById("panel");
+  panel.classList.remove("open");
+  panel.closest(".stage").classList.remove("with-panel");
+}
+function renderArchitecture(part) {
+  part.replaceChildren();
+  const changes = ELEMENTS.some(e => e.status) || RELATIONS.some(r => r.status);
+  const legend = changes ? '<span><span class="swatch" style="background:var(--add-bg);border-color:var(--add-edge)"></span>added</span>' +
+    '<span><span class="swatch" style="background:var(--chg-bg);border-color:var(--chg-edge)"></span>changed</span>' +
+    '<span><span class="swatch" style="background:var(--del-bg);border-color:var(--del-edge)"></span>removed</span>' +
+    '<span><span class="swatch" style="background:var(--surface);border-color:var(--line)"></span>unchanged</span>' +
+    '<label><input type="checkbox" id="highlight"> Highlight what changes</label>' : "";
+  const stage = el("div", "stage");
+  stage.innerHTML = '<div class="stage-bar"><div class="level-note" id="level-note"></div><nav class="crumbs" id="crumbs" aria-label="C4 levels"></nav></div>' +
+    '<svg id="c4" role="img" aria-label="C4 diagram"></svg><aside class="panel" id="panel" aria-label="Element details"></aside>' +
+    '<div class="stage-foot">' + legend + '</div>';
+  const relations = el("div");
+  relations.append(el("h3", null, "Relations at this level"));
+  const ul = el("ul", "relations"); ul.id = "relation-list";
+  relations.append(ul);
+  part.append(stage, relations);
+  const box = stage.querySelector("#highlight");
+  if (box) box.addEventListener("change", event => { highlightChanges = event.target.checked; applyHighlight(); });
+  stage.querySelector("svg").addEventListener("click", dismiss);
+  drawLevel(null);
+}
+
+/* ---------- Scenarios: abstracted blocks, a storyboard of Given, When and Then, or the Gherkin ---------- */
+const HUES = [212, 12, 145, 280, 38, 330, 182, 95];
+const ARTICLE_START = new Set(["A", "I"]);
+function entityLetters() {
+  // Capital letters that stand for an example thing: a lone capital somewhere other than the start of a step.
+  const letters = new Set();
+  DATA.scenarios.forEach(s => s.steps.forEach(([, t]) => { for (const m of t.matchAll(/(?<=\S\s|\()([A-Z])(?=\b(?!\.\w))/g)) letters.add(m[1]); }));
+  return [...letters].sort();
+}
+const LETTERS = entityLetters();
+const COLOUR = Object.fromEntries(LETTERS.map((letter, i) => [letter, "hsl(" + HUES[i % HUES.length] + " 58% 46%)"]));
+const TOKEN = new RegExp([
+  "(\\{[^}]*\\})",                                                     // JSON
+  "(\"[^\"]*\")",                                                       // quoted text
+  "((?:[\\w.-]+)?/[\\w./{}:-]*[\\w}](?:::[\\w]+)?)",                    // paths, URLs, files, tests
+  "\\b(GET|POST|PUT|PATCH|DELETE|UPDATE|INSERT)\\b",                    // HTTP and SQL verbs
+  "\\b(\\w+_\\w+)\\b",                                                  // identifiers
+  "\\b(\\d+(?:ms|s)?)\\b",                                              // numbers
+  "(?<![\\w'])(" + (LETTERS.join("|") || "\\u0000") + ")(?=\\b|'s)",   // example letters
+].join("|"), "g");
+function rich(text, atStart) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  for (const m of text.matchAll(TOKEN)) {
+    const [whole, , , , , , num, letter] = m;
+    if (letter && m.index === 0 && ARTICLE_START.has(letter) && atStart) continue;
+    frag.append(text.slice(last, m.index));
+    if (letter) { const b = el("span", "ent", letter); b.style.setProperty("--ent", COLOUR[letter]); frag.append(b); }
+    else frag.append(el("code", "lit" + (num ? " num" : ""), whole));
+    last = m.index + whole.length;
+  }
+  frag.append(text.slice(last));
+  return frag;
+}
+function stepItem(text) {
+  // "... parameterized over X, Y and Z" keeps its words, with the options set as chips.
+  const li = el("li"), m = /^(.*\bparameterized over )(.+)$/.exec(text);
+  if (!m) { li.append(rich(text, true)); return li; }
+  li.append(rich(m[1], true));
+  const chips = el("span", "variants");
+  m[2].split(/,\s*|\s+and\s+/).filter(Boolean).forEach(o => { const c = el("span"); c.append(rich(o)); chips.append(c); });
+  li.append(chips);
+  li.title = text;
+  return li;
+}
+function sections(s) {
+  const out = { Given: [], When: [], Then: [] };
+  let current = "Given";
+  s.steps.forEach(([k, t]) => { if (k !== "And") current = k; out[current].push(t); });
+  return out;
+}
+function arrow() {
+  const a = el("div", "arrow");
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h16M13 6l6 6-6 6"/></svg>';
+  return a;
+}
+function gherkinText(s) {
+  const pre = el("pre", "gherkin");
+  const lines = [["Scenario:", " " + s.name], ...s.steps.map(([k, t]) => [k, " " + t])];
+  lines.forEach(([k, t], i) => { if (i) pre.append("\n  "); pre.append(el("span", "kw", k), t); });
+  return pre;
+}
+function panelOf(section, steps) {
+  const p = el("div", "panelg " + section.toLowerCase() + (steps.length ? "" : " empty"));
+  p.append(el("div", "k", section));
+  const ul = el("ul");
+  steps.forEach(step => ul.append(stepItem(step)));
+  if (!steps.length) ul.append(el("li", "muted", "—"));
+  p.append(ul);
+  return p;
+}
+function card(s, id) {
+  const c = el("article", "scene");
+  c.id = id;
+  const head = el("div", "scene-head"), title = el("h3");
+  title.append(rich(s.name));
+  head.append(el("span", "n", "#" + s.number), title);
+  c.append(head);
+  if (!s.steps.length) return c;
+  const strip = el("div", "strip"), parts = sections(s);
+  ["Given", "When", "Then"].forEach((k, i) => { if (i) strip.append(arrow()); strip.append(panelOf(k, parts[k])); });
+  c.append(strip, gherkinText(s));
+  return c;
+}
+function lcs(a, b) {
+  const t = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = a.length - 1; i >= 0; i--) for (let j = b.length - 1; j >= 0; j--) t[i][j] = a[i] === b[j] ? t[i + 1][j + 1] + 1 : Math.max(t[i + 1][j], t[i][j + 1]);
+  const out = [];
+  for (let i = 0, j = 0; i < a.length && j < b.length;) { if (a[i] === b[j]) { out.push(a[i]); i++; j++; } else if (t[i + 1][j] >= t[i][j + 1]) i++; else j++; }
+  return out;
+}
+function commonWords(texts) { return texts.slice(1).reduce((c, t) => lcs(c, t.split(/\s+/)), texts[0].split(/\s+/)); }
+function marked(text, common) {
+  // `text` with the words not in `common` (in order) underlined.
+  const frag = document.createDocumentFragment();
+  let k = 0;
+  text.split(/\s+/).forEach((w, i) => {
+    if (i) frag.append(" ");
+    if (k < common.length && w === common[k]) { frag.append(rich(w)); k++; } else { const ins = el("ins"); ins.append(rich(w)); frag.append(ins); }
+  });
+  return frag;
+}
+function trunkText(texts) {
+  // The shared step once, with "…" where the members' wording differs.
+  const common = commonWords(texts), frag = document.createDocumentFragment();
+  let k = 0, gap = false;
+  texts[0].split(/\s+/).forEach(w => {
+    if (k < common.length && w === common[k]) { if (frag.childNodes.length) frag.append(" "); frag.append(rich(w)); k++; gap = false; }
+    else if (!gap) { if (frag.childNodes.length) frag.append(" "); frag.append(el("span", "gap", "…")); gap = true; }
+  });
+  return { frag, common, varies: texts.some(t => t !== texts[0]) };
+}
+function blockView(block, index) {
+  const box = el("section", "block");
+  box.id = "block-" + index;
+  const members = block.scenarios.map((n, k) => ({ s: DATA.scenarios[n - 1], anchor: block.steps[k], parts: sections(DATA.scenarios[n - 1]) }));
+  const head = el("div", "block-head");
+  head.append(el("span", "count", members.length + " scenarios"), el("span", "muted", members.map(m => "#" + m.s.number).join(" · ") + " share this " + block.section + " step"));
+  const trunk = el("div", "trunk " + block.section), text = el("div", "text"), t = trunkText(members.map(m => m.anchor));
+  text.append(t.frag);
+  trunk.append(el("span", "k", block.section), text);
+  box.append(head, trunk);
+  // Steps every member has word for word, beyond the shared one, are shown once.
+  const own = (m, section) => m.parts[section].filter(step => !(section === block.section && step === m.anchor));
+  const shared = Object.fromEntries(["Given", "When", "Then"].map(section => [section, own(members[0], section).filter(step => members.every(m => own(m, section).includes(step)))]));
+  if (Object.values(shared).some(steps => steps.length)) {
+    const also = el("div", "also"), ul = el("ul");
+    also.append(el("span", "k", "Every one also has"));
+    Object.entries(shared).forEach(([section, steps]) => steps.forEach(step => { const li = el("li"); li.append(el("b", null, section + " "), rich(step)); ul.append(li); }));
+    also.append(ul);
+    box.append(also);
+  }
+  const branches = el("div", "branches");
+  members.forEach(m => {
+    const row = el("div", "branch");
+    row.id = "a-" + m.s.number;
+    const who = el("div", "who"), name = el("b");
+    name.append(rich(m.s.name));
+    who.append(el("span", "n", "#" + m.s.number), name);
+    if (t.varies) { const v = el("div", "variant"); v.append(block.section + ": ", marked(m.anchor, t.common)); who.append(v); }
+    row.append(who);
+    // Each branch keeps its own steps in Given, When, Then order; the shared step is the trunk above.
+    const panels = ["Given", "When", "Then"].map(section => [section, own(m, section).filter(step => !shared[section].includes(step))])
+      .filter(([section, steps]) => steps.length || section !== block.section);
+    row.style.gridTemplateColumns = "minmax(180px, .7fr) " + panels.map(() => "minmax(0, 1fr)").join(" 26px ");
+    panels.forEach(([section, steps], k) => { if (k) row.append(arrow()); row.append(panelOf(section, steps)); });
+    branches.append(row);
+  });
+  box.append(branches);
+  return box;
+}
+function goTo(number) {
+  const view = document.getElementById("scen").dataset.view;
+  const target = document.getElementById((view === "abstract" ? "a-" : "s-") + number);
+  if (!target) return;
+  const box = target.closest(".block, .scene");
+  if (box) box.classList.add("seen");
+  target.scrollIntoView({ block: "center" });
+  target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash");
+}
+function setView(view) {
+  document.getElementById("scen").dataset.view = view;
+  document.getElementById("board").dataset.view = view;
+  document.querySelectorAll(".views button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  try { localStorage.setItem("document-page-scenario-view", view); } catch (error) { /* a remembered view is optional */ }
+}
+function renderScenarios(part) {
+  part.replaceChildren();
+  const toolbar = el("div", "toolbar"), views = el("div", "views");
+  [["abstract", "Abstracted · " + DATA.blocks.length + " blocks"], ["story", "Storyboard · " + DATA.scenarios.length], ["gherkin", "Gherkin"]].forEach(([v, label]) => {
+    const b = el("button", null, label); b.type = "button"; b.dataset.view = v;
+    b.addEventListener("click", () => setView(v));
+    views.append(b);
+  });
+  toolbar.append(views);
+  const layout = el("div", "scen-layout"), index = el("nav", "index"), board = el("div", "board"), blocksEl = el("div", "blocks"), holder = el("div");
+  holder.id = "scen";
+  board.id = "board";
+  DATA.blocks.forEach((b, i) => blocksEl.append(b.section ? blockView(b, i) : card(DATA.scenarios[b.scenarios[0] - 1], "a-" + b.scenarios[0])));
+  index.setAttribute("aria-label", "Scenario index");
+  const ol = el("ol");
+  DATA.scenarios.forEach(s => {
+    const li = el("li"), a = el("a");
+    a.href = "#s-" + s.number;
+    a.addEventListener("click", event => { event.preventDefault(); goTo(s.number); });
+    a.append(el("span", "n", "#" + s.number), el("span", null, s.name));
+    li.append(a); ol.append(li);
+    board.append(card(s, "s-" + s.number));
+  });
+  index.append(ol);
+  holder.append(blocksEl, board);
+  layout.append(index, holder);
+  part.append(toolbar, layout);
+  let saved = null;
+  try { saved = localStorage.getItem("document-page-scenario-view"); } catch (error) { /* a remembered view is optional */ }
+  setView(["abstract", "story", "gherkin"].includes(saved) ? saved : "abstract");
+  const links = [...ol.querySelectorAll("a")];
+  if (!("IntersectionObserver" in window)) { holder.querySelectorAll(".scene, .block").forEach(c => c.classList.add("seen")); return; }
+  const seen = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("seen"); seen.unobserve(entry.target); } }), { rootMargin: "0px 0px -8% 0px" });
+  const spy = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#s-" + entry.target.id.replace(/^[as]-/, "")));
+  }), { rootMargin: "-30% 0px -60% 0px" });
+  holder.querySelectorAll(".scene, .block").forEach(c => seen.observe(c));
+  holder.querySelectorAll(".board .scene, .blocks .branch, .blocks > .scene").forEach(c => spy.observe(c));
+}
+
+/* ---------- Sections: reveal on scroll and light up their link ---------- */
+function watchSections() {
+  const parts = [...document.querySelectorAll("section.part")], links = [...document.querySelectorAll("nav.sections a")];
+  if (!("IntersectionObserver" in window)) { parts.forEach(p => p.classList.add("seen")); return; }
+  const reveal = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("seen"); reveal.unobserve(entry.target); } }), { rootMargin: "0px 0px -5% 0px" });
+  const spy = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + entry.target.id));
+  }), { rootMargin: "-35% 0px -60% 0px" });
+  parts.forEach(p => { reveal.observe(p); spy.observe(p); });
+}
+
+document.querySelectorAll('[data-component="c4"]').forEach(part => { if (DATA.c4) renderArchitecture(part); });
+document.querySelectorAll('[data-component="scenarios"]').forEach(part => { if (DATA.scenarios.length) renderScenarios(part); });
+watchSections();
+</script>
+</body>
+</html>
+
