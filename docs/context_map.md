@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 889c68c79df45402bd1071373d1ccd5a711addba
+generated_from: 57aad7c115b30d41b0de2d7006bcd3480f2c700e
 ---
 
 # Context Map: hello
@@ -42,6 +42,7 @@ generated_from: 889c68c79df45402bd1071373d1ccd5a711addba
 | Character count in word-count output (SPEC-0002) | docs/specs/SPEC-0002.md | spec |
 | Line count in word-count output (SPEC-0003) | docs/specs/SPEC-0003.md | spec |
 | Standard input through an explicit '-' argument (SPEC-0004) | docs/specs/SPEC-0004.md | spec |
+| Longest-line word count in word-count output (SPEC-0006) | docs/specs/SPEC-0006.md | spec |
 | Standard-library-only runtime (ADR-0001) | docs/adrs/ADR-0001.md | ADR |
 | Pure word counter separated from command I/O (ADR-0002) | docs/adrs/ADR-0002.md | ADR |
 | Minimal Quality Gate toolchain: ruff, mypy, pytest (ADR-0003) | docs/adrs/ADR-0003.md | ADR |
