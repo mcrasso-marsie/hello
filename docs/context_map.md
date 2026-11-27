@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: b418bbac6fecf9b355844cd15eaaf5ebc6c28587
+generated_from: 889c68c79df45402bd1071373d1ccd5a711addba
 ---
 
 # Context Map: hello
@@ -22,10 +22,11 @@ generated_from: b418bbac6fecf9b355844cd15eaaf5ebc6c28587
 |------|------|----------|------------|
 | hello (hello) | system | docs/architecture.md#8-system-decomposition |  |
 | hello command-line package (hello-cli) | container | docs/architecture.md#8-system-decomposition |  |
-| Word-count command (word-count-command) | component | docs/architecture.md#8-system-decomposition | Word counter, Character counter, Line counter |
+| Word-count command (word-count-command) | component | docs/architecture.md#8-system-decomposition | Word counter, Character counter, Line counter, Longest-line counter |
 | Word counter (word-counter) | component | docs/architecture.md#8-system-decomposition |  |
 | Character counter (character-counter) | component | docs/architecture.md#8-system-decomposition |  |
 | Line counter (line-counter) | component | docs/architecture.md#8-system-decomposition |  |
+| Longest-line counter (longest-line-counter) | component | docs/architecture.md#8-system-decomposition | Word counter, Line counter |
 
 ## Glossary
 
