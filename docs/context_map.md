@@ -3,7 +3,7 @@ artifact_type: context map
 id: CTXMAP-hello
 scope: project
 status: Generated
-generated_from: 82941ccf11248e9ab2d47892042922752309f7cc
+generated_from: 47e32355e99e78e433dcc0e102ce5618ff797d40
 ---
 
 # Context Map: hello
@@ -49,6 +49,8 @@ generated_from: 82941ccf11248e9ab2d47892042922752309f7cc
 | Explicit line-terminator rule in a pure line counter (ADR-0007) | docs/adrs/ADR-0007.md | ADR |
 | Three-field labeled success output for wordcount (supersedes ADR-0006) (ADR-0008) | docs/adrs/ADR-0008.md | ADR |
 | Explicit '-' stdin marker sharing the file decode path (ADR-0009) | docs/adrs/ADR-0009.md | ADR |
+| Four-field labeled success output for wordcount (ADR-0012) | docs/adrs/ADR-0012.md | ADR |
+| Longest-line measure reuses the word rule and terminator set in a pure counter (ADR-0013) | docs/adrs/ADR-0013.md | ADR |
 | Architecture (ARCH-0001) | docs/architecture.md | architecture |
 
 ## Validation Checklist
